@@ -2167,6 +2167,8 @@
 
   <java-symbol type="bool" name="config_enable_mms_with_mobile_data_off" />
 
+  <java-symbol type="bool" name="config_wifiApFirmwareReload" />
+
   <!-- Gesture Sensor -->
   <java-symbol type="bool" name="config_enableGestureService" />
 </resources>
