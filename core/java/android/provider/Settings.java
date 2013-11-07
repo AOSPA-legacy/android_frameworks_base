@@ -2765,6 +2765,13 @@ public final class Settings {
          */
         public static final String POINTER_SPEED = "pointer_speed";
 
+         /**
+         * Network activity arrows
+         *
+         * @hide
+         */
+        public static final String NETWORK_ACTIVITY_ARROWS = "network_activity_arrows";
+
         /**
          * I am the lolrus.
          * <p>
