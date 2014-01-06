@@ -380,6 +380,14 @@ android_media_MediaRecorder_start(JNIEnv *env, jobject thiz)
 }
 
 static void
+android_media_MediaRecorder_pause(JNIEnv *env, jobject thiz)
+{
+    ALOGV("pause");
+    sp<MediaRecorder> mr = getMediaRecorder(env, thiz);
+    process_media_recorder_call(env, mr->pause(), "java/lang/RuntimeException", "pause failed.");
+}
+
+static void
 android_media_MediaRecorder_stop(JNIEnv *env, jobject thiz)
 {
     ALOGV("stop");
@@ -500,6 +508,7 @@ static JNINativeMethod gMethods[] = {
     {"getSurface",           "()Landroid/view/Surface;",        (void *)android_media_MediaRecorder_getSurface},
     {"getMaxAmplitude",      "()I",                             (void *)android_media_MediaRecorder_native_getMaxAmplitude},
     {"start",                "()V",                             (void *)android_media_MediaRecorder_start},
+    {"pause",                "()V",                             (void *)android_media_MediaRecorder_pause},
     {"stop",                 "()V",                             (void *)android_media_MediaRecorder_stop},
     {"native_reset",         "()V",                             (void *)android_media_MediaRecorder_native_reset},
     {"release",              "()V",                             (void *)android_media_MediaRecorder_release},
