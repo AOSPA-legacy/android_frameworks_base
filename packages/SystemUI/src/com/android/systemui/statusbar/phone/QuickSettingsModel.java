@@ -107,6 +107,9 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
     static class BrightnessState extends State {
         boolean autoBrightness;
     }
+    static class BatterySaverState extends State {
+        boolean isEnabled;
+    }
     public static class BluetoothState extends State {
         boolean connected = false;
         String stateContentDescription;
@@ -377,6 +380,26 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
         }
     }
 
+    /** ContentObserver to watch batterysaver **/
+    private class BatterySaverObserver extends ContentObserver {
+        public BatterySaverObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            onBatterySaverChanged();
+        }
+
+        public void startObserving() {
+            final ContentResolver cr = mContext.getContentResolver();
+            cr.unregisterContentObserver(this);
+            cr.registerContentObserver(
+                    Settings.Global.getUriFor(Settings.Global.BATTERY_SAVER_OPTION),
+                    false, this);
+        }
+    }
+
     /** Callback for changes to remote display routes. */
     private class RemoteDisplayRouteCallback extends MediaRouter.SimpleCallback {
         @Override
@@ -421,6 +444,7 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
     private final NetworkObserver mMobileNetworkObserver;
     private final SleepTimeObserver mSleepTimeObserver;
     private final ImmersiveObserver mImmersiveObserver;
+    private final BatterySaverObserver mBatterySaverObserver;
     private final RingerObserver mRingerObserver;
     private boolean mUsbTethered = false;
     private boolean mUsbConnected = false;
@@ -506,6 +530,10 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
     private RefreshCallback mBrightnessCallback;
     private BrightnessState mBrightnessState = new BrightnessState();
 
+    private QuickSettingsTileView mBatterySaverTile;
+    private RefreshCallback mBatterySaverCallback;
+    private BatterySaverState mBatterySaverState = new BatterySaverState();
+
     private QuickSettingsTileView mBugreportTile;
     private RefreshCallback mBugreportCallback;
     private State mBugreportState = new State();
@@ -554,6 +582,7 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
                 mBrightnessObserver.startObserving();
                 mSleepTimeObserver.startObserving();
                 mImmersiveObserver.startObserving();
+                mBatterySaverObserver.startObserving();
                 mRingerObserver.startObserving();
                 refreshRotationLockTile();
                 onBrightnessLevelChanged();
@@ -576,6 +605,8 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
         mSleepTimeObserver.startObserving();
         mImmersiveObserver = new ImmersiveObserver(mHandler);
         mImmersiveObserver.startObserving();
+        mBatterySaverObserver = new BatterySaverObserver(mHandler);
+        mBatterySaverObserver.startObserving();
         mRingerObserver = new RingerObserver(mHandler);
         mRingerObserver.startObserving();
 
@@ -633,6 +664,7 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
         refreshBatteryTile();
         refreshBluetoothTile();
         refreshBrightnessTile();
+        onBatterySaverChanged();
         refreshRotationLockTile();
         refreshRssiTile();
         refreshLocationTile();
@@ -1686,6 +1718,26 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
         mWifiApTile = view;
         mWifiApCallback = cb;
         onWifiApChanged();
+
+    // battery saver
+    void addBatterySaverTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mBatterySaverTile = view;
+        mBatterySaverCallback = cb;
+        onBatterySaverChanged();
+    }
+
+    private void onBatterySaverChanged() {
+        Resources r = mContext.getResources();
+        int mode = Settings.Global.getInt(mContext.getContentResolver(),
+                       Settings.Global.BATTERY_SAVER_OPTION, 0);
+        mBatterySaverState.isEnabled = (mode == 1);
+        mBatterySaverState.iconId = mBatterySaverState.isEnabled
+                ? R.drawable.ic_qs_battery_saver_on
+                : R.drawable.ic_qs_battery_saver_off;
+        mBatterySaverState.label = mBatterySaverState.isEnabled
+                ? r.getString(R.string.quick_settings_battery_saver_label)
+                : r.getString(R.string.quick_settings_battery_saver_off_label);
+        mBatterySaverCallback.refreshView(mBatterySaverTile, mBatterySaverState);
     }
 
     void onWifiApChanged() {
