@@ -6424,6 +6424,13 @@ public final class Settings {
         public static final String CAPTIVE_PORTAL_SERVER = "captive_portal_server";
 
         /**
+         * smart phone caller
+         *
+         * @hide
+         */
+        public static final String SMART_PHONE_CALLER = "smart_phone_caller";
+         
+        /**
          * Whether network service discovery is enabled.
          *
          * @hide
