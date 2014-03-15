@@ -2076,6 +2076,12 @@ public final class Settings {
         public static final String ENABLE_REVERSE_LOOKUP = "enable_reverse_lookup";
 
         /**
+         * Option to place call to current # in Dialer & Mms
+         * @hide
+         */
+        public static final String SMART_PHONE_CALLER = "smart_phone_caller";
+
+        /**
          * The forward lookup provider
          *
          * @hide
