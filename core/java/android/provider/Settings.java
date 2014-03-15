@@ -3151,6 +3151,12 @@ public final class Settings {
          */
         public static final String INCOMING_CALL_STYLE = "incoming_call_style";
 
+        /**
+         *
+         * @hide
+         */
+        public static final String SMART_PHONE_CALLER = "smart_phone_caller";
+
         /** @hide */
         public static final int INCOMING_CALL_STYLE_CLASSIC = 0;
         /** @hide */
