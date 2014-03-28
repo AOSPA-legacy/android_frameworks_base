@@ -652,6 +652,13 @@ class WallpaperManagerService extends IWallpaperManager.Stub {
 
     public void setDimensionHints(int width, int height) throws RemoteException {
         checkPermission(android.Manifest.permission.SET_WALLPAPER_HINTS);
+
+        int maxWidth = mContext.getResources().getInteger(
+                com.android.internal.R.integer.config_wallpaperMaxWidth);
+        if (maxWidth != -1 && width > maxWidth) {
+            width = maxWidth;
+        }
+
         synchronized (mLock) {
             int userId = UserHandle.getCallingUserId();
             WallpaperData wallpaper = mWallpaperMap.get(userId);
