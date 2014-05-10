@@ -807,7 +807,7 @@ public class SignalStrength implements Parcelable {
         if (mLteRsrp > -44) rsrpIconLevel = -1;
         else if (mLteRsrp >= -96) rsrpIconLevel = SIGNAL_STRENGTH_GREAT;
         else if (mLteRsrp >= -107) rsrpIconLevel = SIGNAL_STRENGTH_GOOD;
-        else if (mLteRsrp >= -114) rsrpIconLevel = SIGNAL_STRENGTH_MODERATE;
+        else if (mLteRsrp >= -117) rsrpIconLevel = SIGNAL_STRENGTH_MODERATE;
         else if (mLteRsrp >= -121) rsrpIconLevel = SIGNAL_STRENGTH_POOR;
         else if (mLteRsrp >= -140) rsrpIconLevel = SIGNAL_STRENGTH_NONE_OR_UNKNOWN;
 
@@ -819,9 +819,9 @@ public class SignalStrength implements Parcelable {
          */
         if (mLteRssnr > 300) snrIconLevel = -1;
         else if (mLteRssnr >= 130) snrIconLevel = SIGNAL_STRENGTH_GREAT;
-        else if (mLteRssnr >= 45) snrIconLevel = SIGNAL_STRENGTH_GOOD;
-        else if (mLteRssnr >= 10) snrIconLevel = SIGNAL_STRENGTH_MODERATE;
-        else if (mLteRssnr >= -30) snrIconLevel = SIGNAL_STRENGTH_POOR;
+        else if (mLteRssnr >= 50) snrIconLevel = SIGNAL_STRENGTH_GOOD;
+        else if (mLteRssnr >= 15) snrIconLevel = SIGNAL_STRENGTH_MODERATE;
+        else if (mLteRssnr >= -20) snrIconLevel = SIGNAL_STRENGTH_POOR;
         else if (mLteRssnr >= -200)
             snrIconLevel = SIGNAL_STRENGTH_NONE_OR_UNKNOWN;
 
