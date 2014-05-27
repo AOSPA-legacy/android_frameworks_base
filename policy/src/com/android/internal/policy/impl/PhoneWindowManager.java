@@ -182,6 +182,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_VOICE_SEARCH = 4;
     private static final int KEY_ACTION_IN_APP_SEARCH = 5;
     private static final int KEY_ACTION_LAUNCH_CAMERA = 6;
+    private static final int KEY_ACTION_HOME = 7;
+    private static final int KEY_ACTION_BACK = 8;
 
     // Masks for checking presence of hardware keys.
     // Must match values in core/res/res/values/config.xml
@@ -495,7 +497,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     // Tracks user-customisable behavior for certain key events
     private int mLongPressOnHomeBehavior = -1;
+    private int mPressOnHomeBehavior = -1;
     private int mPressOnMenuBehavior = -1;
+    private int mPressOnBackBehavior = -1;
     private int mLongPressOnMenuBehavior = -1;
     private int mPressOnAssistBehavior = -1;
     private int mLongPressOnAssistBehavior = -1;
@@ -1080,8 +1084,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         switch (behavior) {
             case KEY_ACTION_NOTHING:
                 break;
+            case KEY_ACTION_HOME:
+                launchHomeFromHotKey();
+                break;
             case KEY_ACTION_MENU:
                 triggerVirtualKeypress(KeyEvent.KEYCODE_MENU);
+                break;
+            case KEY_ACTION_BACK:
+                triggerVirtualKeypress(KeyEvent.KEYCODE_BACK);
                 break;
             case KEY_ACTION_APP_SWITCH:
                 toggleRecentApps();
@@ -1348,7 +1358,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final ContentResolver resolver = mContext.getContentResolver();
 
         // Initialize all assignments to sane defaults.
+        mPressOnHomeBehavior = KEY_ACTION_HOME;
         mPressOnMenuBehavior = KEY_ACTION_MENU;
+        mPressOnBackBehavior = KEY_ACTION_BACK;
+
         if (!hasMenu || hasAssist) {
             mLongPressOnMenuBehavior = KEY_ACTION_NOTHING;
         } else {
@@ -1417,6 +1430,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     || mLongPressOnAppSwitchBehavior == KEY_ACTION_MENU;
         }
     }
+
+        if (mDevForceNavbar){
+            mPressOnHomeBehavior = KEY_ACTION_NOTHING;
+            mLongPressOnHomeBehavior = KEY_ACTION_NOTHING;
+            mDoubleTapOnHomeBehavior = KEY_ACTION_NOTHING;;
+            mPressOnMenuBehavior = KEY_ACTION_NOTHING;
+            mLongPressOnMenuBehavior = KEY_ACTION_NOTHING;
+            mPressOnBackBehavior = KEY_ACTION_NOTHING;
+        }
 
     @Override
     public void setInitialDisplaySize(Display display, int width, int height, int density) {
@@ -4621,7 +4643,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
 
         if (down && (policyFlags & WindowManagerPolicy.FLAG_VIRTUAL) != 0
-                && event.getRepeatCount() == 0) {
+                && event.getRepeatCount() == 0 && !mDevForceNavbar) {
             performHapticFeedbackLw(null, HapticFeedbackConstants.VIRTUAL_KEY, false);
         }
 
