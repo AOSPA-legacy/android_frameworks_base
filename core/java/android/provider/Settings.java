@@ -2812,9 +2812,26 @@ public final class Settings {
          * 4 - Voice search
          * 5 - In-app search
          * 6 - Launch Camera
+         * 7 - Home
+         * 8 - Back
          * @hide
          */
         public static final String KEY_HOME_LONG_PRESS_ACTION = "key_home_long_press_action";
+
+        /**
+         * Action to perform when the back key is pressed. (Default is 8)
+         * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+         * @hide
+         */
+        public static final String KEY_BACK_ACTION = "key_back_action";
+
+        /**
+         * Action to perform when the home key is pressed. (Default is 7)
+         * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+         * @hide
+         */
+        public static final String KEY_HOME_ACTION = "key_home_action";
+
 
         /**
          * Action to perform when the home key is double-tapped.
