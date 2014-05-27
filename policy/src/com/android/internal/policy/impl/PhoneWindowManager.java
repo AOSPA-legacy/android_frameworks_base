@@ -184,6 +184,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_VOICE_SEARCH = 4;
     private static final int KEY_ACTION_IN_APP_SEARCH = 5;
     private static final int KEY_ACTION_LAUNCH_CAMERA = 6;
+    private static final int KEY_ACTION_HOME = 7;
+    private static final int KEY_ACTION_BACK = 8;
 
     // Masks for checking presence of hardware keys.
     // Must match values in core/res/res/values/config.xml
@@ -494,7 +496,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     // Tracks user-customisable behavior for certain key events
     private int mLongPressOnHomeBehavior = -1;
+    private int mPressOnHomeBehavior = -1;
     private int mPressOnMenuBehavior = -1;
+    private int mPressOnBackBehavior = -1;
     private int mLongPressOnMenuBehavior = -1;
     private int mPressOnAssistBehavior = -1;
     private int mLongPressOnAssistBehavior = -1;
@@ -706,6 +710,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.KEY_MENU_LONG_PRESS_ACTION), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.KEY_BACK_ACTION), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.KEY_ASSIST_ACTION), false, this,
@@ -1089,8 +1096,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         switch (behavior) {
             case KEY_ACTION_NOTHING:
                 break;
+            case KEY_ACTION_HOME:
+                launchHomeFromHotKey();
+                break;
             case KEY_ACTION_MENU:
                 triggerVirtualKeypress(KeyEvent.KEYCODE_MENU);
+                break;
+            case KEY_ACTION_BACK:
+                triggerVirtualKeypress(KeyEvent.KEYCODE_BACK);
                 break;
             case KEY_ACTION_APP_SWITCH:
                 toggleRecentApps();
@@ -1365,12 +1378,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
         final boolean hasMenu = (activeHardwareKeys & KEY_MASK_MENU) != 0;
         final boolean hasHome = (activeHardwareKeys & KEY_MASK_HOME) != 0;
+        final boolean hasBack = (activeHardwareKeys & KEY_MASK_BACK) != 0;
         final boolean hasAssist = (activeHardwareKeys & KEY_MASK_ASSIST) != 0;
         final boolean hasAppSwitch = (activeHardwareKeys & KEY_MASK_APP_SWITCH) != 0;
         final ContentResolver resolver = mContext.getContentResolver();
 
         // Initialize all assignments to sane defaults.
+        mPressOnHomeBehavior = KEY_ACTION_HOME;
         mPressOnMenuBehavior = KEY_ACTION_MENU;
+        mPressOnBackBehavior = KEY_ACTION_BACK;
 
         mLongPressOnMenuBehavior = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_longPressOnMenuBehavior);
@@ -1402,6 +1418,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         // Check for custom assignments and whether KEY_ACTION_MENU is assigned.
 
         if (hasHome) {
+            mPressOnHomeBehavior = Settings.System.getIntForUser(resolver,
+                    Settings.System.KEY_HOME_ACTION,
+                    mPressOnHomeBehavior, UserHandle.USER_CURRENT);
             mLongPressOnHomeBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.KEY_HOME_LONG_PRESS_ACTION,
                     mLongPressOnHomeBehavior, UserHandle.USER_CURRENT);
@@ -1421,6 +1440,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mHasMenuKeyEnabled |= mPressOnMenuBehavior == KEY_ACTION_MENU
                     || mLongPressOnMenuBehavior == KEY_ACTION_MENU;
         }
+        if (hasBack) {
+            mPressOnBackBehavior = Settings.System.getIntForUser(resolver,
+                    Settings.System.KEY_BACK_ACTION,
+                    mPressOnBackBehavior, UserHandle.USER_CURRENT);
+            }
         if (hasAssist) {
             mPressOnAssistBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.KEY_ASSIST_ACTION,
@@ -1440,6 +1464,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     mLongPressOnAppSwitchBehavior, UserHandle.USER_CURRENT);
             mHasMenuKeyEnabled |= mPressOnAppSwitchBehavior == KEY_ACTION_MENU
                     || mLongPressOnAppSwitchBehavior == KEY_ACTION_MENU;
+        }
+
+        if (mDevForceNavbar) {
+            mPressOnHomeBehavior = KEY_ACTION_NOTHING;
+            mLongPressOnHomeBehavior = KEY_ACTION_NOTHING;
+            mDoubleTapOnHomeBehavior = KEY_ACTION_NOTHING;;
+            mPressOnMenuBehavior = KEY_ACTION_NOTHING;
+            mLongPressOnMenuBehavior = KEY_ACTION_NOTHING;
+            mPressOnBackBehavior = KEY_ACTION_NOTHING;
+            //mLongPressOnBackBehavior = KEY_ACTION_NOTHING;
+            mPressOnAppSwitchBehavior = KEY_ACTION_NOTHING;
+            mLongPressOnAppSwitchBehavior = KEY_ACTION_NOTHING;
+            mPressOnAssistBehavior = KEY_ACTION_NOTHING;
+            mLongPressOnAssistBehavior = KEY_ACTION_NOTHING;
         }
     }
 
@@ -4662,7 +4700,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
 
         if (down && (policyFlags & WindowManagerPolicy.FLAG_VIRTUAL) != 0
-                && event.getRepeatCount() == 0) {
+                && event.getRepeatCount() == 0 && !mDevForceNavbar) {
             performHapticFeedbackLw(null, HapticFeedbackConstants.VIRTUAL_KEY, false);
         }
 
