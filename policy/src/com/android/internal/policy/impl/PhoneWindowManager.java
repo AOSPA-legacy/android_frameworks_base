@@ -1376,7 +1376,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mHasMenuKeyEnabled = false;
         // Check for custom assignments and whether KEY_ACTION_MENU is assigned.
 
-        if (hasHome) {
+        if (hasHome && !mDevForceNavbar) {
             mLongPressOnHomeBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.KEY_HOME_LONG_PRESS_ACTION,
                     mLongPressOnHomeBehavior, UserHandle.USER_CURRENT);
@@ -1386,7 +1386,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mHasMenuKeyEnabled = mLongPressOnHomeBehavior == KEY_ACTION_MENU
                     || mDoubleTapOnHomeBehavior == KEY_ACTION_MENU;
         }
-        if (hasMenu) {
+        if (hasMenu && !mDevForceNavbar) {
             mPressOnMenuBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.KEY_MENU_ACTION,
                     mPressOnMenuBehavior, UserHandle.USER_CURRENT);
@@ -1396,7 +1396,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mHasMenuKeyEnabled |= mPressOnMenuBehavior == KEY_ACTION_MENU
                     || mLongPressOnMenuBehavior == KEY_ACTION_MENU;
         }
-        if (hasAssist) {
+        if (hasAssist && !mDevForceNavbar) {
             mPressOnAssistBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.KEY_ASSIST_ACTION,
                     mPressOnAssistBehavior, UserHandle.USER_CURRENT);
@@ -1406,7 +1406,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mHasMenuKeyEnabled |= mPressOnAssistBehavior == KEY_ACTION_MENU
                     || mLongPressOnAssistBehavior == KEY_ACTION_MENU;
         }
-        if (hasAppSwitch) {
+        if (hasAppSwitch && !mDevForceNavbars) {
             mPressOnAppSwitchBehavior = Settings.System.getIntForUser(resolver,
                     Settings.System.KEY_APP_SWITCH_ACTION,
                     mPressOnAppSwitchBehavior, UserHandle.USER_CURRENT);
@@ -4621,7 +4621,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
 
         if (down && (policyFlags & WindowManagerPolicy.FLAG_VIRTUAL) != 0
-                && event.getRepeatCount() == 0) {
+                && event.getRepeatCount() == 0 && !mDevForceNavbar) {
             performHapticFeedbackLw(null, HapticFeedbackConstants.VIRTUAL_KEY, false);
         }
 
