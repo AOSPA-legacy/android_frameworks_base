@@ -2881,6 +2881,12 @@ public final class Settings {
         public static final String VOLUME_WAKE_SCREEN = "volume_wake_screen";
 
         /**
+         * volume rocker music track control enable/disable
+         * @hide
+         */
+        public static final String VOLUME_MUSIC_CONTROL = "volume_music_control";
+
+        /**
          * Volume keys control cursor in text fields (default is 0)
          * 0 - Disabled
          * 1 - Volume up/down moves cursor left/right
