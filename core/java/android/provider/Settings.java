@@ -2875,10 +2875,10 @@ public final class Settings {
         public static final String LOCKSCREEN_SEE_THROUGH = "lockscreen_see_through";
 
         /**
-         * Whether to wake the screen with the volume keys, the value is boolean.
+         * volume rocker music track control enable/disable
          * @hide
          */
-        public static final String VOLUME_WAKE_SCREEN = "volume_wake_screen";
+        public static final String VOLUME_MUSIC_CONTROL = "volume_music_control";
 
         /**
          * Volume keys control cursor in text fields (default is 0)
