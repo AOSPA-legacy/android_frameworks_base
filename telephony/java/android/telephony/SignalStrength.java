@@ -808,10 +808,10 @@ public class SignalStrength implements Parcelable {
         int rssiIconLevel = SIGNAL_STRENGTH_NONE_OR_UNKNOWN, rsrpIconLevel = -1, snrIconLevel = -1;
 
         if (mLteRsrp > -44) rsrpIconLevel = -1;
-        else if (mLteRsrp >= -85) rsrpIconLevel = SIGNAL_STRENGTH_GREAT;
-        else if (mLteRsrp >= -95) rsrpIconLevel = SIGNAL_STRENGTH_GOOD;
-        else if (mLteRsrp >= -105) rsrpIconLevel = SIGNAL_STRENGTH_MODERATE;
-        else if (mLteRsrp >= -115) rsrpIconLevel = SIGNAL_STRENGTH_POOR;
+        else if (mLteRsrp >= -96) rsrpIconLevel = SIGNAL_STRENGTH_GREAT;
+        else if (mLteRsrp >= -107) rsrpIconLevel = SIGNAL_STRENGTH_GOOD;
+        else if (mLteRsrp >= -115) rsrpIconLevel = SIGNAL_STRENGTH_MODERATE;
+        else if (mLteRsrp >= -121) rsrpIconLevel = SIGNAL_STRENGTH_POOR;
         else if (mLteRsrp >= -140) rsrpIconLevel = SIGNAL_STRENGTH_NONE_OR_UNKNOWN;
 
         /*
@@ -821,10 +821,10 @@ public class SignalStrength implements Parcelable {
          * Icon Only
          */
         if (mLteRssnr > 300) snrIconLevel = -1;
-        else if (mLteRssnr >= 130) snrIconLevel = SIGNAL_STRENGTH_GREAT;
-        else if (mLteRssnr >= 45) snrIconLevel = SIGNAL_STRENGTH_GOOD;
-        else if (mLteRssnr >= 10) snrIconLevel = SIGNAL_STRENGTH_MODERATE;
-        else if (mLteRssnr >= -30) snrIconLevel = SIGNAL_STRENGTH_POOR;
+        else if (mLteRssnr >= 100) snrIconLevel = SIGNAL_STRENGTH_GREAT;
+        else if (mLteRssnr >= 15) snrIconLevel = SIGNAL_STRENGTH_GOOD;
+        else if (mLteRssnr >= 2) snrIconLevel = SIGNAL_STRENGTH_MODERATE;
+        else if (mLteRssnr >= -10) snrIconLevel = SIGNAL_STRENGTH_POOR;
         else if (mLteRssnr >= -200)
             snrIconLevel = SIGNAL_STRENGTH_NONE_OR_UNKNOWN;
 
@@ -838,7 +838,7 @@ public class SignalStrength implements Parcelable {
              * associated with LTE RSRP and the bars associated with the LTE
              * RS_SNR
              */
-            return (rsrpIconLevel < snrIconLevel ? rsrpIconLevel : snrIconLevel);
+            return (rsrpIconLevel > snrIconLevel ? rsrpIconLevel : snrIconLevel);
         }
 
         if (snrIconLevel != -1) return snrIconLevel;
