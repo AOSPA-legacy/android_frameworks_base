@@ -929,6 +929,12 @@ class QuickSettings {
                         @Override
                         public void onClick(View v) {
                             if (!immsersiveStyleSelected() && mModel.getImmersiveMode() == 0) {
+                                // reset on the spot value to 0 if is set to ASK_LATER
+                                // so pie observer detects the change and switches to immersive even on more
+                                // ask later choices
+                                Settings.System.putInt(mContext.getContentResolver(),
+                                        Settings.System.PIE_STATE, 0);
+                                // launch on the spot dialog
                                 selectImmersiveStyle();
                             } else {
                                 mModel.switchImmersiveGlobal();
