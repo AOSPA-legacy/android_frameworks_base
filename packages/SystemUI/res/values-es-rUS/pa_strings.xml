@@ -22,10 +22,10 @@
   <string name="screenshot_delete_confirmation">Captura de pantalla eliminada</string>
   <string name="quick_settings_battery_charging">Cargando</string>
   <string name="quick_settings_battery_discharging">Descargando</string>
-  <string name="quick_settings_immersive_global_on_label">Inmersión</string>
+  <string name="quick_settings_immersive_global_on_label">Inmersivo</string>
   <string name="quick_settings_immersive_global_off_label">Inmersión desactivada</string>
-  <string name="quick_settings_immersive_mode_off_label">Desactivada</string>
-  <string name="quick_settings_immersive_mode_full_label">Completa</string>
+  <string name="quick_settings_immersive_mode_off_label">Desabilitada</string>
+  <string name="quick_settings_immersive_mode_full_label">Completo</string>
   <string name="quick_settings_immersive_mode_no_status_bar_label">Barra de navegación</string>
   <string name="quick_settings_immersive_mode_no_navigation_bar_label">Barra de estado</string>
   <string name="quick_settings_lte">LTE</string>
@@ -62,11 +62,13 @@
   <string name="status_bar_notification_floating_item_title">Modo flotante</string>
   <string name="quick_settings_quick_pull_down_title">Despliegue rápido</string>
   <string name="quick_settings_quick_pull_down_message">¿Le gustaría que el borde derecho de la barra de estado despliegue el panel de ajustes rápidos?</string>
-  <string name="navbar_recents_clear_all_title">Cerrar recientes</string>
+  <string name="navbar_recents_clear_all_title">Cerrar todos</string>
   <string name="navbar_recents_clear_all_message">¿Le gustaría que el botón \"recientes\" cierre todas las aplicaciones?</string>
   <string name="enable_pie_control_title">Controles Pie</string>
   <string name="enable_pie_control_message">¿Le gustaría usar los controles Pie cuando esté en modo Inmersivo?</string>
   <string name="enable_switch_apps_title">Alternar aplicaciones</string>
   <string name="enable_switch_apps_message">¿Le gustaría que al mantener pulsado el botón de recientes se abriera la última aplicación utilizada?</string>
   <string name="status_bar_recent_floating_item_title">Modo flotante</string>
+  <string name="floating_mode_blacklisted_app">Esta aplicación esta en la lista negra debido a que puede no funcionar correctamente en modo flotante </string>
+  <string name="hover_cling_text">Hover está activado.\n\nCuando una nueva notificación llegue, un cartel superpuesto te la mostrará y te permitirá interactuar con ella sin abandonar la aplicación actual.</string>
 </resources>

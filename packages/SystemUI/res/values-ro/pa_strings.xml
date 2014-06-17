@@ -22,8 +22,8 @@
   <string name="screenshot_delete_confirmation">Captură de ecran ştearsă</string>
   <string name="quick_settings_battery_charging">Se încarcă</string>
   <string name="quick_settings_battery_discharging">Se descarcă</string>
-  <string name="quick_settings_immersive_global_on_label">Maximizează</string>
-  <string name="quick_settings_immersive_global_off_label">Dezactivează maximizarea</string>
+  <string name="quick_settings_immersive_global_on_label">Imersiune</string>
+  <string name="quick_settings_immersive_global_off_label">Imersiune Inactivă</string>
   <string name="quick_settings_immersive_mode_off_label">Dezactivat</string>
   <string name="quick_settings_immersive_mode_full_label">Întreg</string>
   <string name="quick_settings_immersive_mode_no_status_bar_label">Bara de navigaţie</string>
@@ -52,7 +52,7 @@
   <string name="quick_settings_bluetooth_discoverable_label">Detectabil</string>
   <string name="quick_settings_bluetooth_disabled">Inactiv</string>
   <string name="quick_settings_location_mode_high_label">Precis</string>
-  <string name="quick_settings_location_mode_battery_label">Economic</string>
+  <string name="quick_settings_location_mode_battery_label">Baterie</string>
   <string name="quick_settings_location_mode_sensors_label">Dispozitiv</string>
   <string name="quick_settings_ringer_mode_silent_label">Silențios</string>
   <string name="quick_settings_ringer_mode_vibrate_label">Vibrează</string>
@@ -64,9 +64,11 @@
   <string name="quick_settings_quick_pull_down_message">Doriţi să trageţi de marginea barei de status pentru a accesa setările rapide?</string>
   <string name="navbar_recents_clear_all_title">Ștergere completă</string>
   <string name="navbar_recents_clear_all_message">Doriţi ca butonul \"aplicații recente\" să închidă toate aplicațiile?</string>
-  <string name="enable_pie_control_title">Control Pie</string>
-  <string name="enable_pie_control_message">Doriţi să folosiţi controlul pie în modul imersiv?</string>
+  <string name="enable_pie_control_title">Operare Pie</string>
+  <string name="enable_pie_control_message">Doriţi să utilizaţi operarea Pie în modul imersiune?</string>
   <string name="enable_switch_apps_title">Schimbă aplicațiile</string>
   <string name="enable_switch_apps_message">Lansaţi aplicaţia precendentă în timp ce ţineti apasat butonul \"aplicaţii recente\"?</string>
   <string name="status_bar_recent_floating_item_title">Mod plutitor</string>
+  <string name="floating_mode_blacklisted_app">Applicaţiunea curentă este pe lista neagră deoarece poate să nu funcţioneze corect în floating mode </string>
+  <string name="hover_cling_text">Hover este acum activ.\n\nCând primiți o nouă notificare, o fereastră va apărea suprapus, oferindu-vă posibilitatea să răspundeți fără a părăsi aplicația curentă.</string>
 </resources>

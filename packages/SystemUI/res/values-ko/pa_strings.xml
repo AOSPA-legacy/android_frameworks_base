@@ -25,7 +25,7 @@
   <string name="quick_settings_immersive_global_on_label">몰입모드</string>
   <string name="quick_settings_immersive_global_off_label">몰입모드 꺼짐</string>
   <string name="quick_settings_immersive_mode_off_label">비활성화됨</string>
-  <string name="quick_settings_immersive_mode_full_label">전체</string>
+  <string name="quick_settings_immersive_mode_full_label">둘 다 숨기기</string>
   <string name="quick_settings_immersive_mode_no_status_bar_label">네비게이션 바</string>
   <string name="quick_settings_immersive_mode_no_navigation_bar_label">상태 표시줄</string>
   <string name="quick_settings_lte">LTE</string>
@@ -34,8 +34,8 @@
   <string name="quick_settings_network_unknown">알수없음</string>
   <string name="quick_settings_network_disabled">비활성화됨</string>
   <string name="quick_settings_network_toast_disabled">네트워크 설정을 사용할 수 없습니다</string>
-  <string name="quick_settings_lightbulb_label">플래시</string>
-  <string name="quick_settings_lightbulb_off_label">플래시 꺼짐</string>
+  <string name="quick_settings_lightbulb_label">손전등</string>
+  <string name="quick_settings_lightbulb_off_label">손전등 꺼짐</string>
   <string name="quick_settings_usb_tether_connected_label">USB 테더링 꺼짐</string>
   <string name="quick_settings_usb_tether_on_label">USB 테더링</string>
   <string name="quick_settings_sleep_action_label">화면 끄기</string>
@@ -58,15 +58,17 @@
   <string name="quick_settings_ringer_mode_vibrate_label">진동</string>
   <string name="quick_settings_ringer_mode_normal_label">소리</string>
   <string name="quick_settings_ringer_mode_normal_vibrate_label">소리 &amp; 진동</string>
-  <string name="quick_settings_volume_label">볼륨</string>
+  <string name="quick_settings_volume_label">음량</string>
   <string name="status_bar_notification_floating_item_title">플로팅 모드</string>
-  <string name="quick_settings_quick_pull_down_title">빠른 풀 다운</string>
+  <string name="quick_settings_quick_pull_down_title">쉽게 설정패널 열기</string>
   <string name="quick_settings_quick_pull_down_message">상태 표시줄의 모서리를 끌어내려 빠른 설정 패널을 여시겠습니까?</string>
-  <string name="navbar_recents_clear_all_title">모두 지우기</string>
-  <string name="navbar_recents_clear_all_message">\"최근 앱 보기\" 버튼에 모든 앱 지우기 버튼을 추가하시겠습니까?</string>
+  <string name="navbar_recents_clear_all_title">모두 종료</string>
+  <string name="navbar_recents_clear_all_message">최근 앱 버튼을 모든 앱을 종료하는 데에도 사용하시겠습니까?</string>
   <string name="enable_pie_control_title">Pie 컨트롤</string>
   <string name="enable_pie_control_message">몰입 모드에 있는 동안 파이 컨트롤을 사용 하시겠습니까?</string>
   <string name="enable_switch_apps_title">앱 전환</string>
-  <string name="enable_switch_apps_message">최근 앱 보기 버튼을 오래 눌러 앱 전환을 사용 하시겠습니까?</string>
+  <string name="enable_switch_apps_message">최근 앱 보기 버튼을 오래 눌러 마지막으로 사용한 앱으로 전환하시겠습니까?</string>
   <string name="status_bar_recent_floating_item_title">플로팅 모드</string>
+  <string name="floating_mode_blacklisted_app">이 앱은 플로팅 모드에서 오작동할 가능성이 있어 블랙리스트되었습니다.</string>
+  <string name="hover_cling_text">Hover가 활성화 되었습니다.\n\n새 알림이 도착하면, 현재 사용중인 앱을 벗어나지 않고도 알림에 반응할 수 있도록 작은 창이 나타날 것 입니다.</string>
 </resources>

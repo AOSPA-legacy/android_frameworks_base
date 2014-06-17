@@ -69,4 +69,6 @@
   <string name="enable_switch_apps_title">Tukar aplikasi</string>
   <string name="enable_switch_apps_message">Melancarkan aplikasi sebelum ini jika butang recents ditekan dengan lama?</string>
   <string name="status_bar_recent_floating_item_title">Mod terapung</string>
+  <string name="floating_mode_blacklisted_app">Aplikasi ini disenaraihitamkan kerana ia mungkin tidak berfungsi seperti yang diharapkan dalam mod terapung </string>
+  <string name="hover_cling_text">Hover sudah diaktivkan.\n\nApabila notifikasi baru sampai, anda boleh bertindak-balas tanpa meninggalkan aplikasi semasa melalui satu tetingkap kecil.</string>
 </resources>

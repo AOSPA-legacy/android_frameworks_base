@@ -29,13 +29,13 @@
   <string name="quick_settings_immersive_mode_no_status_bar_label">Barra di navigazione</string>
   <string name="quick_settings_immersive_mode_no_navigation_bar_label">Barra di stato</string>
   <string name="quick_settings_lte">LTE</string>
-  <string name="quick_settings_lte_off">LTE disattivato</string>
+  <string name="quick_settings_lte_off">LTE Disattivato</string>
   <string name="quick_settings_network_type">Rete</string>
   <string name="quick_settings_network_unknown">Sconosciuta</string>
-  <string name="quick_settings_network_disabled">Disattivata</string>
+  <string name="quick_settings_network_disabled">Disabilitata</string>
   <string name="quick_settings_network_toast_disabled">Impostazioni di rete non disponibili</string>
   <string name="quick_settings_lightbulb_label">Lightbulb</string>
-  <string name="quick_settings_lightbulb_off_label">Lightbulb disattivato</string>
+  <string name="quick_settings_lightbulb_off_label">Lightbulb Spento</string>
   <string name="quick_settings_usb_tether_connected_label">Tethering USB disattivato</string>
   <string name="quick_settings_usb_tether_on_label">Tethering USB</string>
   <string name="quick_settings_sleep_action_label">Standby</string>
@@ -69,4 +69,6 @@
   <string name="enable_switch_apps_title">Scambio apps</string>
   <string name="enable_switch_apps_message">Vorresti avviare l\'ultima app usata tenendo premuto il tasto recenti?</string>
   <string name="status_bar_recent_floating_item_title">Modalità floating</string>
+  <string name="floating_mode_blacklisted_app">L\'applicazione corrente è stata aggiunta alla lista nera in quanto potrebbe non funzionare correttamente in modalità floating.</string>
+  <string name="hover_cling_text">Hover è abilitato,\n\nAll\'arrivo di una nuova notifica una finestra a tendina ti permetterà di rispondere senza abbandonare l\'app corrente.</string>
 </resources>

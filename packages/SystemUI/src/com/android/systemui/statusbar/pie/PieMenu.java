@@ -180,6 +180,7 @@ public class PieMenu extends FrameLayout {
     private PieControlPanel mPanel;
 
     private boolean mHasShown;
+    private boolean mHasAssistant = false;
 
     private class SnapPoint {
         public boolean active;
@@ -200,12 +201,12 @@ public class PieMenu extends FrameLayout {
     private SnapPoint[] mSnapPoint = new SnapPoint[3];
     int mSnapRadius;
     int mSnapThickness;
+    int mNumberOfSnapPoints;
 
     private int mImmersiveMode;
     private boolean mOpen;
     private boolean mHapticFeedback;
     private boolean mIsProtected;
-    private boolean mIsAssistantAvailable;
 
     private int mGlowOffset = NORMAL_GLOW;
 
@@ -253,6 +254,7 @@ public class PieMenu extends FrameLayout {
         mHapticFeedback = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0;
         mIsProtected = mPanel.isKeyguardSecureShowing();
+        mHasAssistant = mPieHelper.isAssistantAvailable();
 
         // hardcode for now
         mPieAngle = ANGLE_BASE;
@@ -289,6 +291,7 @@ public class PieMenu extends FrameLayout {
             mSnapPoint[snapIndex ++] = new SnapPoint(
                     mWidth / 2, mHeight - mSnapThickness / 2, mSnapRadius, Gravity.BOTTOM);
         }
+        mNumberOfSnapPoints = snapIndex;
 
         // create pie
         mEmptyAngle = (int) (mPieAngle * mPieSize);
@@ -461,8 +464,6 @@ public class PieMenu extends FrameLayout {
 
         mVibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mPieHelper = PieHelper.getInstance();
-
-        mIsAssistantAvailable = mPieHelper.getAssistIntent() != null;
 
         // initialize classes
         mItems = new ArrayList<PieItem>();
@@ -671,8 +672,10 @@ public class PieMenu extends FrameLayout {
                     mOuterChevronRadius : mOuterChevronLiteRadius;
 
             if (mCenterDistance > threshold) {
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < mNumberOfSnapPoints; i++) {
                     SnapPoint snap = mSnapPoint[i];
+
+                    if (snap == null) continue;
 
                     float snapDistanceX = snap.x - mX;
                     float snapDistanceY = snap.y - mY;
@@ -841,8 +844,10 @@ public class PieMenu extends FrameLayout {
             // open panel
             animateIn();
         } else if (MotionEvent.ACTION_MOVE == action) {
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < mNumberOfSnapPoints; i++) {
                 SnapPoint snap = mSnapPoint[i];
+
+                if (snap == null) continue;
 
                 float snapDistanceX = snap.x - mX;
                 float snapDistanceY = snap.y - mY;
@@ -908,7 +913,7 @@ public class PieMenu extends FrameLayout {
 
                 // check for google now action
                 if (mCenterDistance > shadeTreshold) {
-                    if (mIsAssistantAvailable) mPieHelper.launchAssistAction();
+                    if (mHasAssistant) mPieHelper.startAssistActivity();
                 }
             }
 

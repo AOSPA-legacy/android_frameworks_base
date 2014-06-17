@@ -19,9 +19,9 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <string name="screenshot_delete_action">Törlés</string>
-  <string name="screenshot_delete_confirmation">Screenshot törölve</string>
+  <string name="screenshot_delete_confirmation">Képernyőkép törölve</string>
   <string name="quick_settings_battery_charging">Töltés</string>
-  <string name="quick_settings_battery_discharging">Merül</string>
+  <string name="quick_settings_battery_discharging">Merülés</string>
   <string name="quick_settings_immersive_global_on_label">Immersive</string>
   <string name="quick_settings_immersive_global_off_label">Immersive kikapcsolva</string>
   <string name="quick_settings_immersive_mode_off_label">Letiltva</string>
@@ -33,7 +33,7 @@
   <string name="quick_settings_network_type">Hálózat</string>
   <string name="quick_settings_network_unknown">Ismeretlen</string>
   <string name="quick_settings_network_disabled">Letiltva</string>
-  <string name="quick_settings_network_toast_disabled">Hálózati beállítások nem elérhetők</string>
+  <string name="quick_settings_network_toast_disabled">Hálózati beállítások nem érhetők el</string>
   <string name="quick_settings_lightbulb_label">Zseblámpa</string>
   <string name="quick_settings_lightbulb_off_label">Zseblámpa ki</string>
   <string name="quick_settings_usb_tether_connected_label">USB Tethering ki</string>
@@ -48,25 +48,27 @@
   <string name="quick_settings_sleep_time_1800_label">30 perc</string>
   <string name="quick_settings_wifi_ap_label">Wi-Fi AP</string>
   <string name="quick_settings_wifi_ap_off_label">Wi-Fi AP ki</string>
-  <string name="quick_settings_bluetooth_not_discoverable_label">Nem felderíthető</string>
-  <string name="quick_settings_bluetooth_discoverable_label">Felderíthető</string>
+  <string name="quick_settings_bluetooth_not_discoverable_label">Nem látható</string>
+  <string name="quick_settings_bluetooth_discoverable_label">Látható</string>
   <string name="quick_settings_bluetooth_disabled">Letiltva</string>
   <string name="quick_settings_location_mode_high_label">Magas</string>
   <string name="quick_settings_location_mode_battery_label">Akkumulátor</string>
-  <string name="quick_settings_location_mode_sensors_label">Készülék</string>
+  <string name="quick_settings_location_mode_sensors_label">Eszköz</string>
   <string name="quick_settings_ringer_mode_silent_label">Néma</string>
   <string name="quick_settings_ringer_mode_vibrate_label">Rezgés</string>
   <string name="quick_settings_ringer_mode_normal_label">Hang</string>
   <string name="quick_settings_ringer_mode_normal_vibrate_label">Hang és rezgés</string>
   <string name="quick_settings_volume_label">Hangerő</string>
   <string name="status_bar_notification_floating_item_title">Lebegő mód</string>
-  <string name="quick_settings_quick_pull_down_title">Gyors lehúzás</string>
-  <string name="quick_settings_quick_pull_down_message">Szeretné hogy az állapotsor széle a gyors beállításokat húzza le?</string>
+  <string name="quick_settings_quick_pull_down_title">Gyors beállítások</string>
+  <string name="quick_settings_quick_pull_down_message">Szeretné, hogy az állapotsor szélének lehúzása a gyors beállításokat nyissa meg?</string>
   <string name="navbar_recents_clear_all_title">Összes törlése</string>
-  <string name="navbar_recents_clear_all_message">Szeretné ha az \"utoljára használt\" gomb törölné az összes nyitott alkalmazást?</string>
+  <string name="navbar_recents_clear_all_message">Szeretné, ha az \"utóbbi alkalmazások\" gomb bezárná az összes nyitott alkalmazást?</string>
   <string name="enable_pie_control_title">Pie vezérlő</string>
-  <string name="enable_pie_control_message">Szeretné használni a Pie vezérlőt immersive módban?</string>
+  <string name="enable_pie_control_message">Szeretné használni a Pie vezérlőt Immersive módban?</string>
   <string name="enable_switch_apps_title">Alkalmazások váltása</string>
-  <string name="enable_switch_apps_message">Szeretné ha az utóbbi alkalmazások gomb hosszan nyomása visszavinné az előző nyitott alkalmazásra?</string>
+  <string name="enable_switch_apps_message">Szeretné, ha az \"utóbbi alkalmazások\" gomb hosszan nyomása visszavinné az előző nyitott alkalmazásra?</string>
   <string name="status_bar_recent_floating_item_title">Lebegő mód</string>
+  <string name="floating_mode_blacklisted_app">Ez az alkalmazás feketelistára került, mert nem működik megfelelően lebegő módban </string>
+  <string name="hover_cling_text">Hover engedélyezve.\n\nHa új értesítés érkezik, egy megjelenő felületen tud reagálni rá, anélkül, hogy elhagyná a jelenlegi alkalmazást.</string>
 </resources>

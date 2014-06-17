@@ -46,10 +46,10 @@
   <string name="quick_settings_sleep_time_300_label">5 phút</string>
   <string name="quick_settings_sleep_time_600_label">10 phút</string>
   <string name="quick_settings_sleep_time_1800_label">30 phút</string>
-  <string name="quick_settings_wifi_ap_label">Wi-Fi AP</string>
-  <string name="quick_settings_wifi_ap_off_label">Wi-Fi AP Tắt</string>
-  <string name="quick_settings_bluetooth_not_discoverable_label">Ẩn</string>
-  <string name="quick_settings_bluetooth_discoverable_label">Cho phép nhìn thấy</string>
+  <string name="quick_settings_wifi_ap_label">Phát sóng Wi-Fi</string>
+  <string name="quick_settings_wifi_ap_off_label">Phát sóng Wi-Fi Tắt</string>
+  <string name="quick_settings_bluetooth_not_discoverable_label">Không tìm thấy</string>
+  <string name="quick_settings_bluetooth_discoverable_label">Đã tìm thấy</string>
   <string name="quick_settings_bluetooth_disabled">Đã vô hiệu hóa</string>
   <string name="quick_settings_location_mode_high_label">Cao</string>
   <string name="quick_settings_location_mode_battery_label">Pin</string>
@@ -69,4 +69,6 @@
   <string name="enable_switch_apps_title">Chuyển đổi ứng dụng</string>
   <string name="enable_switch_apps_message">Khởi chạy nhanh ứng dụng trước đó khi nhấn lâu phím ứng dụng gần đây?</string>
   <string name="status_bar_recent_floating_item_title">Chế độ cửa sổ nổi</string>
+  <string name="floating_mode_blacklisted_app">Ứng dụng hiện tại đang nằm trong danh sách đen vì nó có thể không hoạt động như mong đợi</string>
+  <string name="hover_cling_text">Đã kích hoạt Hover.\n\nKhi có thông báo mới, một lớp phủ sẽ cho bạn thao tác mà không thoát khỏi ứng dụng hiện tại.</string>
 </resources>

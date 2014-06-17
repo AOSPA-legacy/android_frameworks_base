@@ -46,7 +46,7 @@
   <string name="quick_settings_sleep_time_300_label">5 minutter</string>
   <string name="quick_settings_sleep_time_600_label">10 minutter</string>
   <string name="quick_settings_sleep_time_1800_label">30 minutter</string>
-  <string name="quick_settings_wifi_ap_label">Wi-Fi hotspot</string>
+  <string name="quick_settings_wifi_ap_label">Wi-Fi-hotspot</string>
   <string name="quick_settings_wifi_ap_off_label">Wi-Fi-hotspot Fra</string>
   <string name="quick_settings_bluetooth_not_discoverable_label">Ikke synlig</string>
   <string name="quick_settings_bluetooth_discoverable_label">Synlig</string>
@@ -57,16 +57,18 @@
   <string name="quick_settings_ringer_mode_silent_label">Lydløs</string>
   <string name="quick_settings_ringer_mode_vibrate_label">Vibrér</string>
   <string name="quick_settings_ringer_mode_normal_label">Lyd</string>
-  <string name="quick_settings_ringer_mode_normal_vibrate_label">Lyd &amp; Vibration</string>
+  <string name="quick_settings_ringer_mode_normal_vibrate_label">Lyd &amp; vibration</string>
   <string name="quick_settings_volume_label">Lydstyrke</string>
-  <string name="status_bar_notification_floating_item_title">Svævende tilstand</string>
+  <string name="status_bar_notification_floating_item_title">Flydende tilstand</string>
   <string name="quick_settings_quick_pull_down_title">Hurtigt nedtræk</string>
-  <string name="quick_settings_quick_pull_down_message">Ønsker du at frembringe hurtigindstillinger ved trække ned fra statuslinjens kant?</string>
+  <string name="quick_settings_quick_pull_down_message">Ønsker du at frembringe hurtigindstillinger ved at trække ned fra statuslinjens kant?</string>
   <string name="navbar_recents_clear_all_title">Ryd alle</string>
   <string name="navbar_recents_clear_all_message">Ønsker du, at \"seneste\"-knappen rydder alle apps?</string>
-  <string name="enable_pie_control_title">Pie navigation</string>
-  <string name="enable_pie_control_message">Vil du gerne bruge pie navigation i fuld skærm tilstand?</string>
+  <string name="enable_pie_control_title">Pie-navigation</string>
+  <string name="enable_pie_control_message">Vil du bruge pie-navigation i fuldskærmstilstand?</string>
   <string name="enable_switch_apps_title">Skift apps</string>
   <string name="enable_switch_apps_message">Skift til senest brugte app, ved langt tryk på \"seneste\"-knappen?</string>
-  <string name="status_bar_recent_floating_item_title">Svævende tilstand</string>
+  <string name="status_bar_recent_floating_item_title">Flydende tilstand</string>
+  <string name="floating_mode_blacklisted_app">Den nuværende app er sortlistet, da den fungerer muligvis ikke som forventet i flydende tilstand </string>
+  <string name="hover_cling_text">Hover er nu aktiveret.\n\nNår en ny notifikation ankommer, vil en overlejring fremkomme, som muliggør interaktion med notifikationen, uden at du behøver at forlade din nuværende app.</string>
 </resources>

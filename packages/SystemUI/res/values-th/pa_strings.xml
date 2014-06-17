@@ -69,4 +69,6 @@
   <string name="enable_switch_apps_title">สลับแอพพลิเคชัน</string>
   <string name="enable_switch_apps_message">เปิดแอพพลิเคชันก่อนอย่างรวดเร็วเมื่อกดปุ่ม recents ค้าง</string>
   <string name="status_bar_recent_floating_item_title">Floating mode</string>
+  <string name="floating_mode_blacklisted_app">แอพพลิเคชันนี้ถูกแบล็คลิสท์จึงไม่สามารถทำงานได้ในโหมด floating</string>
+  <string name="hover_cling_text">เปิดการใช้งาน Hover\n\nเมื่อมีการแจ้งเตือนมาใหม่ จะมีการแสดงให้คุณทราบแบบซ้อนทับขึ้นมาเพื่อไม่ต้องออกจากแอพที่ใช้อยู่.</string>
 </resources>

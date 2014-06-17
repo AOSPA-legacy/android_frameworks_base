@@ -56,14 +56,13 @@ public class PieHelper {
     public static int LOW_BATTERY_LEVEL;
     public static int CRITICAL_BATTERY_LEVEL;
 
-    private Context mContext;
-    private int mBatteryLevel = 0;
-    private boolean mTelephony;
-    private BaseStatusBar mBar;
-
-    private OnClockChangedListener mClockChangedListener;
-
     private static PieHelper mInstance;
+
+    private boolean mTelephony;
+    private int mBatteryLevel = 0;
+    private BaseStatusBar mBar;
+    private Context mContext;
+    private OnClockChangedListener mClockChangedListener;
 
     private PieHelper() {
     }
@@ -88,6 +87,7 @@ public class PieHelper {
     }
 
     public void init(Context context, BaseStatusBar bar) {
+        mBar = bar;
         mContext = context;
         mContext.registerReceiver(mBatteryReceiver,
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -101,7 +101,6 @@ public class PieHelper {
                 com.android.internal.R.integer.config_criticalBatteryWarningLevel);
         mTelephony = mContext.getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
-        mBar = bar;
     }
 
     public static PieHelper getInstance() {
@@ -188,30 +187,13 @@ public class PieHelper {
                 .toUpperCase();
     }
 
-    public Intent getAssistIntent() {
+    public boolean isAssistantAvailable() {
         Intent intent = ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
-                    .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
-        return intent;
+                .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
+        return intent != null;
     }
 
-    public void launchAssistAction() {
-        Intent intent = getAssistIntent();
-        if(intent != null) {
-            try {
-                ActivityOptions opts = ActivityOptions.makeCustomAnimation(mContext,
-                        R.anim.search_launch_enter, R.anim.search_launch_exit);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                ActivityManagerNative.getDefault().dismissKeyguardOnNextActivity();
-                mBar.animateCollapsePanels(FLAG_EXCLUDE_NONE);
-                mContext.startActivityAsUser(intent, opts.toBundle(),
-                        new UserHandle(UserHandle.USER_CURRENT));
-            } catch (ActivityNotFoundException e) {
-                // Google now not found
-            } catch (RemoteException ex) {
-                // system is dead
-            }
-        }
+    public void startAssistActivity() {
+        mBar.getSearchPanelView().startAssistActivity();
     }
 }

@@ -260,6 +260,52 @@ public class ResourcesManager {
     }
 
     /**
+     * Creates the top level Resources for applications with the given compatibility info.
+     *
+     * @param resDir the resource directory.
+     * @param compatInfo the compability info. Must not be null.
+     * @param token the application token for determining stack bounds.
+     *
+     * @hide
+     */
+    public Resources getTopLevelThemedResources(String resDir, int displayId,
+                                                String packageName,
+                                                String themePackageName,
+                                                CompatibilityInfo compatInfo, IBinder token) {
+        Resources r;
+
+        AssetManager assets = new AssetManager();
+        assets.setAppName(packageName);
+        assets.setThemeSupport(true);
+        if (assets.addAssetPath(resDir) == 0) {
+            return null;
+        }
+
+        //Slog.i(TAG, "Resource: key=" + key + ", display metrics=" + metrics);
+        DisplayMetrics dm = getDisplayMetricsLocked(displayId);
+        Configuration config;
+        boolean isDefaultDisplay = (displayId == Display.DEFAULT_DISPLAY);
+        if (!isDefaultDisplay) {
+            config = new Configuration(getConfiguration());
+            applyNonDefaultDisplayMetricsToConfigurationLocked(dm, config);
+        } else {
+            config = getConfiguration();
+        }
+
+        /* Attach theme information to the resulting AssetManager when appropriate. */
+        CustomTheme customTheme =
+                new CustomTheme(themePackageName, themePackageName, themePackageName);
+        attachThemeAssets(assets, customTheme);
+        attachCommonAssets(assets, customTheme);
+        attachIconAssets(assets, customTheme);
+
+        r = new Resources(assets, dm, config, compatInfo, token);
+        setActivityIcons(r);
+
+        return r;
+    }
+
+    /**
      * Creates a map between an activity & app's icon ids to its component info. This map
      * is then stored in the resource object.
      * When resource.getDrawable(id) is called it will check this mapping and replace
@@ -281,23 +327,40 @@ public class ResourcesManager {
             return;
         }
 
+        final CustomTheme customTheme = r.getConfiguration().customTheme;
+        if (pkgName != null && customTheme != null &&
+                pkgName.equals(customTheme.getIconPackPkgName())) {
+            return;
+        }
+
         //Map application icon
         if (pkgInfo != null && pkgInfo.applicationInfo != null) {
             appInfo = pkgInfo.applicationInfo;
-            if (appInfo.themedIcon != 0) iconResources.put(appInfo.icon, appInfo);
+            if (appInfo.themedIcon != 0 || iconResources.get(appInfo.icon) == null) {
+                iconResources.put(appInfo.icon, appInfo);
+            }
         }
 
         //Map activity icons.
         if (pkgInfo != null && pkgInfo.activities != null) {
             for (ActivityInfo ai : pkgInfo.activities) {
-                if (ai.themedIcon != 0 && ai.icon != 0) {
+                if (ai.icon != 0 && (ai.themedIcon != 0 || iconResources.get(ai.icon) == null)) {
                     iconResources.put(ai.icon, ai);
-                } else if (ai.themedIcon != 0 && appInfo != null && appInfo.icon != 0) {
+                } else if (appInfo != null && appInfo.icon != 0 &&
+                        (ai.themedIcon != 0 || iconResources.get(appInfo.icon) == null)) {
                     iconResources.put(appInfo.icon, ai);
                 }
             }
         }
+
         r.setIconResources(iconResources);
+        final IPackageManager pm = getPackageManager();
+        try {
+            ComposedIconInfo iconInfo = pm.getComposedIconInfo();
+            r.setComposedIconInfo(iconInfo);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public final int applyConfigurationToResourcesLocked(Configuration config,
@@ -349,6 +412,7 @@ public class ResourcesManager {
                     AssetManager am = r.getAssets();
                     if (am.hasThemeSupport()) {
                         r.setIconResources(null);
+                        r.setComposedIconInfo(null);
                         detachThemeAssets(am);
                         if (config.customTheme != null) {
                             attachThemeAssets(am, config.customTheme);

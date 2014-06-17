@@ -57,6 +57,9 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
     private Runnable mOnScrollListener;
     private Handler mHandler;
 
+    // control clear all animation overload on quick double tap
+    private boolean mAnimationDone = true;
+
     public RecentsHorizontalScrollView(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
         float densityScale = getResources().getDisplayMetrics().density;
@@ -210,9 +213,15 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
                         // one. This will probably never happen
                     }
                 }
+                // we're done dismissing childs here, reset
+                mAnimationDone = true;
             }
         });
-        clearAll.start();
+
+        if (mAnimationDone) {
+            mAnimationDone = false;
+            clearAll.start();
+        }
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {

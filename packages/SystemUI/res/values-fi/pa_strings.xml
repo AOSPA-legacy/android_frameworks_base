@@ -35,7 +35,7 @@
   <string name="quick_settings_network_disabled">Ei käytössä</string>
   <string name="quick_settings_network_toast_disabled">Verkkoasetukset eivät ole käytettävissä</string>
   <string name="quick_settings_lightbulb_label">Taskulamppu</string>
-  <string name="quick_settings_lightbulb_off_label">Taskulamppu kiinni</string>
+  <string name="quick_settings_lightbulb_off_label">Taskulamppu pois</string>
   <string name="quick_settings_usb_tether_connected_label">USB jakaminen pois päältä</string>
   <string name="quick_settings_usb_tether_on_label">USB-jakaminen</string>
   <string name="quick_settings_sleep_action_label">Lepo</string>
@@ -63,10 +63,12 @@
   <string name="quick_settings_quick_pull_down_title">Nopea alasveto</string>
   <string name="quick_settings_quick_pull_down_message">Haluatko pika-asetukset esiin vetämällä alas yläpalkin reunasta?</string>
   <string name="navbar_recents_clear_all_title">Tyhjennä kaikki</string>
-  <string name="navbar_recents_clear_all_message">Haluaisitko \"aiemmat painikkeen\" tyhjentävän kaikki sovellukset?</string>
-  <string name="enable_pie_control_title">Piirakka kontrollit</string>
-  <string name="enable_pie_control_message">Haluaisitko käyttää piirakka komentoja immersive tilassa?</string>
+  <string name="navbar_recents_clear_all_message">Haluaisitko \"viimeisimmät-painikkeen\" tyhjentävän kaikki sovellukset?</string>
+  <string name="enable_pie_control_title">Pie-ohjaus</string>
+  <string name="enable_pie_control_message">Haluaisitko käyttää Pie-ohjausta Immersive-tilassa?</string>
   <string name="enable_switch_apps_title">Vaihda sovelluksia</string>
-  <string name="enable_switch_apps_message">Avaa nopeasti edellinen sovellus painamalla edelliset-painike pohjaan?</string>
+  <string name="enable_switch_apps_message">Haluatko avata nopeasti edellisen sovelluksen painamalla viimeisimmät-painikkeen pohjaan?</string>
   <string name="status_bar_recent_floating_item_title">Kelluva tila</string>
+  <string name="floating_mode_blacklisted_app">Tämä ohjelma on mustalla listalla, eikä se välttämättä toimi oikein kelluvassa tilassa </string>
+  <string name="hover_cling_text">Hover on nyt käytössä.\n\nKun uusi ilmoitus saapuu, näytön yläosaan ilmestyy palkki josta voit vastata ilmoitukseen poistumatta nykyisestä ohjelmasta.</string>
 </resources>

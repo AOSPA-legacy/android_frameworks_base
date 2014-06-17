@@ -21,9 +21,9 @@
   <string name="screenshot_delete_action">Usuń</string>
   <string name="screenshot_delete_confirmation">Zrzut ekranu usunięty</string>
   <string name="quick_settings_battery_charging">Ładowanie</string>
-  <string name="quick_settings_battery_discharging">Rozładowywanie</string>
+  <string name="quick_settings_battery_discharging">Wyładowywanie</string>
   <string name="quick_settings_immersive_global_on_label">Tryb rozszerzony</string>
-  <string name="quick_settings_immersive_global_off_label">Tryb rozszerzony wył.</string>
+  <string name="quick_settings_immersive_global_off_label">Tryb rozsz. wył.</string>
   <string name="quick_settings_immersive_mode_off_label">Wyłączony</string>
   <string name="quick_settings_immersive_mode_full_label">Pełny</string>
   <string name="quick_settings_immersive_mode_no_status_bar_label">Pasek nawigacji</string>
@@ -69,4 +69,6 @@
   <string name="enable_switch_apps_title">Przełącz aplikacje</string>
   <string name="enable_switch_apps_message">Czy przełączać do ostatnio używanej aplikacji, gdy przytrzymasz przycisk \"ostatnio używane aplikacje\"?</string>
   <string name="status_bar_recent_floating_item_title">Tryb okienkowy</string>
+  <string name="floating_mode_blacklisted_app">Aplikacja znajduje się na liście wykluczonych, ponieważ może nie działać poprawnie w trybie okienkowym</string>
+  <string name="hover_cling_text">Hover jest teraz włączony.\n\n Gdy dostaniesz nowe powiadomienie, nakładka ekranowa pokaże je i pozwoli na nie odpowiedzieć bez opuszczania aktualnie używanej aplikacji.</string>
 </resources>

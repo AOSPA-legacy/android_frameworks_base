@@ -46,8 +46,8 @@
   <string name="quick_settings_sleep_time_300_label">5 minutes</string>
   <string name="quick_settings_sleep_time_600_label">10 minutes</string>
   <string name="quick_settings_sleep_time_1800_label">30 minutes</string>
-  <string name="quick_settings_wifi_ap_label">Partage de connexion</string>
-  <string name="quick_settings_wifi_ap_off_label">Partage de connexion désactivé</string>
+  <string name="quick_settings_wifi_ap_label">Point d\'accès Wi-Fi</string>
+  <string name="quick_settings_wifi_ap_off_label">Point d\'accès Wi-Fi désactivé</string>
   <string name="quick_settings_bluetooth_not_discoverable_label">Invisible</string>
   <string name="quick_settings_bluetooth_discoverable_label">Détectable</string>
   <string name="quick_settings_bluetooth_disabled">Désactivé</string>
@@ -65,8 +65,10 @@
   <string name="navbar_recents_clear_all_title">Tout effacer</string>
   <string name="navbar_recents_clear_all_message">Voulez-vous que le bouton \"récents\" ferme toutes les applications ?</string>
   <string name="enable_pie_control_title">Pie</string>
-  <string name="enable_pie_control_message">Voulez-vous utiliser Pie lors de l\'utilisation du mode plein écran ?</string>
+  <string name="enable_pie_control_message">Voulez-vous utiliser Pie lors de l\'utilisation du mode immersif ?</string>
   <string name="enable_switch_apps_title">Changer d\'application</string>
   <string name="enable_switch_apps_message">Lancer rapidement la dernière application avec une pression longue sur le bouton des applications récentes ?</string>
   <string name="status_bar_recent_floating_item_title">Mode flottant</string>
+  <string name="floating_mode_blacklisted_app">Cette application a été placée sur liste noire car elle pourrait ne pas fonctionner correctement en mode flottant</string>
+  <string name="hover_cling_text">Hover est maintenant activé.\n\nLes prochaines notifications s\'afficheront en mode flotant, vous permettant d\'y répondre sans quitter l\'application actuelle.</string>
 </resources>

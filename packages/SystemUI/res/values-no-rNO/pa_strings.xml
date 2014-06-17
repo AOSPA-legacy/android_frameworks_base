@@ -21,7 +21,7 @@
   <string name="screenshot_delete_action">Slett</string>
   <string name="screenshot_delete_confirmation">Skjermbilde slettet</string>
   <string name="quick_settings_battery_charging">Lader</string>
-  <string name="quick_settings_battery_discharging">Lader ikke</string>
+  <string name="quick_settings_battery_discharging">Lader ut</string>
   <string name="quick_settings_immersive_global_on_label">Immersive</string>
   <string name="quick_settings_immersive_global_off_label">Immersive av</string>
   <string name="quick_settings_immersive_mode_off_label">Deaktivert</string>
@@ -69,4 +69,6 @@
   <string name="enable_switch_apps_title">Bytt apper</string>
   <string name="enable_switch_apps_message">Skift hurtig til forrige app når du trykker \"siste-brukte\"-knappen?</string>
   <string name="status_bar_recent_floating_item_title">Flytende modus</string>
+  <string name="floating_mode_blacklisted_app">Gjeldende app er svartelistet fordi den ikke nødvendigvis fungerer som forventet i flytende modus </string>
+  <string name="hover_cling_text">Hover er nå aktivert\n\nNår du mottar en ny varsling vil et overlegg vises slik at du kan svare uten å forlate gjeldende app.</string>
 </resources>

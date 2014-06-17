@@ -69,4 +69,6 @@
   <string name="enable_switch_apps_title">Pārslēgt aplikācijas</string>
   <string name="enable_switch_apps_message">Ātri palaist attiecīgo aplikāciju ilgi turot neseno pogu?</string>
   <string name="status_bar_recent_floating_item_title">Peldošais režīms</string>
+  <string name="floating_mode_blacklisted_app">Patreizējā lietotne ir melnajā sarakstā un varētu nestrādāt, kā paredzēts, peldošajā režīmā </string>
+  <string name="hover_cling_text">Hover ir iespējots.\n\nKad pienāks jauns paziņojums,  parādīsies pārklājs kurš ļaus atbildēt uz to, nepametot patreizējo lietotni.</string>
 </resources>

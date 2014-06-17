@@ -108,6 +108,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
     public static final int VOLUME_OVERLAY_EXPANDABLE = 1;
 
     protected Context mContext;
+    protected Context mSystemContext;
     private AudioManager mAudioManager;
     protected AudioService mAudioService;
     private boolean mRingIsSilent;
@@ -269,9 +270,11 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
         }
     }
 
-
-    public VolumePanel(final Context context, AudioService volumeService) {
+    public VolumePanel(final Context context, final Context system, AudioService volumeService) {
         mContext = context;
+        // Preserve system context to let on the spot read/write from/to system
+        mSystemContext = system != null ? system : context;
+
         mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         mAudioService = volumeService;
 
@@ -930,7 +933,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
                             public void onClick(DialogInterface dialog, int which) {
                                 mAudioService.disableSafeMediaVolume();
                                 SettingConfirmationHelper.showConfirmationDialogForSetting(
-                                        mContext,
+                                        mSystemContext,
                                         mContext.getResources()
                                                 .getString(R.string.safe_headset_warning_title),
                                         mContext.getResources()

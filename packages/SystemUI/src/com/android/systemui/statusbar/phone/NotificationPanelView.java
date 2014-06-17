@@ -119,7 +119,7 @@ public class NotificationPanelView extends PanelView {
                     mOkToFlip = getExpandedHeight() == 0;
                     if(Settings.System.getInt(mContext.getContentResolver(),
                                 Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN, 0) != 2) {
-                            if (event.getX(0) > getWidth() * QUICK_PULL_DOWN_PERCENTAGE) {
+                            if (event.getX(0) > mStatusBar.getStatusBarView().getWidth() * QUICK_PULL_DOWN_PERCENTAGE) {
                                 flip = true;
                             }
                     }

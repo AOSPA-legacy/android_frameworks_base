@@ -28,8 +28,8 @@
   <string name="quick_settings_immersive_mode_full_label">Пун</string>
   <string name="quick_settings_immersive_mode_no_status_bar_label">Навигациона трака</string>
   <string name="quick_settings_immersive_mode_no_navigation_bar_label">Статусна трака</string>
-  <string name="quick_settings_lte">ЛТЕ</string>
-  <string name="quick_settings_lte_off">ЛТЕ искључен</string>
+  <string name="quick_settings_lte">LTE</string>
+  <string name="quick_settings_lte_off">LTE искључен</string>
   <string name="quick_settings_network_type">Мрежа</string>
   <string name="quick_settings_network_unknown">Непознато</string>
   <string name="quick_settings_network_disabled">Онемогућено</string>
@@ -69,4 +69,5 @@
   <string name="enable_switch_apps_title">Замени апликације</string>
   <string name="enable_switch_apps_message">Брзо покрени претходну апликацију након дугог притиска на мултитаскинг дугме?</string>
   <string name="status_bar_recent_floating_item_title">Лебдећи мод</string>
+  <string name="floating_mode_blacklisted_app">Ова апликација се налази на црној листи и могуће да неће радити како треба у лебдећем моду </string>
 </resources>

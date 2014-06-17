@@ -31,7 +31,7 @@
   <string name="quick_settings_lte">LTE</string>
   <string name="quick_settings_lte_off">LTE כבוי</string>
   <string name="quick_settings_network_type">רשת</string>
-  <string name="quick_settings_network_unknown">לא ידוע</string>
+  <string name="quick_settings_network_unknown">לא ידועה</string>
   <string name="quick_settings_network_disabled">כבוי</string>
   <string name="quick_settings_network_toast_disabled">הגדרות הרשת אינן זמינות</string>
   <string name="quick_settings_lightbulb_label">פנס</string>
@@ -51,7 +51,7 @@
   <string name="quick_settings_bluetooth_not_discoverable_label">לא ניתן לגילוי</string>
   <string name="quick_settings_bluetooth_discoverable_label">ניתן לגילוי</string>
   <string name="quick_settings_bluetooth_disabled">כבוי</string>
-  <string name="quick_settings_location_mode_high_label">מצב גבוה</string>
+  <string name="quick_settings_location_mode_high_label">דיוק גבוה</string>
   <string name="quick_settings_location_mode_battery_label">סוללה</string>
   <string name="quick_settings_location_mode_sensors_label">מכשיר</string>
   <string name="quick_settings_ringer_mode_silent_label">שקט</string>
@@ -64,9 +64,11 @@
   <string name="quick_settings_quick_pull_down_message">האם ברצונך שקצה שורת המצב ימשוך את ההגדרות המהירות?</string>
   <string name="navbar_recents_clear_all_title">נקה הכל</string>
   <string name="navbar_recents_clear_all_message">האם ברצונך שכפתור \"אפליקציות אחרונות\" ינקה את כל האפליקציות?</string>
-  <string name="enable_pie_control_title">Pie Controls</string>
+  <string name="enable_pie_control_title">פקדי Pie</string>
   <string name="enable_pie_control_message">האם ברצונך להשתמש ב- Pie Controls כאשר המכשיר נמצא במצב מסך מלא?</string>
   <string name="enable_switch_apps_title">החלף אפליקציות</string>
   <string name="enable_switch_apps_message">האם ברצונך להחליף לאפליקצייה הקודמת כאשר כפתור \"אפליקציות אחרונות\" נלחץ לאורך זמן?</string>
   <string name="status_bar_recent_floating_item_title">מצב צף</string>
+  <string name="floating_mode_blacklisted_app">היישום הנוכחי מופיע ברשימה שחורה מכיוון שהוא עלול לא לתפקד כראויי במצב צף </string>
+  <string name="hover_cling_text">מצב \"התראה צפה\" אופשר.\n\n כאשר תתקבל התראה חדשה, ההתרעה תופיע עם אפשרות להגיב מבלי לצאת מאפליקציה פעילה.</string>
 </resources>

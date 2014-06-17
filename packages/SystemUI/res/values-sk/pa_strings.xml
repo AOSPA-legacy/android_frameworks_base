@@ -24,15 +24,15 @@
   <string name="quick_settings_battery_discharging">Vybíjanie</string>
   <string name="quick_settings_immersive_global_on_label">Rozšírená plocha</string>
   <string name="quick_settings_immersive_global_off_label">Rozšírená plocha vypnutá</string>
-  <string name="quick_settings_immersive_mode_off_label">Zakázané</string>
+  <string name="quick_settings_immersive_mode_off_label">Vypnuté</string>
   <string name="quick_settings_immersive_mode_full_label">Plné</string>
   <string name="quick_settings_immersive_mode_no_status_bar_label">Navigačná lišta</string>
-  <string name="quick_settings_immersive_mode_no_navigation_bar_label">Stavová lišta</string>
+  <string name="quick_settings_immersive_mode_no_navigation_bar_label">Notifikačná lišta</string>
   <string name="quick_settings_lte">LTE</string>
   <string name="quick_settings_lte_off">LTE vypnuté</string>
   <string name="quick_settings_network_type">Sieť</string>
   <string name="quick_settings_network_unknown">Neznámy</string>
-  <string name="quick_settings_network_disabled">Zakázané</string>
+  <string name="quick_settings_network_disabled">Vypnuté</string>
   <string name="quick_settings_network_toast_disabled">Nastavenia siete nie sú k dispozícii</string>
   <string name="quick_settings_lightbulb_label">Žiarovka</string>
   <string name="quick_settings_lightbulb_off_label">Žiarovka vypnutá</string>
@@ -50,7 +50,7 @@
   <string name="quick_settings_wifi_ap_off_label">Wi-Fi AP vypnutý</string>
   <string name="quick_settings_bluetooth_not_discoverable_label">Neviditeľné</string>
   <string name="quick_settings_bluetooth_discoverable_label">Viditeľné</string>
-  <string name="quick_settings_bluetooth_disabled">Zakázané</string>
+  <string name="quick_settings_bluetooth_disabled">Vypnuté</string>
   <string name="quick_settings_location_mode_high_label">Vysoký</string>
   <string name="quick_settings_location_mode_battery_label">Batéria</string>
   <string name="quick_settings_location_mode_sensors_label">Zariadenie</string>
@@ -61,12 +61,14 @@
   <string name="quick_settings_volume_label">Hlasitosť</string>
   <string name="status_bar_notification_floating_item_title">Plávajúci režim</string>
   <string name="quick_settings_quick_pull_down_title">Rýchle nastavenia</string>
-  <string name="quick_settings_quick_pull_down_message">Chceli by ste zobraziť rýchle nastavenia potiahnutím pravej časti notifikačnej lišty dole?</string>
+  <string name="quick_settings_quick_pull_down_message">Chcete zobraziť rýchle nastavenia potiahnutím pravej časti notifikačnej lišty dole?</string>
   <string name="navbar_recents_clear_all_title">Vymazať všetko</string>
-  <string name="navbar_recents_clear_all_message">Chceli by ste, aby tlačidlo \"nedávne\" ukončilo všetky aplikácie?</string>
+  <string name="navbar_recents_clear_all_message">Chcete, aby tlačidlo \"nedávne\" ukončilo všetky aplikácie?</string>
   <string name="enable_pie_control_title">Ovládanie Pie</string>
-  <string name="enable_pie_control_message">Chceli by ste používať Pie v režime rozšírenej plochy?</string>
-  <string name="enable_switch_apps_title">Prepnuť aplikácie</string>
+  <string name="enable_pie_control_message">Chcete používať ovládanie Pie v režíme rozšírenej plochy?</string>
+  <string name="enable_switch_apps_title">Prepnúť aplikácie</string>
   <string name="enable_switch_apps_message">Vrátiť sa na predchádzajúcu aplikáciu dlhým podržaním tlačidla pre nedávno spustené aplikácie?</string>
   <string name="status_bar_recent_floating_item_title">Plávajúci režim</string>
+  <string name="floating_mode_blacklisted_app">Táto aplikácia sa nachádza v blackliste a preto nemusí pracovať správne v plávajúcom režíme </string>
+  <string name="hover_cling_text">Hover je povolený.\n\nKeď dorazí notifikácia, vysunie sa lišta, ktorá Vám umožní odpovedať na notifikáciu bez nutnosti opustiť aktuálnu aplikáciu.</string>
 </resources>
