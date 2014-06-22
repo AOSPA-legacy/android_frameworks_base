@@ -174,6 +174,7 @@ public class NotificationManagerService extends INotificationManager.Stub
 
     // for enabling and disabling notification pulse behavior
     private boolean mScreenOn = true;
+    private boolean mWasScreenOn = true;
     private boolean mDreaming = false;
     private boolean mInCall = false;
     private boolean mNotificationPulseEnabled;
@@ -1464,6 +1465,8 @@ public class NotificationManagerService extends INotificationManager.Stub
                 mScreenOn = true;
             } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
                 mScreenOn = false;
+                mWasScreenOn = true;
+                updateLightsLocked();
                 updateNotificationPulse();
             } else if (action.equals(Intent.ACTION_DREAMING_STARTED)) {
                 mDreaming = true;
@@ -2552,7 +2555,18 @@ public class NotificationManagerService extends INotificationManager.Stub
         }
 
         // Don't flash while we are in a call or screen is on
-        if (mLedNotification == null || mInCall || mScreenOn || !mNotificationPulseEnabled) {
+        final boolean enableLed;
+        if (mLedNotification == null) {
+            enableLed = false;
+        } else if (isLedNotificationForcedOn(mLedNotification)) {
+            enableLed = true;
+        } else if (mInCall || (mScreenOn && !mDreaming)) {
+            enableLed = false;
+        } else {
+            enableLed = true;
+        }
+
+        if (!enableLed) {
             mNotificationLight.turnOff();
         } else if (mNotificationPulseEnabled) {
             final Notification ledno = mLedNotification.sbn.getNotification();
