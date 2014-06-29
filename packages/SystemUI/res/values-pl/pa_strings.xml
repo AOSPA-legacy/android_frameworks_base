@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Tryb okienkowy</string>
   <string name="floating_mode_blacklisted_app">Aplikacja znajduje się na liście wykluczonych, ponieważ może nie działać poprawnie w trybie okienkowym</string>
   <string name="hover_cling_text">Hover jest teraz włączony.\n\n Gdy dostaniesz nowe powiadomienie, nakładka ekranowa pokaże je i pozwoli na nie odpowiedzieć bez opuszczania aktualnie używanej aplikacji.</string>
+  <string name="status_bar_floating_no_interface">Aplikacja nie posiada interfejsu</string>
 </resources>

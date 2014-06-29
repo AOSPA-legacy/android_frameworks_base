@@ -45,6 +45,7 @@
     <dimen name="clock_size">15dp</dimen>
     <!-- Hover dimens -->
     <dimen name="hover_cling_width">-1px</dimen>
+    <dimen name="hover_tablet_width">478dp</dimen>
     <!-- QuickSettings dimens -->
     <dimen name="qs_tile_corner_switch_icon_size">32dp</dimen>
     <!-- Theme Engine overrides to avoid modifications that will affect hover view. -->
@@ -52,4 +53,13 @@
     <dimen name="default_notification_max_height">256dp</dimen>
     <dimen name="default_notification_row_min_height">70dp</dimen>
     <dimen name="default_notification_row_max_height">260dp</dimen>
+
+    <!-- Circle battery view -->
+    <item name="circle_battery_size_percentage" format="float" type="dimen">1.0</item>
+    <item name="circle_battery_thickness_fg_percentage" format="float" type="dimen">1.0</item>
+    <item name="circle_battery_thickness_bg_percentage" format="float" type="dimen">1.0</item>
+
+    <item name="sb_circle_battery_size_percentage" format="float" type="dimen">1.0</item>
+    <item name="sb_circle_battery_thickness_fg_percentage" format="float" type="dimen">1.0</item>
+    <item name="sb_circle_battery_thickness_bg_percentage" format="float" type="dimen">1.0</item>
 </resources>

@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Plávajúci režim</string>
   <string name="floating_mode_blacklisted_app">Táto aplikácia sa nachádza v blackliste a preto nemusí pracovať správne v plávajúcom režíme </string>
   <string name="hover_cling_text">Hover je povolený.\n\nKeď dorazí notifikácia, vysunie sa lišta, ktorá Vám umožní odpovedať na notifikáciu bez nutnosti opustiť aktuálnu aplikáciu.</string>
+  <string name="status_bar_floating_no_interface">Aplikácia neposkytuje žiadne užívateľské rozhranie</string>
 </resources>

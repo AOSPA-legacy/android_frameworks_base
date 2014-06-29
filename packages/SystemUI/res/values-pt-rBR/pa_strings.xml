@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Modo flutuante</string>
   <string name="floating_mode_blacklisted_app">O app atual está na lista negra porque pode não funcionar como esperado no modo flutuante </string>
   <string name="hover_cling_text">O Hover está habilitado.\n\nQuando uma nova notificação chegar, uma sobreposição será exibida permitindo-lhe responder sem sair do aplicativo atual.</string>
+  <string name="status_bar_floating_no_interface">O App não fornece uma interface</string>
 </resources>

@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Chế độ cửa sổ nổi</string>
   <string name="floating_mode_blacklisted_app">Ứng dụng hiện tại đang nằm trong danh sách đen vì nó có thể không hoạt động như mong đợi</string>
   <string name="hover_cling_text">Đã kích hoạt Hover.\n\nKhi có thông báo mới, một lớp phủ sẽ cho bạn thao tác mà không thoát khỏi ứng dụng hiện tại.</string>
+  <string name="status_bar_floating_no_interface">Ứng dụng không cung cấp giao diện</string>
 </resources>

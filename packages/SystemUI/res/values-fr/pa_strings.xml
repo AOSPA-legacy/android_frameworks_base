@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Mode flottant</string>
   <string name="floating_mode_blacklisted_app">Cette application a été placée sur liste noire car elle pourrait ne pas fonctionner correctement en mode flottant</string>
   <string name="hover_cling_text">Hover est maintenant activé.\n\nLes prochaines notifications s\'afficheront en mode flotant, vous permettant d\'y répondre sans quitter l\'application actuelle.</string>
+  <string name="status_bar_floating_no_interface">L\'application n\'a pas d\'interface compatible</string>
 </resources>

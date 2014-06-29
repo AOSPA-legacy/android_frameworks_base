@@ -15,5 +15,14 @@
  -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Pie colors -->
-    <color name="pie_menu_background">#C0000000</color>
+    <color name="pie_battery_background">#aaffffff</color>
+    <color name="pie_battery_juice_background">#aaffffff</color>
+    <color name="pie_battery_juice_low_background">#ffbb33</color>
+    <color name="pie_battery_juice_critical_background">#ff4444</color>
+    <color name="pie_chevron_background">#aaffffff</color>
+    <color name="pie_menu_background">#65000000</color>
+    <color name="pie_outlines_background">#55ffffff</color>
+    <color name="pie_snap_background">#aaffffff</color>
+    <color name="pie_select_background">#aaffffff</color>
+    <color name="pie_status_background">#aaffffff</color>
 </resources>

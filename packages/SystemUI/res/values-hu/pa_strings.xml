@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Lebegő mód</string>
   <string name="floating_mode_blacklisted_app">Ez az alkalmazás feketelistára került, mert nem működik megfelelően lebegő módban </string>
   <string name="hover_cling_text">Hover engedélyezve.\n\nHa új értesítés érkezik, egy megjelenő felületen tud reagálni rá, anélkül, hogy elhagyná a jelenlegi alkalmazást.</string>
+  <string name="status_bar_floating_no_interface">Az alkalmazás nem biztosít felületet</string>
 </resources>

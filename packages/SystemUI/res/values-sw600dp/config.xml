@@ -35,8 +35,8 @@
     <!-- Enable the "flip settings" panel -->
     <bool name="config_hasFlipSettingsPanel">false</bool>
 
-    <!-- Enable stick pie to screen edge -->
-    <bool name="config_stickPieToScreenEdge">false</bool>
+    <!-- Enable Pie relocation to either stick to a physical side or default to the right side -->
+    <bool name="config_relocatePieOnRotation">false</bool>
 
     <!-- Enable force pie centered -->
     <bool name="config_forcePieCentered">false</bool>

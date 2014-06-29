@@ -187,13 +187,36 @@ public class PieHelper {
                 .toUpperCase();
     }
 
+    public Intent getAssistIntent() {
+        Intent intent = ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
+                    .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
+        return intent;
+    }
+
     public boolean isAssistantAvailable() {
         Intent intent = ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
                 .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
         return intent != null;
     }
 
-    public void startAssistActivity() {
-        mBar.getSearchPanelView().startAssistActivity();
+    public void launchAssistAction() {
+        Intent intent = getAssistIntent();
+        if(intent != null) {
+            try {
+                ActivityOptions opts = ActivityOptions.makeCustomAnimation(mContext,
+                        R.anim.search_launch_enter, R.anim.search_launch_exit);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                ActivityManagerNative.getDefault().dismissKeyguardOnNextActivity();
+                mBar.animateCollapsePanels(FLAG_EXCLUDE_NONE);
+                mContext.startActivityAsUser(intent, opts.toBundle(),
+                        new UserHandle(UserHandle.USER_CURRENT));
+            } catch (ActivityNotFoundException e) {
+                // Google now not found
+            } catch (RemoteException ex) {
+                // system is dead
+            }
+        }
     }
 }

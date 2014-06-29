@@ -619,7 +619,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         public void onReceive(Context context, Intent intent) {
            final String action = intent.getAction();
             if (action.equals(Intent.ACTION_POWERMENU)) {
-                showGlobalActionsDialog();
+                mHandler.post(mPowerLongPress);
             }
         }
 

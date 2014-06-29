@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">フローティングモード</string>
   <string name="floating_mode_blacklisted_app">このアプリはフローティングモードで期待どおりに動作しない場合がありますのでブラックリストに登録されています </string>
   <string name="hover_cling_text">Hoverが有効になりました。\n\n新しい通知が到着すると、オーバーレイで表示されて現在のアプリから離れることなく応答できます。</string>
+  <string name="status_bar_floating_no_interface">アプリのインターフェイスはありません</string>
 </resources>

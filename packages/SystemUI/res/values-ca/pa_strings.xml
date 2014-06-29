@@ -69,6 +69,7 @@
   <string name="enable_switch_apps_title">Cambiar entre aplicacions</string>
   <string name="enable_switch_apps_message">Li agradaria que en mantenir pulsat el botó recents s\'obrís la darrera aplicació utilitzada?</string>
   <string name="status_bar_recent_floating_item_title">Mode flotant</string>
-  <string name="floating_mode_blacklisted_app">L\'aplicació actual és a la llista negra i pot ser que no funcioni com s\'espera en el mode flotant </string>
+  <string name="floating_mode_blacklisted_app">L\'aplicació actual és a la llista negra de manera que podria no funcionar com s\'espera en el mode flotant </string>
   <string name="hover_cling_text">Hover ara és activat.\n\nQuan arribi una nova notificació una capa us permetrà respondre-la sense sortir de l\'aplicació actual.</string>
+  <string name="status_bar_floating_no_interface">La aplicació no proporciona cap interfície</string>
 </resources>

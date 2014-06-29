@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Πλωτή λειτουργία</string>
   <string name="floating_mode_blacklisted_app">Η τρέχουσα εφαρμογή είναι στη μαύρη λίστα και ενδέχεται να μην δουλέψει όπως αναμένεται στην πλωτή λειτουργία </string>
   <string name="hover_cling_text">Το Hover είναι τώρα ενεργό.\n\nΌταν φτάνει μια νέα ειδοποίηση, μια επικάλυψη θα εμφανιστεί επιτρέποντάς σας να απαντήσετε σε αυτή χωρίς να βγείτε από την τρέχουσα εφαρμογή.</string>
+  <string name="status_bar_floating_no_interface">Η εφαρμογή δεν παρέχει διεπαφή</string>
 </resources>

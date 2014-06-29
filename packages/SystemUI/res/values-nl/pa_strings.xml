@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Floating mode</string>
   <string name="floating_mode_blacklisted_app">Deze app is geblokkeerd en werkt mogelijk niet naar behoren in zweefmodus </string>
   <string name="hover_cling_text">Hover is nu ingeschakeld.\n\nWanneer een nieuw bericht arriveert, wordt een scherm weergegeven zodat u kunt reageren zonder de huidige app te verlaten.</string>
+  <string name="status_bar_floating_no_interface">App biedt geen interface</string>
 </resources>

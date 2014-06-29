@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Dryf manier interaksie</string>
   <string name="floating_mode_blacklisted_app">Die huidige applikasie is op \'n swartlys, en mag dalk nie werk soos verwag word in \"Floating mode\" </string>
   <string name="hover_cling_text">\"Hover\" is nou aktief.\n\nWanner \'n nuwe kennisgewing arriveer, sal \'n oortrek op die skerm wys, waarop U kan reageer sonder om die huidgie aktiewe applikasie toe te maak.</string>
+  <string name="status_bar_floating_no_interface">App provides no interface</string>
 </resources>

@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Modalità floating</string>
   <string name="floating_mode_blacklisted_app">L\'applicazione corrente è stata aggiunta alla lista nera in quanto potrebbe non funzionare correttamente in modalità floating.</string>
   <string name="hover_cling_text">Hover è abilitato,\n\nAll\'arrivo di una nuova notifica una finestra a tendina ti permetterà di rispondere senza abbandonare l\'app corrente.</string>
+  <string name="status_bar_floating_no_interface">L\'applicazione non fornisce alcuna interfaccia</string>
 </resources>

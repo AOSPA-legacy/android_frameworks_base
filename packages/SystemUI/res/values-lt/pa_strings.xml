@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Plaukiojantis režimas</string>
   <string name="floating_mode_blacklisted_app">Dabartinė programa yra įdėta į juodąjį sąrašą, nes gali dirbti ne taip kaip tikimasi plaukiojimo režime </string>
   <string name="hover_cling_text">Hover įgalintas.\n\nKai atvyks naujas pranešimas, pasirodys perdanga, kuri leis atsakyti į jį, nepaliekant dabartinės programos.</string>
+  <string name="status_bar_floating_no_interface">App suteikia sąsają</string>
 </resources>

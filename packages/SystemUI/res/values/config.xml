@@ -105,8 +105,8 @@
     <!-- Should "4G" be shown instead of "LTE" when the network is NETWORK_TYPE_LTE? -->
     <bool name="config_show4GForLTE">true</bool>
 
-    <!-- Enable stick pie to screen edge -->
-    <bool name="config_stickPieToScreenEdge">true</bool>
+    <!-- Enable Pie relocation to either stick to a physical side or default to the right side -->
+    <bool name="config_relocatePieOnRotation">true</bool>
 
     <!-- Enable force pie centered -->
     <bool name="config_forcePieCentered">true</bool>

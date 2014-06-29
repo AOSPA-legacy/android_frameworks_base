@@ -70,4 +70,5 @@
   <string name="enable_switch_apps_message">Hitro odpiranje predhodne aplikacije z daljšim stiskom tipke \"meni|nedavno\" ?</string>
   <string name="status_bar_recent_floating_item_title">Floating mode</string>
   <string name="floating_mode_blacklisted_app">Trenutan aplikacija je na črnem seznamu in zato ne bo delovala v floating načinu. </string>
+  <string name="status_bar_floating_no_interface">App omogoča brez vmesnika</string>
 </resources>

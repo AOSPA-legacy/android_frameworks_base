@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Floating-Modus</string>
   <string name="floating_mode_blacklisted_app">Die aktuelle App ist auf der Blacklist, da sie möglicherweise nicht wie erwartet im Schwebmodus funktioniert</string>
   <string name="hover_cling_text">Hover ist nun aktiviert.\n\nWenn eine neue Benachrichtung eintrifft, wird diese kurz eingeblendet und ermöglicht eine Interaktion ohne die aktuelle App verlassen zu müssen.</string>
+  <string name="status_bar_floating_no_interface">App hat keine Benutzeroberfläche</string>
 </resources>

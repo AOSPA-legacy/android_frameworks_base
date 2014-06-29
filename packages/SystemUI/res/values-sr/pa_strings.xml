@@ -70,4 +70,6 @@
   <string name="enable_switch_apps_message">Брзо покрени претходну апликацију након дугог притиска на мултитаскинг дугме?</string>
   <string name="status_bar_recent_floating_item_title">Лебдећи мод</string>
   <string name="floating_mode_blacklisted_app">Ова апликација се налази на црној листи и могуће да неће радити како треба у лебдећем моду </string>
+  <string name="hover_cling_text">\"Hover\" је омогућен.\n\nКада стигне ново обавештење, појавиће се прозорчић преко активне апликације омогућавајући одговор без напуштања текуће апликације.</string>
+  <string name="status_bar_floating_no_interface">Апликација не обезбеђује сучеље</string>
 </resources>

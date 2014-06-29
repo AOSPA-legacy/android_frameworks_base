@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">懸浮模式</string>
   <string name="floating_mode_blacklisted_app">目前這個應用程式被列入黑名單中，預期在懸浮模式下可能無法運作</string>
   <string name="hover_cling_text">Hover 經已啟動。\n\n當收到新的通知時，將會懸浮顯示，以便你回饋通知而無需離開當前應用程式。</string>
+  <string name="status_bar_floating_no_interface">應用程式沒有提供介面</string>
 </resources>

@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Yüzer mod</string>
   <string name="floating_mode_blacklisted_app">Geçerli uygulama, yüzer modda beklendiği gibi çalışmadığı için kara listeye alındı </string>
   <string name="hover_cling_text">Hover artık etkin.\n\nYeni bir bildirim geldiğinde, şu anda kullandığınız uygulamadan çıkmadan cevaplamanızı sağlayan bir katman belirecek.</string>
+  <string name="status_bar_floating_no_interface">Uygulama arayüz sağlamıyor</string>
 </resources>

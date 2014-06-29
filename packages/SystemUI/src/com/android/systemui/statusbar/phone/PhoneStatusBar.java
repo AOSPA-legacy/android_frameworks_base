@@ -146,6 +146,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     public static final String CUSTOM_LOCKSCREEN_STATE
             = "com.android.keyguard.custom.STATE";
+    public static final String ACTION_VOLUMEPANEL_SHOWN
+            = "android.view.volumepanel.SHOWN";
+    public static final String ACTION_VOLUMEPANEL_HIDDEN
+            = "android.view.volumepanel.HIDDEN";
 
     private static final int MSG_OPEN_NOTIFICATION_PANEL = 1000;
     private static final int MSG_CLOSE_PANELS = 1001;
@@ -410,7 +414,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
         if (mBattery != null && mCircleBattery != null) {
             mBattery.updateSettings();
+            mBattery.setColors(false);
             mCircleBattery.updateSettings();
+            mCircleBattery.setColors(false);
         }
     }
 
@@ -909,13 +915,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(ACTION_DEMO);
         filter.addAction(CUSTOM_LOCKSCREEN_STATE);
+        filter.addAction(ACTION_VOLUMEPANEL_SHOWN);
+        filter.addAction(ACTION_VOLUMEPANEL_HIDDEN);
         context.registerReceiver(mBroadcastReceiver, filter);
 
         // listen for USER_SETUP_COMPLETE setting (per-user)
         resetUserSetupObserver();
 
         mBattery = (BatteryMeterView) mStatusBarView.findViewById(R.id.battery);
+        mBattery.setColors(false);
         mCircleBattery = (BatteryCircleMeterView) mStatusBarView.findViewById(R.id.circle_battery);
+        mCircleBattery.setColors(false);
+
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
             mMSimNetworkController.setListener(this);
         } else {
@@ -2454,29 +2465,50 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (0 == (mDisabled & (StatusBarManager.DISABLE_NOTIFICATION_ICONS
                             | StatusBarManager.DISABLE_NOTIFICATION_TICKER))) {
                 boolean blacklisted = false;
-                // don't pass notifications that run in Hover to Ticker
+                boolean foreground = false;
+
                 if (mHoverState == HOVER_ENABLED) {
+                    // don't pass notifications that run in Hover to Ticker
                     try {
                         blacklisted = getNotificationManager().isPackageAllowedForHover(n.getPackageName());
                     } catch (android.os.RemoteException ex) {
                         // System is dead
                     }
+
+                    // same foreground app? pass to ticker, hover doesn't show this one
+                    foreground = n.getPackageName().equals(
+                            getNotificationHelperInstance().getForegroundPackageName());
                 }
-                if (!blacklisted) mTicker.addEntry(n);
+
+                if (!blacklisted | foreground) mTicker.addEntry(n);
             }
         }
     }
 
     @Override
     public void animateStatusBarOut() {
-        mStatusBarView.setVisibility(View.GONE);
-        mStatusBarView.startAnimation(loadAnim(com.android.internal.R.anim.push_up_out, null));
+        // ensure to not overload
+        if (mStatusBarView.getVisibility() == View.VISIBLE) {
+            mHandler.post(new Runnable() {
+                public void run() {
+                    mStatusBarView.setVisibility(View.GONE);
+                    mStatusBarView.startAnimation(loadAnim(com.android.internal.R.anim.push_up_out, null));
+                }
+            });
+        }
     }
 
     @Override
     public void animateStatusBarIn() {
-        mStatusBarView.setVisibility(View.VISIBLE);
-        mStatusBarView.startAnimation(loadAnim(com.android.internal.R.anim.push_down_in, null));
+        // ensure to not overload
+        if (mStatusBarView.getVisibility() == View.GONE) {
+            mHandler.post(new Runnable() {
+                public void run() {
+                    mStatusBarView.setVisibility(View.VISIBLE);
+                    mStatusBarView.startAnimation(loadAnim(com.android.internal.R.anim.push_down_in, null));
+                }
+            });
+        }
     }
 
     private class MyTicker extends Ticker {
@@ -2934,6 +2966,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 if (null != mNavigationBarView) {
                     mNavigationBarView.getBarTransitions().applyTransparent(showing);
                 }
+            }
+            else if (ACTION_VOLUMEPANEL_SHOWN.equals(action)) {
+                animateStatusBarOut();
+            }
+            else if (ACTION_VOLUMEPANEL_HIDDEN.equals(action)) {
+                animateStatusBarIn();
             }
         }
     };

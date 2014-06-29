@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">悬浮模式</string>
   <string name="floating_mode_blacklisted_app">当前应用已经添加至黑名单，它将不会以悬浮模式运行</string>
   <string name="hover_cling_text">已启用 Hover\n\n当有新通知时，该通知将以悬浮窗口显示，以便您在不离开当前应用的情况下对其进行操作</string>
+  <string name="status_bar_floating_no_interface">无应用程序接口</string>
 </resources>

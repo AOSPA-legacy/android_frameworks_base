@@ -93,4 +93,7 @@
     <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
     <string name="permdesc_writeThemesDesc">Allows the app to insert new themes and
        modify which theme you have applied.</string>
+
+    <!-- WiFi turn off notification -->
+    <string name="notify_turn_wifi_off_title">Turn Wi-Fi off</string>
 </resources>

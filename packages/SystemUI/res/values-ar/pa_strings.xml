@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">الوضع العائم</string>
   <string name="floating_mode_blacklisted_app">التطبيق الحالي هو على القائمة السوداء كما أنها قد لا يعمل كما هو متوقع في وضع عائم </string>
   <string name="hover_cling_text">وضع \"Hover\" الآن مفعل.\n\nعندما يصل تنبيه جديد, سيتم فتح إطار يسمح لك الرد دون الحاجة للخروج.</string>
+  <string name="status_bar_floating_no_interface">ويوفر التطبيق لا واجهة</string>
 </resources>

@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Mod plutitor</string>
   <string name="floating_mode_blacklisted_app">Applicaţiunea curentă este pe lista neagră deoarece poate să nu funcţioneze corect în floating mode </string>
   <string name="hover_cling_text">Hover este acum activ.\n\nCând primiți o nouă notificare, o fereastră va apărea suprapus, oferindu-vă posibilitatea să răspundeți fără a părăsi aplicația curentă.</string>
+  <string name="status_bar_floating_no_interface">Aplicaţia nu oferă nici o interfaţă</string>
 </resources>

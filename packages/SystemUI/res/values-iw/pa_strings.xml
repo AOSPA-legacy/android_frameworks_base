@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">מצב צף</string>
   <string name="floating_mode_blacklisted_app">היישום הנוכחי מופיע ברשימה שחורה מכיוון שהוא עלול לא לתפקד כראויי במצב צף </string>
   <string name="hover_cling_text">מצב \"התראה צפה\" אופשר.\n\n כאשר תתקבל התראה חדשה, ההתרעה תופיע עם אפשרות להגיב מבלי לצאת מאפליקציה פעילה.</string>
+  <string name="status_bar_floating_no_interface">היישום מספק אין ממשק</string>
 </resources>

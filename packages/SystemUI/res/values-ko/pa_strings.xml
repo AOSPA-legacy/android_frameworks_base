@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">플로팅 모드</string>
   <string name="floating_mode_blacklisted_app">이 앱은 플로팅 모드에서 오작동할 가능성이 있어 블랙리스트되었습니다.</string>
   <string name="hover_cling_text">Hover가 활성화 되었습니다.\n\n새 알림이 도착하면, 현재 사용중인 앱을 벗어나지 않고도 알림에 반응할 수 있도록 작은 창이 나타날 것 입니다.</string>
+  <string name="status_bar_floating_no_interface">앱이 인터페이스를 제공하지 않습니다.</string>
 </resources>

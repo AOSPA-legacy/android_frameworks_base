@@ -63,7 +63,7 @@
   <string name="quick_settings_quick_pull_down_title">Quick pull down</string>
   <string name="quick_settings_quick_pull_down_message">คุณต้องการให้ขอบของแถบสถานะสามารถดึงการตั้งค่าการเร่งด่วนหรือไม่</string>
   <string name="navbar_recents_clear_all_title">ล้างทั้งหมด</string>
-  <string name="navbar_recents_clear_all_message">คุณต้องการ \"ปุ่ม recents\" เพื่อล้างแอพพลิเคชันทั้งหมดที่เปิดทิ้งไว้หรือไม่</string>
+  <string name="navbar_recents_clear_all_message">คุณต้องใช้ \"ปุ่ม recents\" เพื่อล้างแอพพลิเคชันทั้งหมดที่เปิดทิ้งไว้หรือไม่?</string>
   <string name="enable_pie_control_title">ควบคุมแบบวงกลม</string>
   <string name="enable_pie_control_message">คุณต้องใช้ pie controls ในโหมด immersive หรือไม่</string>
   <string name="enable_switch_apps_title">สลับแอพพลิเคชัน</string>
@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Floating mode</string>
   <string name="floating_mode_blacklisted_app">แอพพลิเคชันนี้ถูกแบล็คลิสท์จึงไม่สามารถทำงานได้ในโหมด floating</string>
   <string name="hover_cling_text">เปิดการใช้งาน Hover\n\nเมื่อมีการแจ้งเตือนมาใหม่ จะมีการแสดงให้คุณทราบแบบซ้อนทับขึ้นมาเพื่อไม่ต้องออกจากแอพที่ใช้อยู่.</string>
+  <string name="status_bar_floating_no_interface">App มีไม่</string>
 </resources>

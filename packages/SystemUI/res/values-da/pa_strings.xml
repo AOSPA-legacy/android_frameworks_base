@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Flydende tilstand</string>
   <string name="floating_mode_blacklisted_app">Den nuværende app er sortlistet, da den fungerer muligvis ikke som forventet i flydende tilstand </string>
   <string name="hover_cling_text">Hover er nu aktiveret.\n\nNår en ny notifikation ankommer, vil en overlejring fremkomme, som muliggør interaktion med notifikationen, uden at du behøver at forlade din nuværende app.</string>
+  <string name="status_bar_floating_no_interface">App har ingen brugerflade</string>
 </resources>

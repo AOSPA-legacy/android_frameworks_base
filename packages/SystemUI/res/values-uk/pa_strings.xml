@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Плаваючий режим</string>
   <string name="floating_mode_blacklisted_app">Ця програма занесена до чорного списку, оскільки вона не може працювати належним чином, як слід у плаваючому режимі </string>
   <string name="hover_cling_text">Hover увімкнений.\n\nПри надходженні повідомлення з\'явиться плаваюче вікно, яке дозволить вам відповісти на повідомлення, не залишаючи поточний додаток.</string>
+  <string name="status_bar_floating_no_interface">Програма не має інтерфейсу</string>
 </resources>

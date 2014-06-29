@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Plovoucí režim</string>
   <string name="floating_mode_blacklisted_app">Současná aplikace je v blacklistu a nemusí pracovat v plovoucím módu jak očekáváte </string>
   <string name="hover_cling_text">Hover je nyní aktivován.\n\nJakmile dorazí nové oznámení, objeví se v horní části obrazovky průsvitný překryv, díky kterému můžete na oznámení reagovat bez opuštění momentálně spuštěné aplikace.</string>
+  <string name="status_bar_floating_no_interface">Aplikace neposkytuje žádné rozhraní</string>
 </resources>

@@ -46,6 +46,11 @@
         <item>15</item>
         <item>100</item>
     </array>
+    <array name="sb_batterymeter_color_values">
+        <item>@color/sb_batterymeter_critical</item>
+        <item>@color/sb_batterymeter_low</item>
+        <item>@color/sb_batterymeter_full</item>
+    </array>
     <array name="batterymeter_color_values">
         <item>@color/batterymeter_critical</item>
         <item>@color/batterymeter_low</item>

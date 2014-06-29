@@ -71,4 +71,5 @@
   <string name="status_bar_recent_floating_item_title">Kelluva tila</string>
   <string name="floating_mode_blacklisted_app">Tämä ohjelma on mustalla listalla, eikä se välttämättä toimi oikein kelluvassa tilassa </string>
   <string name="hover_cling_text">Hover on nyt käytössä.\n\nKun uusi ilmoitus saapuu, näytön yläosaan ilmestyy palkki josta voit vastata ilmoitukseen poistumatta nykyisestä ohjelmasta.</string>
+  <string name="status_bar_floating_no_interface">App tarjoaa ei liitäntä</string>
 </resources>
