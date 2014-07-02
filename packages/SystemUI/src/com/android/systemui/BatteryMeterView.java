@@ -214,7 +214,7 @@ public class BatteryMeterView extends View implements DemoMode {
     public void setColors(boolean qs) {
         Resources res = getResources();
         TypedArray levels = res.obtainTypedArray(R.array.batterymeter_color_levels);
-        TypedArray colors = res.obtainTypedArray(qs ? R.array.batterymeter_color_values :
+        TypedArray colors = res.obtainTypedArray(qs ? R.array.qs_batterymeter_color_values :
                                                       R.array.sb_batterymeter_color_values);
 
         final int N = levels.length();
@@ -227,9 +227,9 @@ public class BatteryMeterView extends View implements DemoMode {
         colors.recycle();
         mWarningTextPaint.setColor(mColors[1]);
         if (qs) {
-            mChargeColor = res.getColor(R.color.batterymeter_charge_color);
-            mBoltPaint.setColor(res.getColor(R.color.batterymeter_bolt_color));
-            mFramePaint.setColor(res.getColor(R.color.batterymeter_frame_color));
+            mChargeColor = res.getColor(R.color.qs_batterymeter_charge_color);
+            mBoltPaint.setColor(res.getColor(R.color.qs_batterymeter_bolt_color));
+            mFramePaint.setColor(res.getColor(R.color.qs_batterymeter_frame_color));
         } else {
             mChargeColor = res.getColor(R.color.sb_batterymeter_charge_color);
             mBoltPaint.setColor(res.getColor(R.color.sb_batterymeter_bolt_color));

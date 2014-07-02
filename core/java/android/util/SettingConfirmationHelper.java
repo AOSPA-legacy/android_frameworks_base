@@ -30,6 +30,10 @@ import android.provider.Settings;
 
 import com.android.internal.R;
 
+/**
+ * Hide from public API
+ * @hide
+ */
 public class SettingConfirmationHelper {
 
     private static final int NOT_SET = 0;
@@ -39,10 +43,16 @@ public class SettingConfirmationHelper {
 
     private static Context mUiContext; /* theme engine context for getting just resources */
 
+    /**
+     * @hide
+     */
     public static interface OnSelectListener {
         void onSelect(boolean enabled);
     }
 
+    /**
+     * @hide
+     */
     public static void showConfirmationDialogForSetting(final Context mContext, String title, String msg, Drawable hint,
                                                         final String setting, final OnSelectListener mListener) {
         mUiContext = ThemeUtils.createUiContext(mContext); // avoid package mismatch

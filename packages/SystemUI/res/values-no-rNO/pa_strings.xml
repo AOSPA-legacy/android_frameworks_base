@@ -22,7 +22,7 @@
   <string name="screenshot_delete_confirmation">Skjermbilde slettet</string>
   <string name="quick_settings_battery_charging">Lader</string>
   <string name="quick_settings_battery_discharging">Lader ut</string>
-  <string name="quick_settings_immersive_global_on_label">Immersive</string>
+  <string name="quick_settings_immersive_global_on_label">Fullskjerm</string>
   <string name="quick_settings_immersive_global_off_label">Fullskjerm Av</string>
   <string name="quick_settings_immersive_mode_off_label">Deaktivert</string>
   <string name="quick_settings_immersive_mode_full_label">Full</string>
@@ -33,7 +33,7 @@
   <string name="quick_settings_network_type">Nettverk</string>
   <string name="quick_settings_network_unknown">Ukjent</string>
   <string name="quick_settings_network_disabled">Deaktivert</string>
-  <string name="quick_settings_network_toast_disabled">Nettverk innstillinger er ikke tilgjengelig</string>
+  <string name="quick_settings_network_toast_disabled">Nettverksinnstillinger er ikke tilgjengelig</string>
   <string name="quick_settings_lightbulb_label">Lyspære</string>
   <string name="quick_settings_lightbulb_off_label">Lyspære Av</string>
   <string name="quick_settings_usb_tether_connected_label">USB-tilknytning Av</string>
@@ -67,9 +67,9 @@
   <string name="enable_pie_control_title">Pie kontroller</string>
   <string name="enable_pie_control_message">Ønsker du å bruke Pie-navigasjon i fullskjermsmodus?</string>
   <string name="enable_switch_apps_title">Bytt apper</string>
-  <string name="enable_switch_apps_message">Skift hurtig til forrige app når du trykker \"siste-brukte\"-knappen?</string>
+  <string name="enable_switch_apps_message">Skift hurtig til forrige app når du holder inne \"siste-brukte-knappen\"?</string>
   <string name="status_bar_recent_floating_item_title">Flytende modus</string>
-  <string name="floating_mode_blacklisted_app">Gjeldende app er svartelistet fordi den ikke nødvendigvis fungerer som forventet i flytende modus </string>
-  <string name="hover_cling_text">Hover er nå aktivert\n\nNår du mottar en ny varsling vil et overlegg vises slik at du kan svare uten å forlate gjeldende app.</string>
+  <string name="floating_mode_blacklisted_app">Gjeldende app er svartelistet fordi den muligens ikke fungerer som forventet i flytende modus </string>
+  <string name="hover_cling_text">Hover er nå aktivert.\n\nNår du mottar en ny varsling vil et overlegg vises slik at du kan svare uten å forlate gjeldende app.</string>
   <string name="status_bar_floating_no_interface">Applikasjonen har inget grensesnitt</string>
 </resources>

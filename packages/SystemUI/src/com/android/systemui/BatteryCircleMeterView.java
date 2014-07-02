@@ -262,13 +262,13 @@ public class BatteryCircleMeterView extends ImageView {
     public void setColors(boolean qs) {
         mQS = qs;
         Resources res = getResources();
-        int fgColor = res.getColor(qs ? com.android.systemui.R.color.batterymeter_circle_fg :
+        int fgColor = res.getColor(qs ? com.android.systemui.R.color.qs_batterymeter_circle_fg :
                 com.android.systemui.R.color.sb_batterymeter_circle_fg);
-        int bgColor = res.getColor(qs ? com.android.systemui.R.color.batterymeter_circle_bg :
+        int bgColor = res.getColor(qs ? com.android.systemui.R.color.qs_batterymeter_circle_bg :
                 com.android.systemui.R.color.sb_batterymeter_circle_bg);
-        int textColor = res.getColor(qs ? com.android.systemui.R.color.batterymeter_circle_text :
+        int textColor = res.getColor(qs ? com.android.systemui.R.color.qs_batterymeter_circle_text :
                 com.android.systemui.R.color.sb_batterymeter_circle_text);
-        int chargingTextColor = res.getColor(qs ? com.android.systemui.R.color.batterymeter_circle_text_charging :
+        int chargingTextColor = res.getColor(qs ? com.android.systemui.R.color.qs_batterymeter_circle_text_charging :
                 com.android.systemui.R.color.sb_batterymeter_circle_text_charging);
         mCircleTextColor = textColor;
         mCircleTextChargingColor = chargingTextColor;
@@ -392,10 +392,10 @@ public class BatteryCircleMeterView extends ImageView {
 
         float strokeWidth = mCircleSize / 7.5f;
         float strokeWidthBg = strokeWidth * getFloat(mQS ?
-                com.android.systemui.R.dimen.circle_battery_thickness_bg_percentage :
+                com.android.systemui.R.dimen.qs_circle_battery_thickness_bg_percentage :
                 com.android.systemui.R.dimen.sb_circle_battery_thickness_bg_percentage);
         float strokeWidthFg = strokeWidth * getFloat(mQS ?
-                com.android.systemui.R.dimen.circle_battery_thickness_fg_percentage :
+                com.android.systemui.R.dimen.qs_circle_battery_thickness_fg_percentage :
                 com.android.systemui.R.dimen.sb_circle_battery_thickness_fg_percentage);
         mPaintRed.setStrokeWidth(strokeWidthFg);
         mPaintSystem.setStrokeWidth(strokeWidthFg);
@@ -448,7 +448,7 @@ public class BatteryCircleMeterView extends ImageView {
         }
 
         mCircleSize = Math.round((float)(measure.getHeight() - 3) * getFloat(mQS ?
-                com.android.systemui.R.dimen.circle_battery_size_percentage :
+                com.android.systemui.R.dimen.qs_circle_battery_size_percentage :
                 com.android.systemui.R.dimen.sb_circle_battery_size_percentage));
     }
 

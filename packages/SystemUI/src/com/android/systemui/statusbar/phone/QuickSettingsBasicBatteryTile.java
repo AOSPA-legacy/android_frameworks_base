@@ -56,7 +56,7 @@ class QuickSettingsBasicBatteryTile extends QuickSettingsTileView {
                         FrameLayout.LayoutParams.MATCH_PARENT,
                         FrameLayout.LayoutParams.MATCH_PARENT));
         mTextView = (TextView) findViewById(R.id.text);
-        mBattery = (BatteryMeterView) findViewById(R.id.image);
+        mBattery = (BatteryMeterView) findViewById(R.id.battery);
         mBattery.setColors(true);
         mBattery.setVisibility(View.GONE);
         mCircleBattery = (BatteryCircleMeterView) findViewById(R.id.circle_battery);

@@ -21,7 +21,7 @@
   <string name="screenshot_delete_action">Sil</string>
   <string name="screenshot_delete_confirmation">Ekran görüntüsü silindi</string>
   <string name="quick_settings_battery_charging">Şarj oluyor</string>
-  <string name="quick_settings_battery_discharging">Şarjı tükeniyor</string>
+  <string name="quick_settings_battery_discharging">Şarj edilmiyor</string>
   <string name="quick_settings_immersive_global_on_label">Tam Ekran</string>
   <string name="quick_settings_immersive_global_off_label">Tam Ekran Kapalı</string>
   <string name="quick_settings_immersive_mode_off_label">Devre dışı</string>
