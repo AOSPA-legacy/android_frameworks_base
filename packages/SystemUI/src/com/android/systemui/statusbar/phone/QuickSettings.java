@@ -956,8 +956,8 @@ class QuickSettings {
                     immersiveTile.setBackOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            // instead of just returning, assume user wants to turn on immersive
-                            if(mModel.getImmersiveMode() == 0) {
+                            // instead of just returning, assume user wants to turn on/off immersive
+                            if(mModel.getImmersiveMode() == 0 || mModel.getImmersiveMode() == 4) {
                                 immersiveTile.swapTiles(true);
                                 return;
                             }

@@ -170,6 +170,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int IMMERSIVE_MODE_FULL = 1;
     private static final int IMMERSIVE_MODE_HIDE_ONLY_NAVBAR = 2;
     private static final int IMMERSIVE_MODE_HIDE_ONLY_STATUSBAR = 3;
+    private static final int IMMERSIVE_MODE_APP = 4;
 
     // Pie
     private static final int PIE_ENABLED = 1;
@@ -2808,6 +2809,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         contentInset.setEmpty();
     }
 
+    /** The immersive mode used prior to switching to forced immersive. */
+    private int mNonForcedImmersiveMode = IMMERSIVE_MODE_OFF;
+
     /** {@inheritDoc} */
     @Override
     public void beginLayoutLw(boolean isDefaultDisplay, int displayWidth, int displayHeight,
@@ -2937,6 +2941,18 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mNavigationBarWidthForRotation[mSeascapeRotation] =
                     immersiveModeHidesNavigationBar() && immersiveModeImplementsPie() ?
                             0 : mContext.getResources().getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_width);
+
+            // Turn on Pie if the app is forcing full-screen and user has been chosen to use Pie
+            final ContentResolver res = mContext.getContentResolver();
+            final int immersiveMode = Settings.System.getIntForUser(res, Settings.System.IMMERSIVE_MODE, 0, UserHandle.USER_CURRENT);
+            if ((sysui & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0 && (sysui & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
+                    && (immersiveMode == IMMERSIVE_MODE_OFF || immersiveMode == IMMERSIVE_MODE_HIDE_ONLY_STATUSBAR)
+                    && immersiveModeImplementsPie()) {
+                Settings.System.putIntForUser(res, Settings.System.IMMERSIVE_MODE, IMMERSIVE_MODE_APP, UserHandle.USER_CURRENT);
+                mNonForcedImmersiveMode = immersiveMode;
+            } else if ((sysui & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0 && immersiveMode == IMMERSIVE_MODE_APP) {
+                Settings.System.putIntForUser(res, Settings.System.IMMERSIVE_MODE, mNonForcedImmersiveMode, UserHandle.USER_CURRENT);
+            }
 
             boolean updateSysUiVisibility = false;
             if (mNavigationBar != null) {
@@ -3571,14 +3587,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     private int updateWindowManagerVisibilityFlagsForImmersiveModes(int vis) {
-        if (mImmersiveModeStyle != IMMERSIVE_MODE_OFF) {
+        if (mImmersiveModeStyle != IMMERSIVE_MODE_OFF && mImmersiveModeStyle != IMMERSIVE_MODE_APP) {
             vis |= FLAG_FULLSCREEN;
         }
         return vis;
     }
 
     private boolean immersiveModeHidesNavigationBar() {
-        return mImmersiveModeStyle == IMMERSIVE_MODE_FULL || mImmersiveModeStyle == IMMERSIVE_MODE_HIDE_ONLY_NAVBAR;
+        return mImmersiveModeStyle == IMMERSIVE_MODE_FULL || mImmersiveModeStyle == IMMERSIVE_MODE_HIDE_ONLY_NAVBAR || mImmersiveModeStyle == IMMERSIVE_MODE_APP;
     }
 
     private boolean immersiveModeHidesStatusBar() {

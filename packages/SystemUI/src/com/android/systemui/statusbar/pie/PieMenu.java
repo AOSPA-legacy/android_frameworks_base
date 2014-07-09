@@ -78,6 +78,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.android.systemui.statusbar.pie.PieController.RECENT_BUTTON;
+import static com.android.systemui.statusbar.phone.QuickSettingsModel.IMMERSIVE_MODE_APP;
 
 /**
  * Pie menu
@@ -706,7 +707,7 @@ public class PieMenu extends FrameLayout {
             canvas.drawARGB((int)(mAnimators[ANIMATOR_DEC_SPEED15].fraction * 0xcc), 0, 0, 0);
 
             // snap points
-            final int threshold = mImmersiveMode == IMMERSIVE_MODE_FULL && !mIsProtected ?
+            final int threshold = (mImmersiveMode == IMMERSIVE_MODE_FULL || mImmersiveMode == IMMERSIVE_MODE_APP) && !mIsProtected ?
                     mOuterChevronRadius : mOuterChevronLiteRadius;
 
             if (mCenterDistance > threshold) {
@@ -748,7 +749,7 @@ public class PieMenu extends FrameLayout {
 
             state = canvas.save();
             canvas.rotate(90, mCenter.x, mCenter.y);
-            if (mImmersiveMode == IMMERSIVE_MODE_FULL && !mIsProtected) {
+            if ((mImmersiveMode == IMMERSIVE_MODE_FULL || mImmersiveMode == IMMERSIVE_MODE_APP) && !mIsProtected) {
                 canvas.drawPath(mChevronPath, mChevronBackground);
             } else if (mImmersiveMode == IMMERSIVE_MODE_HIDE_NAVBAR_ONLY) {
                 for (int i=0; i < CHEVRON_LITE_FRAGMENTS + 2; i++) {
@@ -758,7 +759,7 @@ public class PieMenu extends FrameLayout {
             canvas.restoreToCount(state);
 
             // paint status report only if settings allow
-            if (mImmersiveMode == IMMERSIVE_MODE_FULL && !mIsProtected) {
+            if ((mImmersiveMode == IMMERSIVE_MODE_FULL || mImmersiveMode == IMMERSIVE_MODE_APP) && !mIsProtected) {
                 // draw battery
                 mBatteryBackground.setAlpha((int)
                      (mAnimators[ANIMATOR_DEC_SPEED15].fraction * 0x22));
@@ -873,7 +874,7 @@ public class PieMenu extends FrameLayout {
         float distanceY = mCenter.y - mY;
         mCenterDistance = (float) Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
         float shadeTreshold =
-                mImmersiveMode == IMMERSIVE_MODE_FULL ?
+                mImmersiveMode == IMMERSIVE_MODE_FULL || mImmersiveMode == IMMERSIVE_MODE_APP ?
                         mOuterChevronRadius : mOuterChevronLiteRadius;
 
         int action = evt.getActionMasked();
