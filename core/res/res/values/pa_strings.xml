@@ -28,6 +28,8 @@
     <string name="reboot_fastboot">Fastboot</string>
     <!-- Button to reboot the phone into download, within the Reboot Options dialog -->
     <string name="reboot_download">Download</string>
+    <!-- Button to soft reboot the device, within the Reboot Options dialog -->
+    <string name="reboot_soft">Soft reboot</string>
 
     <!-- Reboot confirmation dialog title -->
     <string name="reboot_system" product="tablet">Reboot tablet</string>
