@@ -69,7 +69,7 @@
         android:textColor="@android:color/holo_blue_light"
         android:text="@string/status_bar_recent_applications"
         android:gravity="center_horizontal"
-        android:paddingTop="100dp"
+        android:paddingBottom="100dp"
     />
 
     <include layout="@layout/status_bar_no_recent_apps"
