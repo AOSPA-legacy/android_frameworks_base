@@ -146,7 +146,8 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
             final View thumbnailView = holder.thumbnailView;
             OnLongClickListener longClickListener = new OnLongClickListener() {
                 public boolean onLongClick(View v) {
-                    mCallback.handleLongPress(view, thumbnailView, thumbnailView);
+                    final View anchorView = view.findViewById(R.id.app_description);
+                    mCallback.handleLongPress(view, anchorView, thumbnailView);
                     return true;
                 }
             };
