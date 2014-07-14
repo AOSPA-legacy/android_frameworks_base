@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -20,6 +21,8 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
     private int mLastViewTouch;
     private boolean mIsSwiping;
+    private boolean mClearAllAnimationDone;
+    private Handler mHandler = new Handler();
 
     // SwipeHelper for handling swipe to dismiss.
     private SwipeHelper mSwipeHelper;
@@ -42,6 +45,8 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
         mSwipeHelper = new SwipeHelper(
                 mOrientation == PORTRAIT ? SwipeHelper.X : SwipeHelper.Y,
                 this, densityScale, pagingTouchSlop);
+
+        mClearAllAnimationDone = true;
     }
 
     @Override
@@ -89,6 +94,10 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         return mSwipeHelper.onInterceptTouchEvent(ev) ||
                 super.onInterceptTouchEvent(ev);
+    }
+
+    private void dismissChild(View v) {
+        mSwipeHelper.dismissChild(v, 0);
     }
 
     @Override
@@ -229,6 +238,39 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
     @Override
     public void swipeAllViewsInLayout() {
-        // TODO
+        Thread clearAll = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int count = mItems.size();
+                // if we have more than one app, don't kill the current one
+                if(count > 1) count--;
+                View[] refView = new View[count];
+                for (int i = 0; i < count; i++) {
+                    refView[i] = mItems.get(i);
+                }
+                for (int i = 0; i < count; i++) {
+                    final View child = refView[i];
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            dismissChild(child);
+                        }
+                    });
+                    try {
+                        Thread.sleep(150);
+                    } catch (InterruptedException e) {
+                        // User will see the app fading instantly after the previous
+                        // one. This will probably never happen
+                    }
+                }
+                // we're done dismissing childs here, reset
+                mClearAllAnimationDone = true;
+            }
+        });
+
+        if (mClearAllAnimationDone) {
+            mClearAllAnimationDone = false;
+            clearAll.start();
+        }
     }
 }

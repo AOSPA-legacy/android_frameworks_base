@@ -515,8 +515,10 @@ public class CardStackView extends RelativeLayout {
             // start padding. Expect all items to have the same start padding.
             position -= mItems.get(0).getStartPadding();
 
-            // Check if we touched 'before' first card.
-            if (position > 0) {
+            // Check if we touched 'before' first card or 'after' last card
+            if (position > 0 &&
+                position < scrollPositionToViewPosition(mItems.get(mItems.size()-1).getPosition())
+                            + getCardHeight(false)) {
                 // Convert to scroll position before comparing item positions.
                 float pos = viewPositionToScrollPosition(position, true);
 
@@ -534,6 +536,7 @@ public class CardStackView extends RelativeLayout {
                 }
             }
         }
+
         return id;
     }
 
@@ -581,6 +584,8 @@ public class CardStackView extends RelativeLayout {
     }
 
     public void removeItem(View view) {
+        view.setVisibility(VISIBLE);
+
         if (mRemoveAnimator != null) {
             mRemoveAnimator.cancel();
         }

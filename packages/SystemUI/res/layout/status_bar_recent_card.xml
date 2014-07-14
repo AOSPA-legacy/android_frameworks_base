@@ -21,11 +21,13 @@
             android:layout_height="match_parent" />
 
         <!-- This is an overlay for drawing the border between shadow and content -->
+        <!--
         <ImageView
             android:id="@+id/app_thumbnail_border"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/status_bar_recent_card_border" />
+         -->
     </RelativeLayout>
 
     <TextView
