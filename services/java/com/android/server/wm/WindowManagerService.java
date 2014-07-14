@@ -5666,6 +5666,11 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public Bitmap screenshotApplications(IBinder appToken, int displayId, int width,
             int height, boolean force565) {
+        return screenshotApplications(appToken, displayId, width, height, force565, true);
+    }
+
+    public Bitmap screenshotApplications(IBinder appToken, int displayId, int width,
+            int height, boolean force565, boolean scaleIt) {
         if (!checkCallingPermission(android.Manifest.permission.READ_FRAME_BUFFER,
                 "screenshotApplications()")) {
             throw new SecurityException("Requires READ_FRAME_BUFFER permission");
@@ -5807,6 +5812,11 @@ public class WindowManagerService extends IWindowManager.Stub
                 rot = getDefaultDisplayContentLocked().getDisplay().getRotation();
                 int fw = frame.width();
                 int fh = frame.height();
+
+                if (!scaleIt) {
+                    width = fw;
+                    height = fh;
+                }
 
                 // Constrain thumbnail to smaller of screen width or height. Assumes aspect
                 // of thumbnail is the same as the screen (in landscape) or square.

@@ -1,0 +1,36 @@
+<!-- Stack card view layout for recent items -->
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recent_item"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="true"
+    android:padding="15dp">
+
+    <!-- This is the card with a background for dropping shadow -->
+    <RelativeLayout
+        android:id="@+id/app_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/status_bar_recent_card_shadow" >
+
+        <!--  This is the actual card content -->
+        <ImageView
+            android:id="@+id/app_thumbnail_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- This is an overlay for drawing the border between shadow and content -->
+        <ImageView
+            android:id="@+id/app_thumbnail_border"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/status_bar_recent_card_border" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/app_label"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+</RelativeLayout>

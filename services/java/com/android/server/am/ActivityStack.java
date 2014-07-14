@@ -123,8 +123,7 @@ final class ActivityStack {
     // convertToTranslucent().
     static final long TRANSLUCENT_CONVERSION_TIMEOUT = 2000;
 
-    static final boolean SCREENSHOT_FORCE_565 = ActivityManager
-            .isLowRamDeviceStatic() ? true : false;
+    static final boolean SCREENSHOT_FORCE_565 = true;
 
     enum ActivityState {
         INITIALIZING,
@@ -714,7 +713,7 @@ final class ActivityStack {
                     || mLastScreenshotBitmap.getHeight() != h) {
                 mLastScreenshotActivity = who;
                 mLastScreenshotBitmap = mWindowManager.screenshotApplications(
-                        who.appToken, Display.DEFAULT_DISPLAY, w, h, SCREENSHOT_FORCE_565);
+                        who.appToken, Display.DEFAULT_DISPLAY, w, h, SCREENSHOT_FORCE_565, false);
             }
             if (mLastScreenshotBitmap != null) {
                 return mLastScreenshotBitmap.copy(mLastScreenshotBitmap.getConfig(), true);
