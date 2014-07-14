@@ -121,7 +121,4 @@
 
     <!-- Title shown when app provides no interface -->
     <string name="status_bar_floating_no_interface">App provides no interface</string>
-
-    <!-- Message shown in the top of the screen when there's just a few recent apps-->
-    <string name="status_bar_recent_applications">Recent applications</string>
 </resources>

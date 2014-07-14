@@ -266,14 +266,14 @@ public class RecentsActivity extends Activity {
         String action = intent.getAction();
         if (TOGGLE_RECENTS_INTENT.equals(action)) {
             if (mRecentsPanel != null) {
-                if (!mShowing || !mRecentsPanel.isShowing()) {
+                if (mRecentsPanel.isShowing()) {
+                    dismissAndGoBack();
+                } else {
                     final RecentTasksLoader recentTasksLoader = RecentTasksLoader.getInstance(this);
                     boolean waitingForWindowAnimation = checkWaitingForAnimationParam &&
                             intent.getBooleanExtra(WAITING_FOR_WINDOW_ANIMATION_PARAM, false);
                     mRecentsPanel.show(true, recentTasksLoader.getLoadedTasks(),
                             recentTasksLoader.isFirstScreenful(), waitingForWindowAnimation);
-                } else {
-                    dismissAndGoBack();
                 }
             }
         } else if (CLEAR_RECENTS_INTENT.equals(action)) {
