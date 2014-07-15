@@ -149,8 +149,7 @@ public class RecentsVerticalScrollView extends ScrollView
             final View thumbnailView = holder.thumbnailView;
             OnLongClickListener longClickListener = new OnLongClickListener() {
                 public boolean onLongClick(View v) {
-                    final View anchorView = view.findViewById(R.id.app_description);
-                    mCallback.handleLongPress(view, anchorView, thumbnailView);
+                    mCallback.handleLongPress(view, thumbnailView, thumbnailView);
                     return true;
                 }
             };
@@ -164,10 +163,6 @@ public class RecentsVerticalScrollView extends ScrollView
             final View appTitle = view.findViewById(R.id.app_label);
             appTitle.setContentDescription(" ");
             appTitle.setOnTouchListener(noOpListener);
-            final View calloutLine = view.findViewById(R.id.recents_callout_line);
-            if (calloutLine != null) {
-                calloutLine.setOnTouchListener(noOpListener);
-            }
 
             mLinearLayout.addView(view);
         }

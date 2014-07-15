@@ -48,7 +48,6 @@ import static com.android.systemui.statusbar.phone.QuickSettingsModel.IMMERSIVE_
 public class Recents extends SystemUI implements RecentsComponent {
     private static final String TAG = "Recents";
     private static final boolean DEBUG = false;
-    public static final boolean NEWRECENTS = true;
 
     @Override
     public void start() {
@@ -81,6 +80,15 @@ public class Recents extends SystemUI implements RecentsComponent {
                 }
 
             } else {
+                DisplayMetrics dm = new DisplayMetrics();
+                if (immersiveModeStyle == IMMERSIVE_MODE_FULL ||
+                    immersiveModeStyle == IMMERSIVE_MODE_HIDE_ONLY_NAVBAR ||
+                    immersiveModeStyle == IMMERSIVE_MODE_APP) {
+                    display.getRealMetrics(dm);
+                } else {
+                    display.getMetrics(dm);
+                }
+
                 Bitmap first = null;
                 if (firstTask.getThumbnail() instanceof BitmapDrawable) {
                     first = ((BitmapDrawable) firstTask.getThumbnail()).getBitmap();
@@ -98,25 +106,7 @@ public class Recents extends SystemUI implements RecentsComponent {
                 if (first == null) {
                     throw new RuntimeException("Recents thumbnail is null");
                 }
-                if (!NEWRECENTS) {
-                if (first.getWidth() != thumbWidth || first.getHeight() != thumbHeight) {
-                    first = Bitmap.createScaledBitmap(first, (int) thumbWidth, (int) thumbHeight,
-                            true);
-                    if (first == null) {
-                        throw new RuntimeException("Recents thumbnail is null");
-                    }
-                }
-                }
 
-
-                DisplayMetrics dm = new DisplayMetrics();
-                if (immersiveModeStyle == IMMERSIVE_MODE_FULL ||
-                    immersiveModeStyle == IMMERSIVE_MODE_HIDE_ONLY_NAVBAR ||
-                    immersiveModeStyle == IMMERSIVE_MODE_APP) {
-                    display.getRealMetrics(dm);
-                } else {
-                    display.getMetrics(dm);
-                }
                 // calculate it here, but consider moving it elsewhere
                 // first, determine which orientation you're in.
                 final Configuration config = res.getConfiguration();
@@ -138,15 +128,10 @@ public class Recents extends SystemUI implements RecentsComponent {
                             + thumbWidth
                             + 2 * thumbBgPadding;
 
-                    x = (int) ((dm.widthPixels - width) / 2f + appLabelLeftMargin + appLabelWidth
-                            + thumbBgPadding + thumbLeftMargin);
+                    x = 0;
                     y = (int) (dm.heightPixels
                             - res.getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_height)
                             - thumbBgPadding);
-                    if (layoutDirection == View.LAYOUT_DIRECTION_RTL) {
-                        x = dm.widthPixels - x - res.getDimensionPixelSize(
-                                R.dimen.status_bar_recents_thumbnail_width);
-                    }
 
                 } else { // if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     float thumbTopMargin = res.getDimensionPixelSize(
@@ -185,28 +170,29 @@ public class Recents extends SystemUI implements RecentsComponent {
                     float recentsScrollViewRightPadding = res
                             .getDimensionPixelSize(R.dimen.status_bar_recents_right_glow_margin);
                     x = (int) (dm.widthPixels - res
-                            .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_width)
-                            - thumbBgPadding - recentsItemRightPadding
-                            - recentsScrollViewRightPadding);
-                    y = (int) ((dm.heightPixels - statusBarHeight - height) / 2f + thumbTopMargin
-                            + recentsItemTopPadding + thumbBgPadding + statusBarHeight);
+                            .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_width));
+                    y = (int) statusBarHeight;
                 }
 
-                ActivityOptions opts = ActivityOptions.makeThumbnailScaleDownAnimation(
-                        statusBarView,
-                        first, x, y,
-                        new ActivityOptions.OnAnimationStartedListener() {
-                            public void onAnimationStarted() {
-                                Intent intent =
-                                        new Intent(RecentsActivity.WINDOW_ANIMATION_START_INTENT);
-                                intent.setPackage("com.android.systemui");
-                                mContext.sendBroadcastAsUser(intent,
-                                        new UserHandle(UserHandle.USER_CURRENT));
-                            }
-                        });
-                intent.putExtra(RecentsActivity.WAITING_FOR_WINDOW_ANIMATION_PARAM, true);
-                mContext.startActivityAsUser(intent, opts.toBundle(), new UserHandle(
-                        UserHandle.USER_CURRENT));
+                if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    ActivityOptions opts = ActivityOptions.makeThumbnailScaleDownAnimation(
+                            statusBarView,
+                            first, x, y,
+                            new ActivityOptions.OnAnimationStartedListener() {
+                                public void onAnimationStarted() {
+                                    Intent intent =
+                                            new Intent(RecentsActivity.WINDOW_ANIMATION_START_INTENT);
+                                    intent.setPackage("com.android.systemui");
+                                    mContext.sendBroadcastAsUser(intent,
+                                            new UserHandle(UserHandle.USER_CURRENT));
+                                }
+                            });
+                    intent.putExtra(RecentsActivity.WAITING_FOR_WINDOW_ANIMATION_PARAM, true);
+                    mContext.startActivityAsUser(intent, opts.toBundle(), new UserHandle(
+                            UserHandle.USER_CURRENT));
+                } else {
+                    mContext.startActivityAsUser(intent, new UserHandle(UserHandle.USER_CURRENT));
+                }
             }
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Failed to launch RecentAppsIntent", e);
