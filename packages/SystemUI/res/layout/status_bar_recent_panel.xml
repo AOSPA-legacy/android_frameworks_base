@@ -68,6 +68,7 @@
         android:textSize="20dp"
         android:textColor="@android:color/holo_blue_light"
         android:text="@string/status_bar_recent_applications"
+        android:layout_gravity="bottom"
         android:gravity="center_horizontal"
         android:paddingBottom="100dp"
     />
