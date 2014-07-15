@@ -64,17 +64,25 @@ public final class NavigationBarTransitions extends BarTransitions {
     }
 
     public void setVertical(boolean isVertical) {
-        mVertical = isVertical;
+        if (mVertical != isVertical) {
+            mVertical = isVertical;
+            updateBackgroundResource();
+        }
+    }
+
+    private void updateBackgroundResource() {
+        if (mVertical) {
+            setGradientResourceId(R.drawable.nav_background_land);
+        } else {
+            setGradientResourceId(R.drawable.nav_background);
+        }
         transitionTo(mRequestedMode, false /*animate*/);
     }
 
     @Override
     public void transitionTo(int mode, boolean animate) {
         mRequestedMode = mode;
-        if (mVertical && mode == MODE_TRANSLUCENT) {
-            // translucent mode not allowed when vertical
-            mode = MODE_OPAQUE;
-        } else if (mStickyTransparent) {
+        if (mStickyTransparent) {
             mode = MODE_TRANSPARENT;
         }
         super.transitionTo(mode, animate);
