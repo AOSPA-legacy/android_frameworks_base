@@ -83,6 +83,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private PopupMenu mPopup;
     private View mRecentsScrim;
     private View mRecentsNoApps;
+    private View mRecentsApps;
     private RecentsScrollView mRecentsContainer;
 
     private boolean mShowing;
@@ -377,9 +378,16 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         mRecentsActivity.setRecentHints(show && getTasks() > 0);
 
         if (show) {
+            int tasks = getTasks();
             // if there are no apps, bring up a "No recent apps" message
             mRecentsNoApps.setAlpha(1f);
-            mRecentsNoApps.setVisibility(getTasks() == 0 ? View.VISIBLE : View.INVISIBLE);
+            mRecentsNoApps.setVisibility(tasks == 0 ? View.VISIBLE : View.INVISIBLE);
+            if (mRecentsApps != null) {
+                int numberOfApps = mContext.getResources().
+                        getInteger(R.integer.config_recents_max_number_apps_show_message);
+                mRecentsApps.setAlpha(1f);
+                mRecentsApps.setVisibility(tasks > 0 && tasks <= numberOfApps ? View.VISIBLE : View.INVISIBLE);
+            }
             onAnimationEnd(null);
             setFocusable(true);
             setFocusableInTouchMode(true);
@@ -488,6 +496,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             }
             mRecentsContainer = new RecentsCardStackView(mContext, orientation);
             addView((View)mRecentsContainer, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            mRecentsApps = findViewById(R.id.recents_apps_text);
         } else {
             mRecentsContainer = (RecentsScrollView) findViewById(R.id.recents_container);
             mRecentsContainer.setOnScrollListener(new Runnable() {
@@ -504,6 +513,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
 
         mRecentsScrim = findViewById(R.id.recents_bg_protect);
         mRecentsNoApps = findViewById(R.id.recents_no_apps);
+        mRecentsApps = findViewById(R.id.recents_apps_text);
 
         if (mRecentsScrim != null) {
             mHighEndGfx = ActivityManager.isHighEndGfx();
@@ -854,6 +864,13 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                     mContext.getString(R.string.accessibility_recents_item_dismissed, ad.getLabel()));
             sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
             setContentDescription(null);
+        }
+        if (mRecentsApps != null) {
+            int tasks = getTasks();
+            int numberOfApps = mContext.getResources().
+                    getInteger(R.integer.config_recents_max_number_apps_show_message);
+            mRecentsApps.setAlpha(1f);
+            mRecentsApps.setVisibility(tasks > 0 && tasks <= numberOfApps ? View.VISIBLE : View.INVISIBLE);
         }
     }
 
