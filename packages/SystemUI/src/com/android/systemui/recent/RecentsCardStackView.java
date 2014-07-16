@@ -19,6 +19,19 @@ import android.widget.Toast;
 public class RecentsCardStackView extends CardStackView implements View.OnClickListener,
         View.OnLongClickListener, SwipeHelper.Callback, RecentsPanelView.RecentsScrollView {
 
+    private static RecentsCardStackView mInstance;
+
+    public static int getLastCardPos() {
+        if (mInstance != null) {
+            int count = mInstance.mItems.size();
+            if (count > 1) {
+                return mInstance.scrollPositionToViewPosition(
+                        mInstance.mItems.get(count-1).getPosition());
+            }
+        }
+        return 0;
+    }
+
     private int mLastViewTouch;
     private boolean mIsSwiping;
     private boolean mClearAllAnimationDone;
@@ -47,6 +60,8 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
                 this, densityScale, pagingTouchSlop);
 
         mClearAllAnimationDone = true;
+
+        mInstance = this;
     }
 
     @Override
@@ -63,9 +78,6 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
         if (!isScrolling() && !mIsSwiping) {
             int viewId = getChildIdAtViewPosition(mLastViewTouch, false);
 
-            // TODO: Remove this
-            //Toast.makeText(mContext, "Clicked item: " + viewId, Toast.LENGTH_SHORT).show();
-
             if (viewId >= 0 && mCallback != null) {
                 View v = mItems.get(viewId).getContentView();
                 if (v != null) {
@@ -79,9 +91,6 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     public boolean onLongClick(View view) {
         if (!isScrolling() && !mIsSwiping) {
             int viewId = getChildIdAtViewPosition(mLastViewTouch, false);
-
-            // TODO: Remove this
-            //Toast.makeText(mContext, "Long pressed item: " + viewId, Toast.LENGTH_SHORT).show();
 
             if (viewId >= 0 && mCallback != null) {
                 View contentView = mItems.get(viewId).getContentView();
@@ -100,6 +109,7 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
         return mSwipeHelper.onInterceptTouchEvent(ev) ||
                 super.onInterceptTouchEvent(ev);
     }
+
 
     private void dismissChild(View v) {
         mSwipeHelper.dismissChild(v, 0);
@@ -219,7 +229,7 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
             Log.d(TAG, "Add view from adapter " + i);
             // There is no existing content view that has been update, so
             // we need to add the newly created view to the item
-            item.setContentView(child, getCardWidth(true), getCardHeight(true));
+            item.setContentView(child, getCardWidth(), getCardHeight());
         }
     }
 

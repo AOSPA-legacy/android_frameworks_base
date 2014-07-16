@@ -46,6 +46,7 @@ import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
@@ -85,6 +86,8 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private View mRecentsNoApps;
     private View mRecentsApps;
     private RecentsScrollView mRecentsContainer;
+    private int mRecentsCardWidth;
+    private int mRecentsCardHeight;
 
     private boolean mShowing;
     private boolean mWaitingToShow;
@@ -493,14 +496,37 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
 
         if (NEWRECENTS) {
             int orientation;
+            int width, height;
+            DisplayMetrics dm = getResources().getDisplayMetrics();
+            int cardPadding = getResources().getDimensionPixelSize(R.dimen.status_bar_recents_card_margin);
+
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 orientation = CardStackView.PORTRAIT;
+
+                // Full width, but padding reduces width of content a little bit
+                width = dm.widthPixels;
+                // Height without padding, content height will match display height
+                // in landscape mode (no scaling necessary)
+                height = dm.widthPixels + (cardPadding * 2);
             } else {
                 orientation = CardStackView.LANDSCAPE;
+
+                // Width without padding, content width will match display width in
+                // portrait mode (no scaling necessary)
+                width = dm.heightPixels + (cardPadding * 2);
+                // Full height, but padding reduces height of content a little bit
+                height = dm.heightPixels;
             }
-            mRecentsContainer = new RecentsCardStackView(mContext, orientation);
-            addView((View)mRecentsContainer, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-            mRecentsApps = findViewById(R.id.recents_apps_text);
+            RecentsCardStackView container =
+                    new RecentsCardStackView(mContext, orientation);
+            container.setCardWidth(width);
+            container.setCardHeight(height);
+            addView((View)container, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            mRecentsContainer = container;
+
+            // Card size without padding
+            mRecentsCardWidth = width - (cardPadding * 2);
+            mRecentsCardHeight = height - (cardPadding * 2);
         } else {
             mRecentsContainer = (RecentsScrollView) findViewById(R.id.recents_container);
             mRecentsContainer.setOnScrollListener(new Runnable() {
@@ -576,37 +602,37 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                 } else {
                     Matrix scaleMatrix = new Matrix();
                     float scale;
-                    if (mRecentsContainer instanceof RecentsCardStackView) {
+                    if (NEWRECENTS) {
                         // Scale shorter edge of thumbnail to size of
                         // CardStackView item
-                        Log.v(TAG, "thumb width: " + thumbnail.getIntrinsicWidth());
-                        Log.v(TAG, "thumb height: " + thumbnail.getIntrinsicHeight());
+                        //Log.v(TAG, "thumb width: " + thumbnail.getIntrinsicWidth());
+                        //Log.v(TAG, "thumb height: " + thumbnail.getIntrinsicHeight());
 
-                        // Get card height without padding of outer layout
-                        int width = ((RecentsCardStackView)mRecentsContainer).getCardWidth(false);
-                        int height = ((RecentsCardStackView)mRecentsContainer).getCardHeight(false);
+                        // Get card width and height without padding of outer layout
+                        int width = mRecentsCardWidth;
+                        int height = mRecentsCardHeight;
 
                         // The card contains a background 9 patch drawable for
                         // rendering a drop shadow. This introduces additional
                         // padding, which needs to be removed as well.
-                        Rect paddingRect = new Rect();
-                        NinePatchDrawable npd = (NinePatchDrawable)h.thumbnailView.getBackground();
-                        if (npd != null && npd.getPadding(paddingRect)) {
-                            width -= paddingRect.left + paddingRect.right;
-                            height -= paddingRect.top + paddingRect.bottom;
+                        Rect backgroundPadding = new Rect();
+                        NinePatchDrawable npd = (NinePatchDrawable)getResources().getDrawable(R.drawable.status_bar_recent_card_shadow);
+                        if (npd != null && npd.getPadding(backgroundPadding)) {
+                            width -= backgroundPadding.left + backgroundPadding.right;
+                            height -= backgroundPadding.top + backgroundPadding.bottom;
                         }
 
                         // Compute scale factor
                         if (thumbnail.getIntrinsicWidth() < thumbnail.getIntrinsicHeight()) {
                             scale = (float)(width) /
                                             (float)thumbnail.getIntrinsicWidth();
-                            Log.v(TAG, "scale to width");
+                            //Log.v(TAG, "scale to width");
                         } else {
                             scale = (float)(height) /
                                             (float)thumbnail.getIntrinsicHeight();
-                            Log.v(TAG, "scale to height");
+                            //Log.v(TAG, "scale to height");
                         }
-                        Log.v(TAG, "scale factor: " + scale);
+                        //Log.v(TAG, "scale factor: " + scale);
                     } else {
                         scale = mThumbnailWidth / (float) thumbnail.getIntrinsicWidth();
                     }

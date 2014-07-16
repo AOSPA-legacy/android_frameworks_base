@@ -25,8 +25,10 @@ import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.NinePatchDrawable;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
@@ -91,24 +93,6 @@ public class Recents extends SystemUI implements RecentsComponent {
                 }
                 final Resources res = mContext.getResources();
 
-                float thumbWidth = res
-                        .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_width);
-                float thumbHeight = res
-                        .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_height);
-                if (first == null) {
-                    throw new RuntimeException("Recents thumbnail is null");
-                }
-                if (!NEWRECENTS) {
-                if (first.getWidth() != thumbWidth || first.getHeight() != thumbHeight) {
-                    first = Bitmap.createScaledBitmap(first, (int) thumbWidth, (int) thumbHeight,
-                            true);
-                    if (first == null) {
-                        throw new RuntimeException("Recents thumbnail is null");
-                    }
-                }
-                }
-
-
                 DisplayMetrics dm = new DisplayMetrics();
                 if (immersiveModeStyle == IMMERSIVE_MODE_FULL ||
                     immersiveModeStyle == IMMERSIVE_MODE_HIDE_ONLY_NAVBAR ||
@@ -117,11 +101,72 @@ public class Recents extends SystemUI implements RecentsComponent {
                 } else {
                     display.getMetrics(dm);
                 }
+
+                final Configuration config = res.getConfiguration();
+
+                float thumbWidth;
+                float thumbHeight;
+
+                int cardPadding = res.getDimensionPixelSize(
+                        R.dimen.status_bar_recents_card_margin);
+                Rect backgroundPadding = new Rect();
+                if (NEWRECENTS) {
+                    float aspectRatio =
+                        (float)first.getWidth() / (float)first.getHeight();
+
+                    // The card contains a background 9 patch drawable for
+                    // rendering a drop shadow. This introduces additional
+                    // padding, which needs to be removed as well.
+                    NinePatchDrawable npd = (NinePatchDrawable)res.getDrawable(R.drawable.status_bar_recent_card_shadow);
+
+                    if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        // Full width, but padding reduces width of content a little bit
+                        thumbWidth = dm.widthPixels - (cardPadding * 2);
+                        if (npd != null && npd.getPadding(backgroundPadding)) {
+                            thumbWidth -= backgroundPadding.left + backgroundPadding.right;
+                        }
+                        thumbHeight = thumbWidth / aspectRatio;
+                    } else {
+                        // Full height, but padding reduces height of content a little bit
+                        thumbHeight = dm.heightPixels - (cardPadding * 2);
+                        if (npd != null && npd.getPadding(backgroundPadding)) {
+                            thumbHeight -= backgroundPadding.top + backgroundPadding.bottom;
+                        }
+                        thumbWidth = thumbHeight * aspectRatio;
+                    }
+
+                } else {
+                    thumbWidth = res
+                            .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_width);
+                    thumbHeight = res
+                            .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_height);
+                }
+
+                if (first == null) {
+                    throw new RuntimeException("Recents thumbnail is null");
+                }
+                if (first.getWidth() != thumbWidth || first.getHeight() != thumbHeight) {
+                    first = Bitmap.createScaledBitmap(first, (int) thumbWidth, (int) thumbHeight,
+                            true);
+                    if (first == null) {
+                        throw new RuntimeException("Recents thumbnail is null");
+                    }
+                }
+
                 // calculate it here, but consider moving it elsewhere
                 // first, determine which orientation you're in.
-                final Configuration config = res.getConfiguration();
                 int x, y;
 
+                if (NEWRECENTS) {
+                    int cardPos = RecentsCardStackView.getLastCardPos();
+                    if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        x = cardPadding + backgroundPadding.left;
+                        y = cardPos + cardPadding + backgroundPadding.top;
+                    } else {
+                        x = cardPos + cardPadding + backgroundPadding.left;
+                        y = cardPadding + backgroundPadding.top;
+                    }
+                } else {
                 if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
                     float appLabelLeftMargin = res.getDimensionPixelSize(
                             R.dimen.status_bar_recents_app_label_left_margin);
@@ -190,6 +235,7 @@ public class Recents extends SystemUI implements RecentsComponent {
                             - recentsScrollViewRightPadding);
                     y = (int) ((dm.heightPixels - statusBarHeight - height) / 2f + thumbTopMargin
                             + recentsItemTopPadding + thumbBgPadding + statusBarHeight);
+                }
                 }
 
                 ActivityOptions opts = ActivityOptions.makeThumbnailScaleDownAnimation(

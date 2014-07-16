@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="true"
-    android:padding="15dp">
+    android:padding="@dimen/status_bar_recents_card_margin">
 
     <!-- This is the card with a background for dropping shadow -->
     <RelativeLayout

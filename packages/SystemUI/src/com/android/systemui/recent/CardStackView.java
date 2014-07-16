@@ -14,7 +14,6 @@ import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -102,6 +101,8 @@ public class CardStackView extends RelativeLayout {
     private int mWidth;
     private int mHeight;
     private int mViewLength;
+    private int mCardWidth;
+    private int mCardHeight;
 
     private int mScrollLength;
     private int mScrollPosition = 0;
@@ -248,55 +249,36 @@ public class CardStackView extends RelativeLayout {
         }
     };
 
-    private final static int CARD_PADDING = 15;
-    private int mCardPaddingPixel;
-
-    public int getCardWidth(boolean withPadding) {
-        int width;
-
-        DisplayMetrics dm = getResources().getDisplayMetrics();
+    public void setCardWidth(int width) {
         if (mOrientation == PORTRAIT) {
-            width = dm.widthPixels;
+            mCardWidth = width;
         } else {
-            width = dm.heightPixels + mCardPaddingPixel*2;
+            mCardHeight = width;
         }
-
-        if (!withPadding) {
-            width -= mCardPaddingPixel*2;
-        }
-
-        return width;
     }
 
-    public int getCardHeight(boolean withPadding) {
-        int height;
-
-        DisplayMetrics dm = getResources().getDisplayMetrics();
+    public void setCardHeight(int height) {
         if (mOrientation == PORTRAIT) {
-            height = dm.widthPixels + mCardPaddingPixel*2;
+            mCardHeight = height;
         } else {
-            height = dm.heightPixels;
+            mCardWidth = height;
         }
-
-        if (!withPadding) {
-            height -= mCardPaddingPixel*2;
-        }
-
-        return height;
     }
 
-    public void createDummy() {
-        /*for (int i = 0; i < 10; i++) {
-            LayoutInflater inflater = (LayoutInflater) mContext
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View dummyCard = inflater.inflate(R.layout.status_bar_recent_card, this, false);
+    public int getCardWidth() {
+        if (mOrientation == PORTRAIT) {
+            return mCardWidth;
+        } else {
+            return mCardHeight;
+        }
+    }
 
-            CardStackViewItem item =
-                    new CardStackViewItem(mContext, mOrientation);
-            item.setContentView(dummyCard, getCardWidth(true), getCardHeight(true));
-            mItems.add(item);
-            addView(item, positionView(item.getPosition()));
-        }*/
+    public int getCardHeight() {
+        if (mOrientation == PORTRAIT) {
+            return mCardHeight;
+        } else {
+            return mCardWidth;
+        }
     }
 
     public CardStackView(Context context, int orientation) {
@@ -305,9 +287,6 @@ public class CardStackView extends RelativeLayout {
         mContext = context;
         mOrientation = orientation;
         mPagingTouchSlop = ViewConfiguration.get(context).getScaledPagingTouchSlop();
-        mCardPaddingPixel = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CARD_PADDING, getResources().getDisplayMetrics());
-
-        createDummy();
 
         mDetector = new GestureDetector(context, mGestureListener);
         mScroller = new OverScroller(context);
@@ -384,7 +363,7 @@ public class CardStackView extends RelativeLayout {
         }
     }
 
-    private int scrollPositionToViewPosition(int position) {
+    protected int scrollPositionToViewPosition(int position) {
         position -= mScrollPosition;
         if (position < mLandingArea && position > -mLandingArea) {
             float fraction = (float)(position+mLandingArea) / (2*mLandingArea);
@@ -400,7 +379,7 @@ public class CardStackView extends RelativeLayout {
         return position;
     }
 
-    private float viewPositionToScrollPosition(float position, boolean ignoreLength) {
+    protected float viewPositionToScrollPosition(float position, boolean ignoreLength) {
         if (position < mLandingArea) {
             float fraction = (float)position / mLandingArea;
             position = (float)(Math.sqrt(fraction)*mLandingArea*2)-mLandingArea;
@@ -482,7 +461,7 @@ public class CardStackView extends RelativeLayout {
 
     protected RelativeLayout.LayoutParams positionView(int position) {
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                getCardWidth(true), getCardHeight(true));
+                getCardWidth(), getCardHeight());
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         if (mOrientation == PORTRAIT) {
             lp.leftMargin = 0;
@@ -525,7 +504,7 @@ public class CardStackView extends RelativeLayout {
             // Check if we touched 'before' first card or 'after' last card
             if (position > 0 &&
                 position < scrollPositionToViewPosition(mItems.get(mItems.size()-1).getPosition())
-                            + getCardHeight(false)) {
+                            + getCardHeight()) {
                 // Convert to scroll position before comparing item positions.
                 float pos = viewPositionToScrollPosition(position, true);
 
