@@ -35,4 +35,22 @@
         android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="0dp" />
+
+    <View
+        android:id="@+id/recents_callout_line"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
+    <ImageView
+        android:id="@+id/app_icon"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
+    <TextView
+        android:id="@+id/app_description"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
 </RelativeLayout>
