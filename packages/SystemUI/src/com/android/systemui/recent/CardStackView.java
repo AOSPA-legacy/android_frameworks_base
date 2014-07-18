@@ -324,7 +324,16 @@ public class CardStackView extends RelativeLayout {
         mWidth = w;
         mHeight = h;
 
-        update();
+        updateLengths();
+
+        updatePositions();
+
+        // Start position: scroll to end of items
+        mOverScrollPosition = mScrollPosition = scrollPositionOfMostRecent();
+
+        updateAdapter();
+
+        updateLayout();
     }
 
     private int scrollPositionOfMostRecent() {
@@ -335,22 +344,9 @@ public class CardStackView extends RelativeLayout {
         }
     }
 
-    public void update() {
+    protected void updateLengths() {
         mViewLength = mOrientation == PORTRAIT ? mHeight : mWidth;
 
-        updateLengths();
-
-        mBottomCap = mViewLength - mDistance;
-
-        updatePositions();
-
-        // Start position: scroll to end of items
-        mOverScrollPosition = mScrollPosition = scrollPositionOfMostRecent();
-
-        updateLayout();
-    }
-
-    private void updateLengths() {
         if (mItems.size() < 2) {
             mLandingArea = 0;
             mScrollLength = 0;
@@ -377,15 +373,15 @@ public class CardStackView extends RelativeLayout {
         }
 
         mMaxOverScroll = (int)(mViewLength * MAX_OVERSCROLL);
+
+        mBottomCap = mViewLength - mDistance;
     }
 
-    private void updatePositions() {
+    protected void updatePositions() {
         mCalculator.reset();
         for (CardStackViewItem item : mItems) {
             item.setPosition(mCalculator.getNextPosition());
         }
-
-        updateLayout();
     }
 
     private int scrollPositionToViewPosition(int position) {
@@ -419,13 +415,17 @@ public class CardStackView extends RelativeLayout {
         return position;
     }
 
-    private boolean isOccluded(CardStackViewItem prev, CardStackViewItem next) {
+    protected boolean isOccluded(CardStackViewItem prev, CardStackViewItem next) {
         if (next.getPosition() + mLandingArea >= mScrollPosition) {
             // card 'next' is not on top
             if (prev.getPosition() >=  mScrollPosition + mBottomCap) {
                 // card 'prev' is on bottom and probably occluded
-                // (except if it is the last card on stack)
-                return true;
+                //if (next.getContentView() == null) {
+                //  // except if it is the last visible card on stack
+                //  return false;
+                //} else {
+                    return true;
+                //}
             } else {
                 // card 'prev' is not occluded
                 return false;
@@ -437,14 +437,14 @@ public class CardStackView extends RelativeLayout {
         }
     }
 
-    private boolean isOccluded(int index) {
+    protected boolean isOccluded(int index) {
         if (mItems.size() - index > 1) {
             return isOccluded(mItems.get(index), mItems.get(index + 1));
         }
         return false;
     }
 
-    private void updateLayout() {
+    protected void updateLayout() {
         CardStackViewItem prev = null;
 
         for (CardStackViewItem next : mItems) {
@@ -452,8 +452,8 @@ public class CardStackView extends RelativeLayout {
                 if (!isOccluded(prev, next)) {
                     layoutItem(prev);
                 } else {
-                    // causes cards to appear delayed
-                    prev.setVisibility(INVISIBLE);
+                    // Release occluded view
+                    prev.resetContentView();
                 }
             }
             prev = next;
@@ -466,7 +466,14 @@ public class CardStackView extends RelativeLayout {
     }
 
     private void layoutItem(CardStackViewItem item) {
-        item.setVisibility(VISIBLE);
+        if (item.getContentView() == null) {
+            // Item has no content view. This whenever an occluded card becomes
+            // visible. Therefore, call adapter to load content view for newly
+            // visible cards.
+            // TODO: Tell adapter which card became visible, instead of
+            //       refreshing all cars.
+            updateAdapter(mItems.indexOf(item), item);
+        }
         item.setTilt(mTilt);
         item.setLayoutParams(
                 positionView(scrollPositionToViewPosition(item.getPosition())));
@@ -546,8 +553,8 @@ public class CardStackView extends RelativeLayout {
 
         mCalculator.reset();
         for (final CardStackViewItem item : mItems) {
-            int oldPos = item.getPosition();
             int newPos = mCalculator.getNextPosition();
+            final int oldPos = item.getPosition();
 
             if (scrollPositionToViewPosition(oldPos) == scrollPositionToViewPosition(newPos)) {
                 // Item is at top or bottom and does not move => no need for animation
@@ -558,7 +565,9 @@ public class CardStackView extends RelativeLayout {
                 animator.addUpdateListener(new AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        layoutItem(item);
+                        if (item.getPosition() != oldPos) {
+                            layoutItem(item);
+                        }
                     }
                 });
                 list.add(animator);
@@ -584,8 +593,6 @@ public class CardStackView extends RelativeLayout {
     }
 
     public void removeItem(View view) {
-        view.setVisibility(VISIBLE);
-
         if (mRemoveAnimator != null) {
             mRemoveAnimator.cancel();
         }
@@ -745,5 +752,11 @@ public class CardStackView extends RelativeLayout {
         if (mScroller.computeScrollOffset()) {
             doScrolling(mScroller.getCurrY());
         }
+    }
+
+    protected void updateAdapter() {
+    }
+
+    protected void updateAdapter(int i, CardStackViewItem item) {
     }
 }

@@ -67,7 +67,10 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
             //Toast.makeText(mContext, "Clicked item: " + viewId, Toast.LENGTH_SHORT).show();
 
             if (viewId >= 0 && mCallback != null) {
-                mCallback.handleOnClick(mItems.get(viewId).getContentView());
+                View v = mItems.get(viewId).getContentView();
+                if (v != null) {
+                    mCallback.handleOnClick(v);
+                }
             }
         }
     }
@@ -82,10 +85,12 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
             if (viewId >= 0 && mCallback != null) {
                 View contentView = mItems.get(viewId).getContentView();
-                RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) contentView.getTag();
-                final View thumbnailView = holder.thumbnailView;
-                mCallback.handleLongPress(contentView, thumbnailView, thumbnailView);
-                return true;
+                if (contentView != null) {
+                    RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) contentView.getTag();
+                    final View thumbnailView = holder.thumbnailView;
+                    mCallback.handleLongPress(contentView, thumbnailView, thumbnailView);
+                    return true;
+                }
             }
         }
         return false;
@@ -140,14 +145,20 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
     @Override
     public void onChildDismissed(View v) {
+        // First: Handle swipe and let callback remove view from adapter
+        if (mCallback != null) {
+            // Use fake view with correct task description
+            mCallback.handleSwipe(v);
+        }
+
+        // Second: Remove item from current view.
+        // Remove animation will call the adapter for layouting cards that
+        // become visible. Therefore, we need to handle swipe (removing from
+        // adapter) before removing the item.
         removeItem(v);
         resetOverscrolling();
-        if (mCallback != null) {
-            mCallback.handleSwipe(((CardStackViewItem)v).getContentView());
-        }
     }
 
-    @Override
     public void onDragCancelled(View v) {
         v.setActivated(false);
         resetOverscrolling();
@@ -158,31 +169,58 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
         return mItems.size();
     }
 
-    private void updateAdapter() {
-        DisplayMetrics dm = getResources().getDisplayMetrics();
+    @Override
+    protected void updateAdapter() {
+        int count = mAdapter.getCount();
+        int size = mItems.size();
+        int missing = count - size;
+        for (int i = 0; i < missing; ++i) {
+            // Create all missing items
+            // (empty views, shouldn't be a big performance issue)
+            CardStackViewItem item = new CardStackViewItem(mContext, mOrientation);
+            addView(item, positionView(0));
+            mItems.add(item);
+        }
 
-        for (int i = 0; i < mAdapter.getCount(); ++i) {
-            Log.d(TAG, "Added adapter view " + i);
+        if (missing > 0) {
+            // Compute lengths and positions
+            updateLengths();
+            updatePositions();
+        }
 
-            // Create our own view item
-            CardStackViewItem item = null;
+        // Update all visible items and their content views from adapter
+        for (int i = 0; i < count; ++i) {
+            CardStackViewItem item = mItems.get(i);
 
-            if (i < mItems.size()) {
-                item = mItems.get(i);
+            if (isOccluded(i)) {
+                if (item.getContentView() == null) {
+                    Log.d(TAG, "Skip occluded content view " + i);
+                } else {
+                    // This should never happen!
+                    // (content views are released by updateLayout())
+                    Log.d(TAG, "Release occluded content view " + i);
+                    item.resetContentView();
+                }
             } else {
-                item = new CardStackViewItem(mContext, mOrientation);
-                addView(item, positionView(0));
-                mItems.add(item);
-            }
-
-            // Let adapter create a view and add to item
-            View child = mAdapter.getView(i, item.getContentView(), item);
-            item.setTag(child.getTag());
-            if (item.getContentView() == null) {
-                item.setContentView(child, getCardWidth(true), getCardHeight(true));
+                // Update single item its content view from adapter
+                updateAdapter(i, item);
             }
         }
-        update();
+    }
+
+    @Override
+    protected void updateAdapter(int i, CardStackViewItem item) {
+        // Let adapter create a view and add to item
+        Log.d(TAG, "Refresh view from adapter " + i);
+        View contentView = item.getContentView();
+        View child = mAdapter.getView(i, contentView, item);
+        item.setTag(child.getTag()); // needed to fake recents item
+        if (contentView == null) {
+            Log.d(TAG, "Add view from adapter " + i);
+            // There is no existing content view that has been update, so
+            // we need to add the newly created view to the item
+            item.setContentView(child, getCardWidth(true), getCardHeight(true));
+        }
     }
 
     @Override
@@ -192,14 +230,17 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
         mAdapter.registerDataSetObserver(new DataSetObserver() {
             public void onChanged() {
                 updateAdapter();
+                updateLayout();
             }
 
             public void onInvalidated() {
                 updateAdapter();
+                updateLayout();
             }
         });
 
         updateAdapter();
+        updateLayout();
     }
 
     @Override
@@ -216,9 +257,11 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     public View findViewForTask(int persistentTaskId) {
         for (CardStackViewItem item : mItems) {
             View view = item.getContentView();
-            RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) view.getTag();
-            if (holder.taskDescription.persistentTaskId == persistentTaskId) {
-                return view;
+            if (view != null) {
+                RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) view.getTag();
+                if (holder.taskDescription.persistentTaskId == persistentTaskId) {
+                    return view;
+                }
             }
         }
         return null;

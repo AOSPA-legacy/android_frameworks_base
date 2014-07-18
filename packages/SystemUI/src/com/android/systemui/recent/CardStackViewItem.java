@@ -39,6 +39,13 @@ public class CardStackViewItem extends LinearLayout {
         this.setStaticTransformationsEnabled(true);
     }
 
+    public void resetContentView() {
+        if (mContentView != null) {
+            removeView(mContentView);
+            mContentView = null;
+        }
+    }
+
     public void setContentView(View view, int width, int height) {
         mContentView = view;
         addView(view, new LinearLayout.LayoutParams(width, height));
@@ -103,8 +110,10 @@ public class CardStackViewItem extends LinearLayout {
 
     @Override
     public void invalidate() {
-        super.invalidate();
-        mContentView.invalidate();
+        if (mContentView != null) {
+            super.invalidate();
+            mContentView.invalidate();
+        }
     }
 
     @Override
