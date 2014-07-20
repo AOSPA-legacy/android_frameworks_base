@@ -180,6 +180,10 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             }
             final ViewHolder holder = (ViewHolder) convertView.getTag();
 
+            // Panel is being destroyed, don't try to obtain thumbnails
+            if (mRecentTaskDescriptions == null)
+                return convertView;
+
             // index is reverse since most recent appears at the bottom...
             final int index = mRecentTaskDescriptions.size() - position - 1;
 
