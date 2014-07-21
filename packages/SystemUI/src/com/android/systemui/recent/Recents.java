@@ -151,6 +151,18 @@ public class Recents extends SystemUI implements RecentsComponent {
                     if (first == null) {
                         throw new RuntimeException("Recents thumbnail is null");
                     }
+                    if (NEWRECENTS) {
+                        // Crop thumbnail to reduced card size
+                        if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                            thumbHeight = dm.widthPixels - (backgroundPadding.top + backgroundPadding.bottom);
+                        } else {
+                            thumbWidth = dm.heightPixels - (backgroundPadding.left + backgroundPadding.right);
+                        }
+                        first = Bitmap.createBitmap(first, 0, 0, (int)thumbWidth, (int)thumbHeight);
+                        if (first == null) {
+                            throw new RuntimeException("Recents thumbnail is null");
+                        }
+                    }
                 }
 
                 // calculate it here, but consider moving it elsewhere
