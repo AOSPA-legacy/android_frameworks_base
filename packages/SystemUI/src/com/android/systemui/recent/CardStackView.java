@@ -449,8 +449,6 @@ public class CardStackView extends RelativeLayout {
             // Item has no content view. This whenever an occluded card becomes
             // visible. Therefore, call adapter to load content view for newly
             // visible cards.
-            // TODO: Tell adapter which card became visible, instead of
-            //       refreshing all cars.
             updateAdapter(mItems.indexOf(item), item);
         }
         item.setTilt(mTilt);
