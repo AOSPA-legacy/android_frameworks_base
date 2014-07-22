@@ -80,7 +80,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         StatusBarPanel, Animator.AnimatorListener {
     static final String TAG = "RecentsPanelView";
     static final boolean DEBUG = PhoneStatusBar.DEBUG || false;
-    static final boolean NEWRECENTS = true;
+    private boolean mUseCardStack = Recents.mUseCardStack;
     private PopupMenu mPopup;
     private View mRecentsScrim;
     private View mRecentsNoApps;
@@ -187,7 +187,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             final ViewHolder holder = (ViewHolder) convertView.getTag();
 
             // Panel is being destroyed, don't try to obtain thumbnails
-            if (NEWRECENTS && mRecentTaskDescriptions == null)
+            if (mUseCardStack && mRecentTaskDescriptions == null)
                 return convertView;
 
             // index is reverse since most recent appears at the bottom...
@@ -200,11 +200,11 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             holder.loadedThumbnailAndIcon = td.isLoaded();
 
             Drawable d = null;
-            if (NEWRECENTS) {
+            if (mUseCardStack) {
                 d = mMemoryCache.get(td.packageName);
             }
             if (td.isLoaded()) {
-                if (NEWRECENTS) {
+                if (mUseCardStack) {
                     if (d == null) {
                         d = td.getThumbnail();
                     }
@@ -214,7 +214,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                     updateThumbnail(holder, td.getThumbnail(), true, false);
                     updateIcon(holder, td.getIcon(), true, false);
                 }
-            } else if (NEWRECENTS && d != null) {
+            } else if (mUseCardStack && d != null) {
                 updateThumbnail(holder, d, true, false);
             }
             if (index == 0) {
@@ -303,12 +303,14 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RecentsPanelView,
                 defStyle, 0);
 
-        mRecentItemLayoutId = a.getResourceId(R.styleable.RecentsPanelView_recentItemLayout, 0);
         mRecentTasksLoader = RecentTasksLoader.getInstance(context);
         mRecentsActivity = (RecentsActivity) context;
         a.recycle();
 
-        if (NEWRECENTS) {
+        if (!mUseCardStack) {
+            mRecentItemLayoutId = R.layout.status_bar_recent_item;
+        } else {
+            mRecentItemLayoutId = R.layout.status_bar_recent_card;
             final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
             final int cacheSize = maxMemory / 16;
             mMemoryCache = new LruCache<String, Drawable>(cacheSize);
@@ -494,7 +496,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        if (NEWRECENTS) {
+        if (mUseCardStack) {
             int orientation;
             int width, height;
             DisplayMetrics dm = getResources().getDisplayMetrics();
@@ -527,6 +529,9 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             // Card size without padding
             mRecentsCardWidth = width - (cardPadding * 2);
             mRecentsCardHeight = height - (cardPadding * 2);
+
+            mRecentsApps = findViewById(R.id.recents_apps_text);
+            mRecentsApps.setVisibility(VISIBLE);
         } else {
             mRecentsContainer = (RecentsScrollView) findViewById(R.id.recents_container);
             mRecentsContainer.setOnScrollListener(new Runnable() {
@@ -543,7 +548,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
 
         mRecentsScrim = findViewById(R.id.recents_bg_protect);
         mRecentsNoApps = findViewById(R.id.recents_no_apps);
-        mRecentsApps = findViewById(R.id.recents_apps_text);
 
         if (mRecentsScrim != null) {
             mHighEndGfx = ActivityManager.isHighEndGfx();
@@ -602,7 +606,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                 } else {
                     Matrix scaleMatrix = new Matrix();
                     float scale;
-                    if (NEWRECENTS) {
+                    if (mUseCardStack) {
                         // Scale shorter edge of thumbnail to size of
                         // CardStackView item
                         //Log.v(TAG, "thumb width: " + thumbnail.getIntrinsicWidth());
@@ -656,7 +660,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         synchronized (td) {
             if (mRecentsContainer != null) {
                 ViewGroup container = (ViewGroup) mRecentsContainer;
-                if (!NEWRECENTS && container instanceof RecentsScrollView) {
+                if (!mUseCardStack && container instanceof RecentsScrollView) {
                     container = (ViewGroup) container.findViewById(
                             R.id.recents_linear_layout);
                 }
@@ -671,7 +675,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                             //boolean animateShow = mShowing &&
                             //    mRecentsContainer.getAlpha() > ViewConfiguration.ALPHA_THRESHOLD;
                             boolean animateShow = false;
-                            if (NEWRECENTS) {
+                            if (mUseCardStack) {
                                 mMemoryCache.put(td.packageName, td.getThumbnail());
                             }
                             updateIcon(h, td.getIcon(), true, animateShow);

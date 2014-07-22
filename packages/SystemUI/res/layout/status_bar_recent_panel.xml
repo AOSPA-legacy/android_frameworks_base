@@ -25,7 +25,6 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:foreground="@drawable/bg_protect_transparent"
-    systemui:recentItemLayout="@layout/status_bar_recent_card"
     >
     <FrameLayout
         android:id="@+id/recents_bg_protect"
@@ -71,6 +70,7 @@
         android:layout_gravity="bottom"
         android:gravity="center_horizontal"
         android:paddingBottom="100dp"
+        android:visibility="invisible"
     />
 
     <include layout="@layout/status_bar_no_recent_apps"

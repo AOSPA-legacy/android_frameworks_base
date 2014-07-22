@@ -104,6 +104,7 @@
     <string name="safe_headset_volume" translatable="false">@*android:string/safe_headset_warning_title</string>
     <string name="navbar_recents_clear_all" translatable="false">@string/navbar_recents_clear_all_title</string>
     <string name="pie_state" translatable="false">@string/enable_pie_control_title</string>
+    <string name="status_bar_recents_card_stack" translatable="false">@string/status_bar_recents_card_stack_title</string>
 
     <!-- Switch apps -->
     <string name="enable_switch_apps_title">Switch apps</string>
@@ -124,4 +125,8 @@
 
     <!-- Message shown in the top of the screen when there's just a few recent apps-->
     <string name="status_bar_recent_applications">Recent applications</string>
+
+    <!-- Recents card stack view confirmation dialog -->
+    <string name="status_bar_recents_card_stack_title">Recents card stack view</string>
+    <string name="status_bar_recents_card_stack_message">Would you like to enable recents card stack view? (requires reboot)</string>
 </resources>

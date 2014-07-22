@@ -34,6 +34,7 @@ import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.SettingConfirmationHelper;
 import android.view.Display;
 import android.view.View;
 
@@ -50,7 +51,7 @@ import static com.android.systemui.statusbar.phone.QuickSettingsModel.IMMERSIVE_
 public class Recents extends SystemUI implements RecentsComponent {
     private static final String TAG = "Recents";
     private static final boolean DEBUG = false;
-    public static final boolean NEWRECENTS = true;
+    static boolean mUseCardStack = true;
 
     @Override
     public void start() {
@@ -61,6 +62,22 @@ public class Recents extends SystemUI implements RecentsComponent {
     public void toggleRecents(Display display, int layoutDirection, View statusBarView, int immersiveModeStyle) {
         if (DEBUG) Log.d(TAG, "toggle recents panel");
         try {
+            int cardStackStatus = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.STATUS_BAR_RECENTS_CARD_STACK, 0);
+
+            if (cardStackStatus == 1) {
+                mUseCardStack = true;
+            } else {
+                mUseCardStack = false;
+                SettingConfirmationHelper.showConfirmationDialogForSetting(
+                    mContext,
+                    mContext.getString(R.string.status_bar_recents_card_stack_title),
+                    mContext.getString(R.string.status_bar_recents_card_stack_message),
+                    null, // TODO: missing drawable
+                    Settings.System.STATUS_BAR_RECENTS_CARD_STACK,
+                    null);
+            }
+
             TaskDescription firstTask = RecentTasksLoader.getInstance(mContext).getFirstTask();
 
             Intent intent = new Intent(RecentsActivity.TOGGLE_RECENTS_INTENT);
@@ -110,7 +127,7 @@ public class Recents extends SystemUI implements RecentsComponent {
                 int cardPadding = res.getDimensionPixelSize(
                         R.dimen.status_bar_recents_card_margin);
                 Rect backgroundPadding = new Rect();
-                if (NEWRECENTS) {
+                if (mUseCardStack) {
                     float aspectRatio =
                         (float)first.getWidth() / (float)first.getHeight();
 
@@ -151,7 +168,7 @@ public class Recents extends SystemUI implements RecentsComponent {
                     if (first == null) {
                         throw new RuntimeException("Recents thumbnail is null");
                     }
-                    if (NEWRECENTS) {
+                    if (mUseCardStack) {
                         // Crop thumbnail to reduced card size
                         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             thumbHeight = dm.widthPixels - (backgroundPadding.top + backgroundPadding.bottom);
@@ -169,7 +186,7 @@ public class Recents extends SystemUI implements RecentsComponent {
                 // first, determine which orientation you're in.
                 int x, y;
 
-                if (NEWRECENTS) {
+                if (mUseCardStack) {
                     int cardPos = RecentsCardStackView.getLastCardPos();
                     if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
                         x = cardPadding + backgroundPadding.left;
