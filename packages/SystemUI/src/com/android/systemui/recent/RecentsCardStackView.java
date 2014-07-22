@@ -326,4 +326,13 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
             clearAll.start();
         }
     }
+
+    @Override
+    public void removeViewInLayout(View view) {
+        for (CardStackViewItem item : mItems) {
+            if (item.getContentView() == view) {
+                dismissChild(item);
+            }
+        }
+    }
 }
