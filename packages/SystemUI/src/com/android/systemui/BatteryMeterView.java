@@ -208,7 +208,7 @@ public class BatteryMeterView extends View implements DemoMode {
         mBoltPoints = loadBoltPoints(res);
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
-        updateSettings();
+        updateSettings(false);
     }
 
     public void setColors(boolean qs) {
@@ -270,12 +270,12 @@ public class BatteryMeterView extends View implements DemoMode {
         return color;
     }
 
-    public void updateSettings(){
+    public void updateSettings(final boolean qs) {
         int batteryStyle = Settings.System.getInt(getContext().getContentResolver(),
                                 Settings.System.STATUS_BAR_BATTERY_STYLE, 0);
 
         mShowPercent = batteryStyle == 1;
-        boolean show = (batteryStyle == 0 || mShowPercent);
+        boolean show = (batteryStyle == 0 || mShowPercent || (qs && batteryStyle == 4));
 
         setVisibility(show ? View.VISIBLE : View.GONE);
         postInvalidate();

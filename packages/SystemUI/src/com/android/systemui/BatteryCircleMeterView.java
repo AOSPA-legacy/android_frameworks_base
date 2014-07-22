@@ -184,7 +184,7 @@ public class BatteryCircleMeterView extends ImageView {
         mContext = context;
         mHandler = new Handler();
         mBatteryReceiver = new BatteryReceiver(mContext);
-        updateSettings();
+        updateSettings(false);
     }
 
     @Override
@@ -193,7 +193,7 @@ public class BatteryCircleMeterView extends ImageView {
         if (!mAttached) {
             mAttached = true;
             mBatteryReceiver.updateRegistration();
-            updateSettings();
+            updateSettings(false);
             setColors(mQS);
             mHandler.postDelayed(mInvalidate, 250);
         }
@@ -298,7 +298,7 @@ public class BatteryCircleMeterView extends ImageView {
         }
     }
 
-    public void updateSettings() {
+    public void updateSettings(final boolean qs) {
         Resources res = getResources();
         ContentResolver resolver = mContext.getContentResolver();
 
