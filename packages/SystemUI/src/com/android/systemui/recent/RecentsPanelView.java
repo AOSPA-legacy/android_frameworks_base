@@ -590,7 +590,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             if (h.thumbnailViewDrawable == null ||
                 h.thumbnailViewDrawable.getIntrinsicWidth() != thumbnail.getIntrinsicWidth() ||
                 h.thumbnailViewDrawable.getIntrinsicHeight() != thumbnail.getIntrinsicHeight()) {
-                if (mFitThumbnailToXY) {
+                if (mFitThumbnailToXY && !mUseCardStack) {
                     h.thumbnailViewImage.setScaleType(ScaleType.FIT_XY);
                 } else {
                     Matrix scaleMatrix = new Matrix();
