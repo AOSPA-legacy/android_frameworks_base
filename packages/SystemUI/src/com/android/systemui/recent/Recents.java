@@ -51,7 +51,9 @@ import static com.android.systemui.statusbar.phone.QuickSettingsModel.IMMERSIVE_
 public class Recents extends SystemUI implements RecentsComponent {
     private static final String TAG = "Recents";
     private static final boolean DEBUG = false;
-    static boolean mUseCardStack = true;
+
+    private boolean mInitCardStack = false;
+    static boolean mUseCardStack = false;
 
     @Override
     public void start() {
@@ -65,17 +67,20 @@ public class Recents extends SystemUI implements RecentsComponent {
             int cardStackStatus = Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.STATUS_BAR_RECENTS_CARD_STACK, 0);
 
+            boolean useCardStack = false;
             if (cardStackStatus == 1) {
-                mUseCardStack = true;
-            } else {
-                mUseCardStack = false;
-                SettingConfirmationHelper.showConfirmationDialogForSetting(
-                    mContext,
-                    mContext.getString(R.string.status_bar_recents_card_stack_title),
-                    mContext.getString(R.string.status_bar_recents_card_stack_message),
-                    null, // TODO: missing drawable
-                    Settings.System.STATUS_BAR_RECENTS_CARD_STACK,
-                    null);
+                useCardStack = true;
+            }
+
+            boolean toggleCardStack = false;
+            if (!mInitCardStack) {
+                // First run, accept value from settings
+                mInitCardStack = true;
+                mUseCardStack = useCardStack;
+            } else if (useCardStack != mUseCardStack) {
+                // No first run and setting has been flipped, toggle view
+                toggleCardStack = true;
+                mUseCardStack = useCardStack;
             }
 
             TaskDescription firstTask = RecentTasksLoader.getInstance(mContext).getFirstTask();
@@ -98,7 +103,6 @@ public class Recents extends SystemUI implements RecentsComponent {
                     mContext.startActivityAsUser(intent, new UserHandle(
                             UserHandle.USER_CURRENT));
                 }
-
             } else {
                 Bitmap first = null;
                 if (firstTask.getThumbnail() instanceof BitmapDrawable) {
@@ -283,6 +287,43 @@ public class Recents extends SystemUI implements RecentsComponent {
                 mContext.startActivityAsUser(intent, opts.toBundle(), new UserHandle(
                         UserHandle.USER_CURRENT));
             }
+
+            if (toggleCardStack) {
+                restartRecentsActivity();
+            }
+
+            if (cardStackStatus == 0 || cardStackStatus == 3) {
+                SettingConfirmationHelper.showConfirmationDialogForSetting(
+                    mContext,
+                    mContext.getString(R.string.status_bar_recents_card_stack_title),
+                    mContext.getString(R.string.status_bar_recents_card_stack_message),
+                    null, // TODO: missing drawable
+                    Settings.System.STATUS_BAR_RECENTS_CARD_STACK,
+                    new SettingConfirmationHelper.OnSelectListener() {
+                        @Override
+                        public void onSelect(boolean enabled) {
+                            if (mUseCardStack != enabled) {
+                                mUseCardStack = enabled;
+                                restartRecentsActivity();
+                            }
+                        }
+                    });
+            }
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, "Failed to launch RecentAppsIntent", e);
+        }
+    }
+
+    private void restartRecentsActivity() {
+        try {
+            Intent intent = new Intent(RecentsActivity.TOGGLE_RECENTS_INTENT);
+            intent.setClassName("com.android.systemui",
+                    "com.android.systemui.recent.RecentsActivity");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                    | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            mContext.startActivityAsUser(intent, new UserHandle(
+                    UserHandle.USER_CURRENT));
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Failed to launch RecentAppsIntent", e);
         }
