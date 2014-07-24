@@ -123,9 +123,6 @@
     <!-- Title shown when app provides no interface -->
     <string name="status_bar_floating_no_interface">App provides no interface</string>
 
-    <!-- Message shown in the top of the screen when there's just a few recent apps-->
-    <string name="status_bar_recent_applications">Recent applications</string>
-
     <!-- Recents card stack view confirmation dialog -->
     <string name="status_bar_recents_card_stack_title">Recents card stack view</string>
     <string name="status_bar_recents_card_stack_message">Would you like to enable recents card stack view?</string>
