@@ -297,7 +297,7 @@ public class Recents extends SystemUI implements RecentsComponent {
                     mContext,
                     mContext.getString(R.string.status_bar_recents_card_stack_title),
                     mContext.getString(R.string.status_bar_recents_card_stack_message),
-                    null, // TODO: missing drawable
+                    mContext.getResources().getDrawable(R.drawable.status_bar_recents_card_stack),
                     Settings.System.STATUS_BAR_RECENTS_CARD_STACK,
                     new SettingConfirmationHelper.OnSelectListener() {
                         @Override
