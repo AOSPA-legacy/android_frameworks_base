@@ -654,9 +654,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                             //boolean animateShow = mShowing &&
                             //    mRecentsContainer.getAlpha() > ViewConfiguration.ALPHA_THRESHOLD;
                             boolean animateShow = false;
-                            if (mUseCardStack) {
-                                //mMemoryCache.put(td.packageName, td.getThumbnail());
-                            }
                             updateIcon(h, td.getIcon(), true, animateShow);
                             updateThumbnail(h, td.getThumbnail(), true, animateShow);
                             h.loadedThumbnailAndIcon = true;
