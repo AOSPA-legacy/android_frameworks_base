@@ -103,7 +103,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private boolean mFitThumbnailToXY;
     private int mRecentItemLayoutId;
     private boolean mHighEndGfx;
-    private LruCache<String, Drawable> mMemoryCache;
 
     private RecentsActivity mRecentsActivity;
     private INotificationManager mNotificationManager;
@@ -199,16 +198,10 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             holder.loadedThumbnailAndIcon = td.isLoaded();
 
             Drawable d = null;
-            if (mUseCardStack) {
-                d = mMemoryCache.get(td.packageName);
-            }
             if (td.isLoaded()) {
                 if (mUseCardStack) {
-                    if (d == null) {
-                        d = td.getThumbnail();
-                    }
+                    d = td.getThumbnail();
                     updateThumbnail(holder, d, true, false);
-                    mMemoryCache.put(td.packageName, td.getThumbnail());
                 } else {
                     updateThumbnail(holder, td.getThumbnail(), true, false);
                     updateIcon(holder, td.getIcon(), true, false);
@@ -310,9 +303,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             mRecentItemLayoutId = R.layout.status_bar_recent_item;
         } else {
             mRecentItemLayoutId = R.layout.status_bar_recent_card;
-            final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-            final int cacheSize = maxMemory / 16;
-            mMemoryCache = new LruCache<String, Drawable>(cacheSize);
         }
     }
 
@@ -665,7 +655,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                             //    mRecentsContainer.getAlpha() > ViewConfiguration.ALPHA_THRESHOLD;
                             boolean animateShow = false;
                             if (mUseCardStack) {
-                                mMemoryCache.put(td.packageName, td.getThumbnail());
+                                //mMemoryCache.put(td.packageName, td.getThumbnail());
                             }
                             updateIcon(h, td.getIcon(), true, animateShow);
                             updateThumbnail(h, td.getThumbnail(), true, animateShow);
