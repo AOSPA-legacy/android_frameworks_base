@@ -203,30 +203,35 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
             CardStackViewItem item = mItems.get(i);
 
             if (isOccluded(i)) {
-                if (item.getContentView() == null) {
-                    Log.d(TAG, "Skip occluded content view " + i);
-                } else {
+                if (item.getContentView() != null) {
                     // This should never happen!
                     // (content views are released by updateLayout())
-                    Log.d(TAG, "Release occluded content view " + i);
+                    Log.w(TAG, "Need to release occluded content view " + i);
                     item.resetContentView();
                 }
+
+                if (item.getTag() == null) {
+                    // Update single item from adapter. Add tag info to card
+                    // (necessary if clear all hits an occluded card), but
+                    // don't update content view because card is occluded.
+                    updateAdapter(i, item, true);
+                }
             } else {
-                // Update single item its content view from adapter
-                updateAdapter(i, item);
+                // Update single item's content view from adapter
+                updateAdapter(i, item, false);
             }
         }
     }
 
     @Override
-    protected void updateAdapter(int i, CardStackViewItem item) {
+    protected void updateAdapter(int i, CardStackViewItem item, boolean occluded) {
         // Let adapter create a view and add to item
-        Log.d(TAG, "Refresh view from adapter " + i);
+        //Log.d(TAG, "Refresh view from adapter " + i);
         View contentView = item.getContentView();
         View child = mAdapter.getView(i, contentView, item);
-        item.setTag(child.getTag()); // needed to fake recents item
-        if (contentView == null) {
-            Log.d(TAG, "Add view from adapter " + i);
+        item.setTag(child.getTag()); // tag info needed to fake recents item
+        if (!occluded && contentView == null) {
+            //Log.d(TAG, "Add view from adapter " + i);
             // There is no existing content view that has been update, so
             // we need to add the newly created view to the item
             item.setContentView(child, getCardWidth(), getCardHeight());
@@ -235,7 +240,7 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
     @Override
     public void setAdapter(TaskDescriptionAdapter adapter) {
-        Log.d(TAG, "Added adapter with size " + adapter.getCount());
+        //Log.d(TAG, "Added adapter with size " + adapter.getCount());
         mAdapter = adapter;
         mAdapter.registerDataSetObserver(new DataSetObserver() {
             public void onChanged() {
