@@ -197,17 +197,9 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             holder.thumbnailView.setContentDescription(td.getLabel());
             holder.loadedThumbnailAndIcon = td.isLoaded();
 
-            Drawable d = null;
             if (td.isLoaded()) {
-                if (mUseCardStack) {
-                    d = td.getThumbnail();
-                    updateThumbnail(holder, d, true, false);
-                } else {
-                    updateThumbnail(holder, td.getThumbnail(), true, false);
-                    updateIcon(holder, td.getIcon(), true, false);
-                }
-            } else if (mUseCardStack && d != null) {
-                updateThumbnail(holder, d, true, false);
+                updateThumbnail(holder, td.getThumbnail(), true, false);
+                updateIcon(holder, td.getIcon(), true, false);
             }
             if (index == 0) {
                 if (mAnimateIconOfFirstTask) {
@@ -295,15 +287,14 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RecentsPanelView,
                 defStyle, 0);
 
-        mRecentTasksLoader = RecentTasksLoader.getInstance(context);
-        mRecentsActivity = (RecentsActivity) context;
-        a.recycle();
-
         if (!mUseCardStack) {
-            mRecentItemLayoutId = R.layout.status_bar_recent_item;
+            mRecentItemLayoutId = a.getResourceId(R.styleable.RecentsPanelView_recentItemLayout, 0);
         } else {
             mRecentItemLayoutId = R.layout.status_bar_recent_card;
         }
+        mRecentTasksLoader = RecentTasksLoader.getInstance(context);
+        mRecentsActivity = (RecentsActivity) context;
+        a.recycle();
     }
 
     public int numItemsInOneScreenful() {
