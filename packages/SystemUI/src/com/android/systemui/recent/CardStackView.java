@@ -116,14 +116,14 @@ public class CardStackView extends RelativeLayout {
 
     private int mDistance;
     private int mLandingArea;
-    private float mTilt;
     private int mBottomCap;
+    private float mTilt;
 
     private Animator mRemoveAnimator;
 
     private int mLastViewTouch;
-    private float mLastScrollTouch;
     private int mDeltaToScrollAnchor;
+    private float mLastScrollTouch;
 
     // OverScroller and GestureDector for handling fling scrolling (measuring
     // scroll velocity on TOUCH_UP and computing decelerating scroll animation).
