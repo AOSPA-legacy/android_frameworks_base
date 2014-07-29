@@ -129,7 +129,7 @@ public class Recents extends SystemUI implements RecentsComponent {
                 float thumbHeight;
 
                 int cardPadding = res.getDimensionPixelSize(
-                        R.dimen.status_bar_recents_card_margin);
+                        com.android.internal.R.dimen.status_bar_recents_card_margin);
                 Rect backgroundPadding = new Rect();
                 if (mUseCardStack) {
                     float aspectRatio =
@@ -173,15 +173,27 @@ public class Recents extends SystemUI implements RecentsComponent {
                         throw new RuntimeException("Recents thumbnail is null");
                     }
                     if (mUseCardStack) {
-                        // Crop thumbnail to reduced card size
+                        // Compute reduced card size
                         if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
                             thumbHeight = dm.widthPixels - (backgroundPadding.top + backgroundPadding.bottom);
                         } else {
                             thumbWidth = dm.heightPixels - (backgroundPadding.left + backgroundPadding.right);
                         }
-                        first = Bitmap.createBitmap(first, 0, 0, (int)thumbWidth, (int)thumbHeight);
-                        if (first == null) {
-                            throw new RuntimeException("Recents thumbnail is null");
+
+                        // Ensure thumbnail size is smaller or equal than bitmap
+                        if (first.getWidth() < thumbWidth) {
+                            thumbWidth = first.getWidth();
+                        }
+                        if (first.getHeight() < thumbHeight) {
+                            thumbHeight = first.getHeight();
+                        }
+
+                        // Crop thumbnail to reduced card size
+                        if (first.getWidth() != thumbWidth || first.getHeight() != thumbHeight) {
+                            first = Bitmap.createBitmap(first, 0, 0, (int)thumbWidth, (int)thumbHeight);
+                            if (first == null) {
+                                throw new RuntimeException("Recents thumbnail is null");
+                            }
                         }
                     }
                 }

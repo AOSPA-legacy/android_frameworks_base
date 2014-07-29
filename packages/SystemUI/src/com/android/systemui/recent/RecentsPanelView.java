@@ -473,7 +473,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             int orientation;
             int width, height;
             DisplayMetrics dm = getResources().getDisplayMetrics();
-            int cardPadding = getResources().getDimensionPixelSize(R.dimen.status_bar_recents_card_margin);
+            int cardPadding = getResources().getDimensionPixelSize(com.android.internal.R.dimen.status_bar_recents_card_margin);
 
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 orientation = CardStackView.PORTRAIT;
@@ -595,6 +595,9 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                             width -= backgroundPadding.left + backgroundPadding.right;
                             height -= backgroundPadding.top + backgroundPadding.bottom;
                         }
+
+                        //Log.v(TAG, "card width: " + width);
+                        //Log.v(TAG, "card height: " + height);
 
                         // Compute scale factor
                         if (thumbnail.getIntrinsicWidth() < thumbnail.getIntrinsicHeight()) {

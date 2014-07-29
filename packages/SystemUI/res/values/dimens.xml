@@ -58,9 +58,6 @@
     <dimen name="status_bar_recents_app_icon_left_margin">0dp</dimen>
     <dimen name="status_bar_recents_app_icon_top_margin">8dp</dimen>
 
-    <!-- Default margin for recents cards -->
-    <dimen name="status_bar_recents_card_margin">15dp</dimen>
-
     <!-- Amount to offset bottom of notification peek window from top of status bar. -->
     <dimen name="peek_window_y_offset">-12dp</dimen>
 
