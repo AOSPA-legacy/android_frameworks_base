@@ -1810,7 +1810,6 @@
   <java-symbol type="bool" name="config_hasRotationLockSwitch" />
   <java-symbol type="string" name="config_deviceKeyHandlerLib" />
   <java-symbol type="string" name="config_deviceKeyHandlerClass" />
-  <java-symbol type="integer" name="config_wallpaperMaxWidth" />
   <java-symbol type="bool" name="config_batterySdCardAccessibility" />
 
   <!-- Hardware Key ReMapping -->
