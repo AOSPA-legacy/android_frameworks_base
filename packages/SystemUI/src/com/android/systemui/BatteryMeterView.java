@@ -274,8 +274,8 @@ public class BatteryMeterView extends View implements DemoMode {
         int batteryStyle = Settings.System.getInt(getContext().getContentResolver(),
                                 Settings.System.STATUS_BAR_BATTERY_STYLE, 0);
 
-        mShowPercent = batteryStyle == 1;
-        boolean show = (batteryStyle == 0 || mShowPercent || (qs && batteryStyle == 4));
+        mShowPercent = batteryStyle == 1 || (qs && batteryStyle == 4);
+        boolean show = batteryStyle == 0 || mShowPercent;
 
         setVisibility(show ? View.VISIBLE : View.GONE);
         postInvalidate();
