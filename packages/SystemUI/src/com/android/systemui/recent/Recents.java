@@ -64,8 +64,8 @@ public class Recents extends SystemUI implements RecentsComponent {
     public void toggleRecents(Display display, int layoutDirection, View statusBarView, int immersiveModeStyle) {
         if (DEBUG) Log.d(TAG, "toggle recents panel");
         try {
-            int cardStackStatus = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_RECENTS_CARD_STACK, 0);
+            int cardStackStatus = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.STATUS_BAR_RECENTS_CARD_STACK, 0, UserHandle.USER_CURRENT);
 
             boolean useCardStack = false;
             if (cardStackStatus == 1) {
