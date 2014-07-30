@@ -769,7 +769,7 @@ final class ActivityStack {
                     || mLastScreenshotBitmap.getHeight() != h) {
                 mLastScreenshotActivity = who;
                 mLastScreenshotBitmap = mWindowManager.screenshotApplications(
-                        who.appToken, Display.DEFAULT_DISPLAY, w, h, SCREENSHOT_FORCE_565);
+                        who.appToken, Display.DEFAULT_DISPLAY, w, h, SCREENSHOT_FORCE_565 || mUseCardStack);
             }
             if (mLastScreenshotBitmap != null) {
                 return mLastScreenshotBitmap.copy(mLastScreenshotBitmap.getConfig(), true);
