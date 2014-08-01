@@ -569,15 +569,21 @@ public abstract class BaseStatusBar extends SystemUI implements
         // check if immersive mode hides navbar and can show pie
         boolean immersiveHidesNavBar = mImmersiveModeStyle == IMMERSIVE_MODE_FULL
                     | mImmersiveModeStyle == IMMERSIVE_MODE_HIDE_ONLY_NAVBAR;
+        // check if we chosed to use clear all on screen navbar
+        boolean isNavBarClearAllOn = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.NAVBAR_RECENTS_CLEAR_ALL, 0, UserHandle.USER_CURRENT) == 1;;
         // check if device has hardware keys
         boolean hasKeys = false;
+        boolean navBarShowing = true;
         try {
             IWindowManager wm = WindowManagerGlobal.getWindowManagerService();
             hasKeys = !wm.needsNavigationBar();
+            navBarShowing = wm.hasNavigationBar();
         } catch (RemoteException e) {
         }
 
-        if ((!hasKeys && immersiveHidesNavBar && pieEnabled) | (hasKeys && forceNavbar)) {
+        if (!hasKeys ? immersiveHidesNavBar && pieEnabled && isNavBarClearAllOn
+                : (forceNavbar | navBarShowing) && isNavBarClearAllOn) {
             // we have pie enabled or we have navbar force showed,
             // no need to add another clear all way
             Settings.System.putInt(mContext.getContentResolver(),
