@@ -728,9 +728,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.PIE_STATE), false, this,
                     UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.USE_EDGE_SERVICE_FOR_GESTURES), false, this,
-                    UserHandle.USER_ALL);
             updateSettings();
         }
 
@@ -1273,13 +1270,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     }
                     @Override
                     public void onSwipeFromBottom() {
-                        if (mNavigationBar != null && mNavigationBarOnBottom) {
+                        if (mNavigationBar != null && mNavigationBarOnBottom
+                                && !(immersiveModeImplementsPie() && immersiveModeHidesNavigationBar())) {
                             requestTransientBars(mNavigationBar);
                         }
                     }
                     @Override
                     public void onSwipeFromRight() {
-                        if (mNavigationBar != null && !mNavigationBarOnBottom) {
+                        if (mNavigationBar != null && !mNavigationBarOnBottom
+                                && !(immersiveModeImplementsPie() && immersiveModeHidesNavigationBar())) {
                             requestTransientBars(mNavigationBar);
                         }
                     }
