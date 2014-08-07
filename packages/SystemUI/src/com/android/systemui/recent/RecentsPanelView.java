@@ -103,6 +103,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private boolean mFitThumbnailToXY;
     private int mRecentItemLayoutId;
     private boolean mHighEndGfx;
+    private int mAppColorBarHeight;
 
     private RecentsActivity mRecentsActivity;
     private INotificationManager mNotificationManager;
@@ -136,6 +137,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         TextView labelView;
         TextView descriptionView;
         View calloutLine;
+        View appColorBarView;
         TaskDescription taskDescription;
         boolean loadedThumbnailAndIcon;
     }
@@ -173,6 +175,9 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             holder.labelView = (TextView) convertView.findViewById(R.id.app_label);
             holder.calloutLine = convertView.findViewById(R.id.recents_callout_line);
             holder.descriptionView = (TextView) convertView.findViewById(R.id.app_description);
+            if (mUseCardStack) {
+                holder.appColorBarView = (View)convertView.findViewById(R.id.app_top_colored_bar);
+            }
 
             convertView.setTag(holder);
             return convertView;
@@ -200,6 +205,16 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             if (td.isLoaded()) {
                 updateThumbnail(holder, td.getThumbnail(), true, false);
                 updateIcon(holder, td.getIcon(), true, false);
+
+                if (mUseCardStack) {
+                    holder.appColorBarView.setBackgroundColor(td.getABColor());
+                    int topPadding = mAppColorBarHeight - td.getABHeight();
+                    if (topPadding < 0) {
+                        //TODO: crop bitmap
+                        topPadding = 0;
+                    }
+                    holder.thumbnailViewImage.setPadding(0, topPadding, 0, 0);
+                }
             }
             if (index == 0) {
                 if (mAnimateIconOfFirstTask) {
@@ -291,6 +306,8 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             mRecentItemLayoutId = a.getResourceId(R.styleable.RecentsPanelView_recentItemLayout, 0);
         } else {
             mRecentItemLayoutId = R.layout.status_bar_recent_card;
+            mAppColorBarHeight = getResources().getDimensionPixelSize(
+                    R.dimen.status_bar_recents_app_color_bar_height);
         }
         mRecentTasksLoader = RecentTasksLoader.getInstance(context);
         mRecentsActivity = (RecentsActivity) context;

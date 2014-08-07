@@ -72,6 +72,8 @@ public class RecentTasksLoader implements View.OnTouchListener {
     private enum State { LOADING, LOADED, CANCELLED };
     private State mState = State.CANCELLED;
 
+    private int mDefaultAppBarColor;
+
 
     private static RecentTasksLoader sInstance;
     public static RecentTasksLoader getInstance(Context context) {
@@ -111,6 +113,8 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
         mDefaultThumbnailBackground =
                 new ColorDrawableWithDimensions(color, thumbnailWidth, thumbnailHeight);
+
+        mDefaultAppBarColor = res.getColor(R.color.status_bar_recents_app_bar_color);
     }
 
     public void setRecentsPanel(RecentsPanelView newRecentsPanel, RecentsPanelView caller) {
@@ -186,6 +190,49 @@ public class RecentTasksLoader implements View.OnTouchListener {
         return null;
     }
 
+    int detectEdge(int[] pixels, int length) {
+        // simple 1D Laplacian operator for edge detection
+        if (length > 2) {
+            int r1, r2, r3, g1, g2, g3, b1, b2, b3;
+            int val = pixels[0];
+
+            r1 = (val & 0xff0000) >> 16;
+            g1 = (val & 0xff00) >> 8;
+            b1 = val & 0xff;
+
+            val = pixels[1];
+
+            r2 = (val & 0xff0000) >> 16;
+            g2 = (val & 0xff00) >> 8;
+            b2 = val & 0xff;
+
+            for (int i = 2; i < length; ++i) {
+                val = pixels[i];
+
+                r3 = (val & 0xff0000) >> 16;
+                g3 = (val & 0xff00) >> 8;
+                b3 = val & 0xff;
+
+                int diff = Math.abs(r1 - r3);
+                diff += Math.abs(g1 - g3);
+                diff += Math.abs(b1 - b3);
+
+                if (diff > 30) {
+                    return i-1;
+                }
+
+                r1 = r2;
+                g1 = g2;
+                b1 = b2;
+                r2 = r3;
+                g2 = g3;
+                b2 = b3;
+            }
+        }
+
+        return -1;
+    }
+
     void loadThumbnailAndIcon(TaskDescription td) {
         final ActivityManager am = (ActivityManager)
                 mContext.getSystemService(Context.ACTIVITY_SERVICE);
@@ -198,6 +245,28 @@ public class RecentTasksLoader implements View.OnTouchListener {
         synchronized (td) {
             if (thumbnail != null) {
                 td.setThumbnail(new BitmapDrawable(mContext.getResources(), thumbnail));
+
+                // TODO: do this only if using card stack view
+                int maxHeight = Math.min(thumbnail.getHeight(), 300);
+                Bitmap thumb = Bitmap.createBitmap(thumbnail, thumbnail.getWidth()-1, 0, 1, maxHeight);
+                int[] pixels = new int[maxHeight];
+                thumb.getPixels(pixels, 0, 1, 0, 0, 1, maxHeight);
+
+                int abHeight = detectEdge(pixels, maxHeight);
+                if (abHeight == -1) {
+                    Log.v(TAG, "No edge found");
+                    td.setABHeight(0);
+                    // Keep last evaluated color
+                    if (td.getABColor() == 0) {
+                        // or initially set default color
+                        td.setABColor(mDefaultAppBarColor);
+                    }
+                } else {
+                    Log.v(TAG, "Edge found at " + abHeight);
+                    td.setABHeight(abHeight);
+                    td.setABColor(pixels[abHeight]);
+                }
+                thumb.recycle();
             } else {
                 td.setThumbnail(mDefaultThumbnailBackground);
             }

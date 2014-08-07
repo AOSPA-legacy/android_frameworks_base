@@ -34,6 +34,10 @@ public final class TaskDescription {
     private CharSequence mLabel; // application package label
     private boolean mLoaded;
 
+    // ActionBar detection
+    private int mABColor;
+    private int mABHeight;
+
     public TaskDescription(int _taskId, int _persistentTaskId,
             ResolveInfo _resolveInfo, Intent _intent,
             String _packageName, CharSequence _description) {
@@ -95,5 +99,21 @@ public final class TaskDescription {
 
     public Drawable getThumbnail() {
         return mThumbnail;
+    }
+
+    public void setABColor(int abColor) {
+        mABColor = abColor;
+    }
+
+    public int getABColor() {
+        return mABColor;
+    }
+
+    public void setABHeight(int abHeight) {
+        mABHeight = abHeight;
+    }
+
+    public int getABHeight() {
+        return mABHeight;
     }
 }

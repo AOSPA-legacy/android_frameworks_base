@@ -7,27 +7,34 @@
     android:clipChildren="true"
     android:padding="@android:dimen/status_bar_recents_card_margin">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/app_thumbnail"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/status_bar_recent_card_shadow" >
+
+        <ImageView
+            android:id="@+id/app_thumbnail_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:paddingTop="@dimen/status_bar_recents_app_color_bar_height" />
 
         <RelativeLayout
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content" >
 
             <LinearLayout
+                android:id="@+id/app_top_colored_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/status_bar_recents_app_color_bar_height"
                 android:orientation="horizontal"
-                android:background="#dcdcdc" >
+                android:background="@color/status_bar_recents_app_bar_color" >
 
                 <ImageView
                     android:id="@+id/app_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
                     android:layout_weight="0"
@@ -57,23 +64,23 @@
                     android:textSize="@dimen/status_bar_recents_app_label_text_size" />
 
                 <Button
-                    android:id="@+id/app_kill"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
-                    android:layout_weight="0"
-                    android:background="@drawable/recents_kill_light" />
-
-                <Button
                     android:id="@+id/app_floating"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="right|center_vertical"
                     android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
                     android:layout_weight="0"
                     android:background="@drawable/recents_floating_light"
                     android:gravity="right" />
+
+                <Button
+                    android:id="@+id/app_kill"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
+                    android:layout_weight="0"
+                    android:background="@drawable/recents_kill_light" />
 
             </LinearLayout>
 			
@@ -85,13 +92,7 @@
 
         </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/app_thumbnail_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
-
-    </LinearLayout>
+    </RelativeLayout>
 
     <View
         android:id="@+id/recents_callout_line"
