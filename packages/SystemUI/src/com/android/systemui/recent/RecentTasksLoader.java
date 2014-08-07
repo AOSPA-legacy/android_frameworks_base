@@ -32,6 +32,7 @@ import android.os.Handler;
 import android.os.Process;
 import android.os.UserHandle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -72,7 +73,11 @@ public class RecentTasksLoader implements View.OnTouchListener {
     private enum State { LOADING, LOADED, CANCELLED };
     private State mState = State.CANCELLED;
 
+    private static final int EDGE_DETECTION_SKIP_AMOUNT = 10; // dp
+    private static final int EDGE_DETECTION_SCAN_AMOUNT = 60; // dp
     private int mDefaultAppBarColor;
+    private int mEdgeDetectionScanPixels;
+    private int mEdgeDetectionSkipPixels;
 
 
     private static RecentTasksLoader sInstance;
@@ -115,6 +120,10 @@ public class RecentTasksLoader implements View.OnTouchListener {
                 new ColorDrawableWithDimensions(color, thumbnailWidth, thumbnailHeight);
 
         mDefaultAppBarColor = res.getColor(R.color.status_bar_recents_app_bar_color);
+        mEdgeDetectionSkipPixels = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                EDGE_DETECTION_SKIP_AMOUNT, res.getDisplayMetrics());
+        mEdgeDetectionScanPixels = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                EDGE_DETECTION_SCAN_AMOUNT, res.getDisplayMetrics());
     }
 
     public void setRecentsPanel(RecentsPanelView newRecentsPanel, RecentsPanelView caller) {
@@ -193,27 +202,29 @@ public class RecentTasksLoader implements View.OnTouchListener {
     int detectEdge(int[] pixels, int length) {
         // simple 1D Laplacian operator for edge detection
         if (length > 2) {
-            int r1, r2, r3, g1, g2, g3, b1, b2, b3;
+            int r1, r2, r3, g1, g2, g3, b1, b2, b3, diff;
             int val = pixels[0];
 
-            r1 = (val & 0xff0000) >> 16;
-            g1 = (val & 0xff00) >> 8;
+            r1 = (val >> 16) & 0xff;
+            g1 = (val >> 8) & 0xff;
             b1 = val & 0xff;
 
             val = pixels[1];
 
-            r2 = (val & 0xff0000) >> 16;
-            g2 = (val & 0xff00) >> 8;
+            r2 = (val >> 16) & 0xff;
+            g2 = (val >> 8) & 0xff;
             b2 = val & 0xff;
 
             for (int i = 2; i < length; ++i) {
+                diff = 0;
                 val = pixels[i];
 
-                r3 = (val & 0xff0000) >> 16;
-                g3 = (val & 0xff00) >> 8;
+                r3 = (val >> 16) & 0xff;
+                g3 = (val >> 8) & 0xff;
                 b3 = val & 0xff;
 
-                int diff = Math.abs(r1 - r3);
+                // do the math for each channel and fuse in diff
+                diff += Math.abs(r1 - r3);
                 diff += Math.abs(g1 - g3);
                 diff += Math.abs(b1 - b3);
 
@@ -221,6 +232,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
                     return i-1;
                 }
 
+                // move on to next pixel
                 r1 = r2;
                 g1 = g2;
                 b1 = b2;
@@ -246,27 +258,44 @@ public class RecentTasksLoader implements View.OnTouchListener {
             if (thumbnail != null) {
                 td.setThumbnail(new BitmapDrawable(mContext.getResources(), thumbnail));
 
-                // TODO: do this only if using card stack view
-                int maxHeight = Math.min(thumbnail.getHeight(), 300);
-                Bitmap thumb = Bitmap.createBitmap(thumbnail, thumbnail.getWidth()-1, 0, 1, maxHeight);
-                int[] pixels = new int[maxHeight];
-                thumb.getPixels(pixels, 0, 1, 0, 0, 1, maxHeight);
+                // TODO: Only do this if using card stack view
+                int maxHeight = Math.min(thumbnail.getHeight(), mEdgeDetectionScanPixels);
+                if (mEdgeDetectionSkipPixels < maxHeight) {
+                    // Crop bitmap to single rightmost column of pixels,
+                    // starting at mEdgeDetectionSkipPixels till maxHeight
+                    Bitmap thumb = Bitmap.createBitmap(thumbnail, thumbnail.getWidth()-1, mEdgeDetectionSkipPixels, 1, maxHeight);
 
-                int abHeight = detectEdge(pixels, maxHeight);
-                if (abHeight == -1) {
-                    Log.v(TAG, "No edge found");
-                    td.setABHeight(0);
-                    // Keep last evaluated color
-                    if (td.getABColor() == 0) {
-                        // or initially set default color
-                        td.setABColor(mDefaultAppBarColor);
+                    // Obtain pixels from bitmap
+                    int length = maxHeight-mEdgeDetectionSkipPixels;
+                    int[] pixels = new int[length];
+                    thumb.getPixels(pixels, 0, 1, 0, 0, 1, length);
+
+                    int abHeight = detectEdge(pixels, length);
+                    if (abHeight == -1) {
+                        Log.v(TAG, "No edge found");
+                        td.setABHeight(0);
+
+                        // Now it gets messy: Look for pixel color in left
+                        // corner and use that color if it is the same.
+                        Bitmap thumbLeft = Bitmap.createBitmap(thumbnail, 0, 0, 1, 1);
+                        int[] pixelsLeft = new int[1];
+                        thumbLeft.getPixels(pixelsLeft, 0, 1, 0, 0, 1, 1);
+                        if (pixelsLeft[0] == pixels[0]) {
+                            td.setABColor(pixels[0]);
+                        } else {
+                            td.setABColor(mDefaultAppBarColor);
+                        }
+                        thumbLeft.recycle();
+                    } else {
+                        Log.v(TAG, "Edge found at " + abHeight);
+                        td.setABHeight(mEdgeDetectionSkipPixels + abHeight);
+                        td.setABColor(pixels[abHeight]);
                     }
+                    thumb.recycle();
                 } else {
-                    Log.v(TAG, "Edge found at " + abHeight);
-                    td.setABHeight(abHeight);
-                    td.setABColor(pixels[abHeight]);
+                    td.setABHeight(0);
+                    td.setABColor(mDefaultAppBarColor);
                 }
-                thumb.recycle();
             } else {
                 td.setThumbnail(mDefaultThumbnailBackground);
             }
