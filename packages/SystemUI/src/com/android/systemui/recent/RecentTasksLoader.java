@@ -73,7 +73,8 @@ public class RecentTasksLoader implements View.OnTouchListener {
     private enum State { LOADING, LOADED, CANCELLED };
     private State mState = State.CANCELLED;
 
-    private static final int EDGE_DETECTION_SKIP_AMOUNT = 20; // dp
+    private static final int EDGE_DETECTION_MAX_DIFF = 30;
+    private static final int EDGE_DETECTION_SKIP_AMOUNT = 30; // dp
     private static final int EDGE_DETECTION_SCAN_AMOUNT = 60; // dp
     private int mDefaultAppBarColor;
     private int mEdgeDetectionScanPixels;
@@ -228,7 +229,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
                 diff += Math.abs(g1 - g3);
                 diff += Math.abs(b1 - b3);
 
-                if (diff > 30) {
+                if (diff > EDGE_DETECTION_MAX_DIFF) {
                     return i-1;
                 }
 
