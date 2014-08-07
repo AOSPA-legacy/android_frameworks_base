@@ -73,7 +73,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
     private enum State { LOADING, LOADED, CANCELLED };
     private State mState = State.CANCELLED;
 
-    private static final int EDGE_DETECTION_SKIP_AMOUNT = 10; // dp
+    private static final int EDGE_DETECTION_SKIP_AMOUNT = 20; // dp
     private static final int EDGE_DETECTION_SCAN_AMOUNT = 60; // dp
     private int mDefaultAppBarColor;
     private int mEdgeDetectionScanPixels;
@@ -200,22 +200,22 @@ public class RecentTasksLoader implements View.OnTouchListener {
     }
 
     int detectEdge(int[] pixels, int length) {
-        // simple 1D Laplacian operator for edge detection
-        if (length > 2) {
+        // simple 1D Laplacian operator for edge detection on each channel
+        if (length > mEdgeDetectionSkipPixels+1) {
             int r1, r2, r3, g1, g2, g3, b1, b2, b3, diff;
-            int val = pixels[0];
+            int val = pixels[mEdgeDetectionSkipPixels-1];
 
             r1 = (val >> 16) & 0xff;
             g1 = (val >> 8) & 0xff;
             b1 = val & 0xff;
 
-            val = pixels[1];
+            val = pixels[mEdgeDetectionSkipPixels];
 
             r2 = (val >> 16) & 0xff;
             g2 = (val >> 8) & 0xff;
             b2 = val & 0xff;
 
-            for (int i = 2; i < length; ++i) {
+            for (int i = mEdgeDetectionSkipPixels+1; i < length; ++i) {
                 diff = 0;
                 val = pixels[i];
 
@@ -263,33 +263,21 @@ public class RecentTasksLoader implements View.OnTouchListener {
                 if (mEdgeDetectionSkipPixels < maxHeight) {
                     // Crop bitmap to single rightmost column of pixels,
                     // starting at mEdgeDetectionSkipPixels till maxHeight
-                    Bitmap thumb = Bitmap.createBitmap(thumbnail, thumbnail.getWidth()-1, mEdgeDetectionSkipPixels, 1, maxHeight);
+                    Bitmap thumb = Bitmap.createBitmap(thumbnail, thumbnail.getWidth()-1, 0, 1, maxHeight);
 
                     // Obtain pixels from bitmap
-                    int length = maxHeight-mEdgeDetectionSkipPixels;
-                    int[] pixels = new int[length];
-                    thumb.getPixels(pixels, 0, 1, 0, 0, 1, length);
+                    int[] pixels = new int[maxHeight];
+                    thumb.getPixels(pixels, 0, 1, 0, 0, 1, maxHeight);
 
-                    int abHeight = detectEdge(pixels, length);
+                    int abHeight = detectEdge(pixels, maxHeight);
                     if (abHeight == -1) {
                         Log.v(TAG, "No edge found");
                         td.setABHeight(0);
-
-                        // Now it gets messy: Look for pixel color in left
-                        // corner and use that color if it is the same.
-                        Bitmap thumbLeft = Bitmap.createBitmap(thumbnail, 0, 0, 1, 1);
-                        int[] pixelsLeft = new int[1];
-                        thumbLeft.getPixels(pixelsLeft, 0, 1, 0, 0, 1, 1);
-                        if (pixelsLeft[0] == pixels[0]) {
-                            td.setABColor(pixels[0]);
-                        } else {
-                            td.setABColor(mDefaultAppBarColor);
-                        }
-                        thumbLeft.recycle();
+                        td.setABColor(pixels[0]);
                     } else {
                         Log.v(TAG, "Edge found at " + abHeight);
-                        td.setABHeight(mEdgeDetectionSkipPixels + abHeight);
-                        td.setABColor(pixels[abHeight]);
+                        td.setABHeight(abHeight);
+                        td.setABColor(pixels[abHeight-1]);
                     }
                     thumb.recycle();
                 } else {
