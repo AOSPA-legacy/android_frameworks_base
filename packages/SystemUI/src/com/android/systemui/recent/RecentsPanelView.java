@@ -209,18 +209,18 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                 if (mUseCardStack) {
                     holder.appColorBarView.setBackgroundColor(td.getABColor());
                     int topPadding = mAppColorBarHeight - td.getABHeight();
-                    if (topPadding < 0) {
-                        // This should never happen. Detected AB height is
-                        // bigger than our app color bar. There would be some
-                        // overlap.
-                        topPadding = 0;
+                    //if (topPadding < 0) {
+                    //    // This should never happen. Detected AB height is
+                    //    // bigger than our app color bar. There would be some
+                    //    // overlap.
+                    //    topPadding = 0;
 
-                        // TODO: We actually need to crop the bitmap or
-                        // increase this app bar height.
-                        //holder.appColorBarView.setLayoutParams(
-                        //        new LinearLayout.LayoutParams(
-                        //            LinearLayout.LayoutParams.MATCH_PARENT, td.getABHeight()));
-                    }
+                    //    // TODO: We actually need to crop the bitmap or
+                    //    // increase this app bar height.
+                    //    //holder.appColorBarView.setLayoutParams(
+                    //    //        new LinearLayout.LayoutParams(
+                    //    //            LinearLayout.LayoutParams.MATCH_PARENT, td.getABHeight()));
+                    //}
                     holder.thumbnailViewImage.setPadding(0, topPadding, 0, 0);
                 }
             }
