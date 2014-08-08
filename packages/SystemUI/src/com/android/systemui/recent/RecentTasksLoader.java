@@ -200,6 +200,32 @@ public class RecentTasksLoader implements View.OnTouchListener {
         return null;
     }
 
+    boolean isEdge(int v1, int v2, int v3) {
+        int r1, r2, r3, g1, g2, g3, b1, b2, b3, diff;
+
+        r1 = (v1 >> 16) & 0xff;
+        g1 = (v1 >> 8) & 0xff;
+        b1 =  v1 & 0xff;
+
+        r2 = (v2 >> 16) & 0xff;
+        g2 = (v2 >> 8) & 0xff;
+        b2 =  v2 & 0xff;
+
+        r3 = (v3 >> 16) & 0xff;
+        g3 = (v3 >> 8) & 0xff;
+        b3 =  v3 & 0xff;
+
+        diff = Math.abs(r1 - r3);
+        diff += Math.abs(g1 - g3);
+        diff += Math.abs(b1 - b3);
+
+        if (diff > EDGE_DETECTION_MAX_DIFF) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     int detectEdge(int[] pixels, int length) {
         // simple 1D Laplacian operator for edge detection on each channel
         if (length > mEdgeDetectionSkipPixels+1) {
@@ -265,22 +291,36 @@ public class RecentTasksLoader implements View.OnTouchListener {
                     // Crop bitmap to single rightmost column of pixels,
                     // starting at mEdgeDetectionSkipPixels till maxHeight
                     Bitmap thumb = Bitmap.createBitmap(thumbnail, thumbnail.getWidth()-1, 0, 1, maxHeight);
+                    Bitmap thumbLeft = Bitmap.createBitmap(thumbnail, 0, 0, 1, maxHeight);
 
                     // Obtain pixels from bitmap
                     int[] pixels = new int[maxHeight];
                     thumb.getPixels(pixels, 0, 1, 0, 0, 1, maxHeight);
+                    int[] pixelsLeft = new int[maxHeight];
+                    thumbLeft.getPixels(pixelsLeft, 0, 1, 0, 0, 1, maxHeight);
 
+                    // Detect edges on the right side
                     int abHeight = detectEdge(pixels, maxHeight);
-                    if (abHeight == -1) {
+
+                    // Check abHeight and if there is also an edge on the left
+                    if (abHeight == -1 ||
+                            !isEdge(pixelsLeft[abHeight-1], pixelsLeft[abHeight], pixelsLeft[abHeight+1])) {
                         Log.v(TAG, "No edge found");
                         td.setABHeight(0);
-                        td.setABColor(pixels[0]);
+
+                        // Take top color if its the same left and right
+                        if (pixels[0] == pixelsLeft[0]) {
+                            td.setABColor(pixels[0]);
+                        } else {
+                            td.setABColor(mDefaultAppBarColor);
+                        }
                     } else {
                         Log.v(TAG, "Edge found at " + abHeight);
                         td.setABHeight(abHeight);
                         td.setABColor(pixels[abHeight-1]);
                     }
                     thumb.recycle();
+                    thumbLeft.recycle();
                 } else {
                     td.setABHeight(0);
                     td.setABColor(mDefaultAppBarColor);
