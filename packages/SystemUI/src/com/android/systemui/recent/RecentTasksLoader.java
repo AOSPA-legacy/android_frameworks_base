@@ -79,6 +79,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
     private int mDefaultAppBarColor;
     private int mEdgeDetectionScanPixels;
     private int mEdgeDetectionSkipPixels;
+    private ArrayList<TaskDescription> mReusableTasks;
 
 
     private static RecentTasksLoader sInstance;
@@ -170,7 +171,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
     // Create an TaskDescription, returning null if the title or icon is null
     TaskDescription createTaskDescription(int taskId, int persistentTaskId, Intent baseIntent,
-            ComponentName origActivity, CharSequence description) {
+            ComponentName origActivity, CharSequence description, TaskDescription reuseTask) {
         Intent intent = new Intent(baseIntent);
         if (origActivity != null) {
             intent.setComponent(origActivity);
@@ -191,6 +192,16 @@ public class RecentTasksLoader implements View.OnTouchListener {
                         persistentTaskId, resolveInfo, baseIntent, info.packageName,
                         description);
                 item.setLabel(title);
+
+                // TODO: Only if cards stack view
+                if (reuseTask != null /*TODO: && mUseCardStack*/) {
+                    //Log.v(TAG, "Reuse task description color: " + reuseTask.getABColor());
+                    item.setABHeight(reuseTask.getABHeight());
+                    item.setABColor(reuseTask.getABColor());
+                } else {
+                    item.setABHeight(0);
+                    item.setABColor(mDefaultAppBarColor);
+                }
 
                 return item;
             } else {
@@ -282,6 +293,9 @@ public class RecentTasksLoader implements View.OnTouchListener {
         if (DEBUG) Log.v(TAG, "Loaded bitmap for task "
                 + td + ": " + thumbnail);
         synchronized (td) {
+            int abHeight = 0;
+            int abColor = mDefaultAppBarColor;
+
             if (thumbnail != null) {
                 td.setThumbnail(new BitmapDrawable(mContext.getResources(), thumbnail));
 
@@ -300,30 +314,29 @@ public class RecentTasksLoader implements View.OnTouchListener {
                     thumbLeft.getPixels(pixelsLeft, 0, 1, 0, 0, 1, maxHeight);
 
                     // Detect edges on the right side
-                    int abHeight = detectEdge(pixels, maxHeight);
+                    abHeight = detectEdge(pixels, maxHeight);
 
                     // Check abHeight and if there is also an edge on the left
-                    if (abHeight == -1 ||
-                            !isEdge(pixelsLeft[abHeight-1], pixelsLeft[abHeight], pixelsLeft[abHeight+1])) {
-                        Log.v(TAG, "No edge found");
-                        td.setABHeight(0);
-
-                        // Take top color if its the same left and right
-                        if (pixels[0] == pixelsLeft[0]) {
-                            td.setABColor(pixels[0]);
-                        } else {
-                            td.setABColor(mDefaultAppBarColor);
-                        }
+                    if (abHeight != -1 &&
+                            isEdge(pixelsLeft[abHeight-1], pixelsLeft[abHeight], pixelsLeft[abHeight+1])) {
+                        //Log.v(TAG, "Edge found at " + abHeight);
+                        abColor = pixels[abHeight-1];
                     } else {
-                        Log.v(TAG, "Edge found at " + abHeight);
-                        td.setABHeight(abHeight);
-                        td.setABColor(pixels[abHeight-1]);
+                        //Log.v(TAG, "No edge found");
+                        abHeight = 0;
+
+                        if (td.getABColor() != mDefaultAppBarColor) {
+                            // Reuse existing color
+                            abColor = td.getABColor();
+                        } else {
+                            // Take top color if its the same left and right
+                            if (pixels[0] == pixelsLeft[0]) {
+                                abColor = pixels[0];
+                            }
+                        }
                     }
                     thumb.recycle();
                     thumbLeft.recycle();
-                } else {
-                    td.setABHeight(0);
-                    td.setABColor(mDefaultAppBarColor);
                 }
             } else {
                 td.setThumbnail(mDefaultThumbnailBackground);
@@ -331,6 +344,10 @@ public class RecentTasksLoader implements View.OnTouchListener {
             if (icon != null) {
                 td.setIcon(icon);
             }
+
+            // TODO: Only do this if using card stack view
+            td.setABHeight(abHeight);
+            td.setABColor(abColor);
             td.setLoaded(true);
         }
     }
@@ -523,7 +540,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
             item = createTaskDescription(recentInfo.id,
                     recentInfo.persistentId, recentInfo.baseIntent,
-                    recentInfo.origActivity, recentInfo.description);
+                    recentInfo.origActivity, recentInfo.description, null);
             if (item != null) {
                 loadThumbnailAndIcon(item);
             }
@@ -558,7 +575,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
             item = createTaskDescription(recentInfo.id,
                     recentInfo.persistentId, recentInfo.baseIntent,
-                    recentInfo.origActivity, recentInfo.description);
+                    recentInfo.origActivity, recentInfo.description, null);
             if (item != null) {
                 loadThumbnailAndIcon(item);
             }
@@ -571,6 +588,10 @@ public class RecentTasksLoader implements View.OnTouchListener {
         return null;
     }
 
+    public void loadTasksInBackground(ArrayList<TaskDescription> reusableTasks) {
+        mReusableTasks = reusableTasks;
+        loadTasksInBackground();
+    }
     public void loadTasksInBackground() {
         loadTasksInBackground(false);
     }
@@ -653,9 +674,21 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
                     loadOneExcluded = false;
 
+                    TaskDescription reuseTask = null;
+                    if (mReusableTasks != null /*TODO: && mUseCardStack*/) {
+                        for (TaskDescription task : mReusableTasks) {
+                            if (task.persistentTaskId == recentInfo.persistentId) {
+                                // TODO: Clarify whether presistentId is a good choice
+                                //Log.v(TAG, "Obtained reuseable task description: " + i);
+                                reuseTask = task;
+                                break;
+                            }
+                        }
+                    }
+
                     TaskDescription item = createTaskDescription(recentInfo.id,
                             recentInfo.persistentId, recentInfo.baseIntent,
-                            recentInfo.origActivity, recentInfo.description);
+                            recentInfo.origActivity, recentInfo.description, reuseTask);
 
                     if (item != null) {
                         while (true) {
@@ -674,6 +707,10 @@ public class RecentTasksLoader implements View.OnTouchListener {
                         }
                         ++index;
                     }
+                }
+
+                if (mReusableTasks != null/*TODO: && mUseCardStack*/) {
+                    mReusableTasks = null;
                 }
 
                 if (!isCancelled()) {
