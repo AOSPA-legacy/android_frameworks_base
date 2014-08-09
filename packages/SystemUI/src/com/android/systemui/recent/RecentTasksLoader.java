@@ -198,9 +198,11 @@ public class RecentTasksLoader implements View.OnTouchListener {
                     //Log.v(TAG, "Reuse task description color: " + reuseTask.getABColor());
                     item.setABHeight(reuseTask.getABHeight());
                     item.setABColor(reuseTask.getABColor());
+                    item.setABUseLight(reuseTask.getABUseLight());
                 } else {
                     item.setABHeight(0);
                     item.setABColor(mDefaultAppBarColor);
+                    item.setABUseLight(false);
                 }
 
                 return item;
@@ -348,6 +350,9 @@ public class RecentTasksLoader implements View.OnTouchListener {
             // TODO: Only do this if using card stack view
             td.setABHeight(abHeight);
             td.setABColor(abColor);
+            td.setABUseLight(.2126f * ((abColor >> 16) & 0xff)
+                           + .7152f * ((abColor >> 8) & 0xff)
+                           + .0722f * (abColor & 0xff) < 192);
             td.setLoaded(true);
         }
     }

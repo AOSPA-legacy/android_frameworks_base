@@ -60,7 +60,7 @@
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:textAlignment="viewStart"
-                    android:textColor="@color/status_bar_recents_app_label_color"
+                    android:textColor="@color/status_bar_recents_app_label_color_dark"
                     android:textSize="@dimen/status_bar_recents_app_label_text_size" />
 
                 <Button
@@ -70,7 +70,7 @@
                     android:layout_gravity="right|center_vertical"
                     android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
                     android:layout_weight="0"
-                    android:background="@drawable/recents_floating_light"
+                    android:background="@drawable/recents_floating"
                     android:gravity="right" />
 
                 <Button
@@ -80,7 +80,7 @@
                     android:layout_gravity="right|center_vertical"
                     android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
                     android:layout_weight="0"
-                    android:background="@drawable/recents_kill_light" />
+                    android:background="@drawable/recents_kill" />
 
             </LinearLayout>
 			

@@ -37,6 +37,7 @@ public final class TaskDescription {
     // ActionBar detection
     private int mABColor;
     private int mABHeight;
+    private boolean mABUseLight;
 
     public TaskDescription(int _taskId, int _persistentTaskId,
             ResolveInfo _resolveInfo, Intent _intent,
@@ -115,5 +116,13 @@ public final class TaskDescription {
 
     public int getABHeight() {
         return mABHeight;
+    }
+
+    public void setABUseLight(boolean abUseLight) {
+        mABUseLight = abUseLight;
+    }
+
+    public boolean getABUseLight() {
+        return mABUseLight;
     }
 }
