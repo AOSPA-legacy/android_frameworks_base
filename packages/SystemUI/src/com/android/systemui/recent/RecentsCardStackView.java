@@ -96,9 +96,11 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
                 View contentView = mItems.get(viewId).getContentView();
                 if (contentView != null) {
                     RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) contentView.getTag();
-                    final View thumbnailView = holder.thumbnailView;
-                    mCallback.handleLongPress(contentView, thumbnailView, thumbnailView);
-                    return true;
+                    if (holder != null) {
+                        final View thumbnailView = holder.thumbnailView;
+                        mCallback.handleLongPress(contentView, thumbnailView, thumbnailView);
+                        return true;
+                    }
                 }
             }
         }
@@ -274,7 +276,7 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
             View view = item.getContentView();
             if (view != null) {
                 RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) view.getTag();
-                if (holder.taskDescription.persistentTaskId == persistentTaskId) {
+                if (holder != null && holder.taskDescription.persistentTaskId == persistentTaskId) {
                     return view;
                 }
             }
