@@ -34,9 +34,9 @@
                 <ImageView
                     android:id="@+id/app_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="@dimen/status_bar_recents_app_color_bar_icon_size"
                     android:layout_gravity="center_vertical"
-                    android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
+                    android:layout_margin="@dimen/status_bar_recents_app_color_bar_icon_margin"
                     android:layout_weight="0"
                     android:adjustViewBounds="true"
                     android:maxHeight="@dimen/status_bar_recents_app_icon_max_height"
@@ -56,29 +56,28 @@
                     android:fadingEdge="horizontal"
                     android:fadingEdgeLength="@dimen/status_bar_recents_text_fading_edge_length"
                     android:importantForAccessibility="no"
-                    android:paddingTop="2dp"
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:textAlignment="viewStart"
                     android:textColor="@color/status_bar_recents_app_label_color_dark"
-                    android:textSize="@dimen/status_bar_recents_app_label_text_size" />
+                    android:textSize="@dimen/status_bar_recents_app_color_bar_label_size" />
 
                 <Button
                     android:id="@+id/app_floating"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/status_bar_recents_app_color_bar_button_size"
+                    android:layout_height="@dimen/status_bar_recents_app_color_bar_button_size"
                     android:layout_gravity="right|center_vertical"
-                    android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
+                    android:layout_marginRight="@dimen/status_bar_recents_app_color_bar_button_sep"
                     android:layout_weight="0"
                     android:background="@drawable/recents_floating"
                     android:gravity="right" />
 
                 <Button
                     android:id="@+id/app_kill"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/status_bar_recents_app_color_bar_button_size"
+                    android:layout_height="@dimen/status_bar_recents_app_color_bar_button_size"
                     android:layout_gravity="right|center_vertical"
-                    android:layout_margin="@dimen/status_bar_recents_app_icon_top_margin"
+                    android:layout_marginRight="@dimen/status_bar_recents_app_color_bar_button_margin"
                     android:layout_weight="0"
                     android:background="@drawable/recents_kill" />
 
