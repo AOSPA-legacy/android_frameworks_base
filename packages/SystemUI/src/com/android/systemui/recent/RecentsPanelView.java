@@ -107,6 +107,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private int mAppColorBarHeight;
     private int mAppColorBarLabelColorDark;
     private int mAppColorBarLabelColorLight;
+    private ArrayList<TaskDescription> mReuseTaskDescriptions;
 
     private RecentsActivity mRecentsActivity;
     private INotificationManager mNotificationManager;
@@ -738,6 +739,11 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     public void onTaskLoadingCancelled() {
         // Gets called by RecentTasksLoader when it's cancelled
         if (mRecentTaskDescriptions != null) {
+            if (mUseCardStack) {
+                // Keep copy of current descriptions for AB color information
+                // reuse
+                mReuseTaskDescriptions = mRecentTaskDescriptions;
+            }
             mRecentTaskDescriptions = null;
             mListAdapter.notifyDataSetInvalidated();
         }
@@ -758,12 +764,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         if (mRecentTaskDescriptions == null && recentTasksList != null) {
             onTasksLoaded(recentTasksList, firstScreenful);
         } else {
-            if (mUseCardStack) {
-                // Reuse AB info (height, color) from existing task descriptions
-                mRecentTasksLoader.loadTasksInBackground(mRecentTaskDescriptions);
-            } else {
-                mRecentTasksLoader.loadTasksInBackground();
-            }
+            mRecentTasksLoader.loadTasksInBackground();
         }
     }
 
@@ -1018,5 +1019,9 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             bottom += getBottomPaddingOffset();
         }
         mRecentsContainer.drawFadedEdges(canvas, left, right, top, bottom);
+    }
+
+    public ArrayList<TaskDescription> getReuseTaskDescriptions() {
+        return mReuseTaskDescriptions;
     }
 }

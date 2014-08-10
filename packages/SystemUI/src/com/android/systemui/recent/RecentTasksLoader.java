@@ -593,11 +593,10 @@ public class RecentTasksLoader implements View.OnTouchListener {
         return null;
     }
 
-    public void loadTasksInBackground(ArrayList<TaskDescription> reusableTasks) {
-        mReusableTasks = reusableTasks;
-        loadTasksInBackground();
-    }
     public void loadTasksInBackground() {
+        if (mRecentsPanel != null /*TODO: && mUseCardStack*/) {
+            mReusableTasks = mRecentsPanel.getReuseTaskDescriptions();
+        }
         loadTasksInBackground(false);
     }
     public void loadTasksInBackground(final boolean zeroeth) {
