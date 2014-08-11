@@ -49,7 +49,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
-import android.widget.Button;
+//import android.widget.Button;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -142,8 +142,8 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         TextView descriptionView;
         View calloutLine;
         View appColorBarView;
-        Button appKillButton;
-        Button appFloatingButton;
+        //Button appKillButton;
+        //Button appFloatingButton;
         TaskDescription taskDescription;
         boolean loadedThumbnailAndIcon;
     }
@@ -183,8 +183,8 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             holder.descriptionView = (TextView) convertView.findViewById(R.id.app_description);
             if (mUseCardStack) {
                 holder.appColorBarView = (View)convertView.findViewById(R.id.app_top_colored_bar);
-                holder.appKillButton = (Button)convertView.findViewById(R.id.app_kill);
-                holder.appFloatingButton= (Button)convertView.findViewById(R.id.app_floating);
+                //holder.appKillButton = (Button)convertView.findViewById(R.id.app_kill);
+                //holder.appFloatingButton= (Button)convertView.findViewById(R.id.app_floating);
             }
 
             convertView.setTag(holder);
@@ -220,10 +220,10 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                 holder.thumbnailViewImage.setPadding(0, topPadding, 0, 0);
                 holder.labelView.setTextColor(td.getABUseLight() ?
                         mAppColorBarLabelColorLight : mAppColorBarLabelColorDark);
-                holder.appKillButton.setBackgroundResource(td.getABUseLight() ?
-                        R.drawable.recents_kill_light : R.drawable.recents_kill);
-                holder.appFloatingButton.setBackgroundResource(td.getABUseLight() ?
-                        R.drawable.recents_floating_light : R.drawable.recents_floating);
+                //holder.appKillButton.setBackgroundResource(td.getABUseLight() ?
+                //        R.drawable.recents_kill_light : R.drawable.recents_kill);
+                //holder.appFloatingButton.setBackgroundResource(td.getABUseLight() ?
+                //        R.drawable.recents_floating_light : R.drawable.recents_floating);
             }
             if (index == 0) {
                 if (mAnimateIconOfFirstTask) {

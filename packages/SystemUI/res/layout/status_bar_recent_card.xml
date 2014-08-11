@@ -64,6 +64,7 @@
 
                 <Button
                     android:id="@+id/app_floating"
+                    android:visibility="gone"
                     android:layout_width="@dimen/status_bar_recents_app_color_bar_button_size"
                     android:layout_height="@dimen/status_bar_recents_app_color_bar_button_size"
                     android:layout_gravity="right|center_vertical"
@@ -74,6 +75,7 @@
 
                 <Button
                     android:id="@+id/app_kill"
+                    android:visibility="gone"
                     android:layout_width="@dimen/status_bar_recents_app_color_bar_button_size"
                     android:layout_height="@dimen/status_bar_recents_app_color_bar_button_size"
                     android:layout_gravity="right|center_vertical"
