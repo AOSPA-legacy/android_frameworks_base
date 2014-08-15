@@ -143,6 +143,8 @@ interface IWifiManager
 
     void enableVerboseLogging(int verbose);
 
+    void enableRssiThreshold(int enabled);
+
     int getVerboseLoggingLevel();
 
     int getAggressiveHandover();
