@@ -149,10 +149,9 @@ public final class ShutdownThread extends Thread {
 
         if (actions != null && which < actions.length) {
             mRebootReason = actions[which];
-            if (actions[which].equals(SOFT_REBOOT)) {
-                 mRebootSoft = true;
-            }
-                 }
+            mRebootSoft = actions[which].equals(SOFT_REBOOT);
+        }
+
                 dialog = new AlertDialog.Builder(context)
                         .setTitle(com.android.internal.R.string.global_action_reboot)
                         .setMessage(com.android.internal.R.string.reboot_confirm)
