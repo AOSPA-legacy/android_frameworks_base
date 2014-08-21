@@ -17,6 +17,7 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothAdapter.BluetoothStateChangeCallback;
 import android.bluetooth.BluetoothDevice;
@@ -340,8 +341,8 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             if (uri.equals(Settings.System.getUriFor(Settings.System.PIE_STATE))) {
-                int pieState = Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.PIE_STATE, 0);
+                int pieState = Settings.System.getIntForUser(mContext.getContentResolver(),
+                        Settings.System.PIE_STATE, 0, UserHandle.USER_CURRENT);
                 if ((getImmersiveMode() == 0 || getImmersiveMode() == 4) && pieState > 0) switchImmersiveGlobal();
             }
             onImmersiveGlobalChanged();
@@ -1478,8 +1479,9 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
     }
 
     protected int getScreenTimeout() {
-        return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.SCREEN_OFF_TIMEOUT, SCREEN_TIMEOUT_30);
+        return Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.SCREEN_OFF_TIMEOUT, SCREEN_TIMEOUT_30,
+                UserHandle.USER_CURRENT);
     }
 
     protected void screenTimeoutChangeState() {
@@ -1510,9 +1512,9 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
                 break;
         }
 
-        Settings.System.putInt(
+        Settings.System.putIntForUser(
                 mContext.getContentResolver(),
-                Settings.System.SCREEN_OFF_TIMEOUT, screenTimeout);
+                Settings.System.SCREEN_OFF_TIMEOUT, screenTimeout, mUserTracker.getCurrentUserId());
         }
 
     protected String screenTimeoutGetLabel(int currentTimeout) {
@@ -1621,31 +1623,31 @@ public class QuickSettingsModel implements BluetoothStateChangeCallback,
     }
 
     protected int getImmersiveMode() {
-        return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.IMMERSIVE_MODE, 0);
+        return Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.IMMERSIVE_MODE, 0, UserHandle.USER_CURRENT);
     }
 
     protected boolean isPieEnabled() {
-        return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.PIE_STATE, 0) == 1;
+        return Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.PIE_STATE, 0, UserHandle.USER_CURRENT) == 1;
     }
 
     private void setImmersiveMode(int style) {
-        Settings.System.putInt(mContext.getContentResolver(),
-                Settings.System.IMMERSIVE_MODE, style);
+        Settings.System.putIntForUser(mContext.getContentResolver(),
+                Settings.System.IMMERSIVE_MODE, style, mUserTracker.getCurrentUserId());
         if (style != 0 && style != 4) {
             setImmersiveLastActiveState(style);
         }
     }
 
     private int getImmersiveLastActiveState() {
-        return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.IMMERSIVE_LAST_ACTIVE_STATE, 1);
+        return Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.IMMERSIVE_LAST_ACTIVE_STATE, 1, UserHandle.USER_CURRENT);
     }
 
     private void setImmersiveLastActiveState(int style) {
-        Settings.System.putInt(mContext.getContentResolver(),
-                Settings.System.IMMERSIVE_LAST_ACTIVE_STATE, style);
+        Settings.System.putIntForUser(mContext.getContentResolver(),
+                Settings.System.IMMERSIVE_LAST_ACTIVE_STATE, style, mUserTracker.getCurrentUserId());
     }
 
     protected void switchImmersiveGlobal() {

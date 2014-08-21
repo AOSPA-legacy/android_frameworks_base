@@ -53,6 +53,7 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.AttributeSet;
@@ -282,10 +283,10 @@ public class PieMenu extends FrameLayout {
         mPanelOrientation = mPanel.getOrientation();
 
         // fetch modes
-        mImmersiveMode = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.IMMERSIVE_MODE, 0);
-        mHapticFeedback = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0;
+        mImmersiveMode = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.IMMERSIVE_MODE, 0, UserHandle.USER_CURRENT);
+        mHapticFeedback = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1, UserHandle.USER_CURRENT) != 0;
         mIsProtected = mPanel.isKeyguardSecureShowing();
         mHasAssistant = mPieHelper.isAssistantAvailable();
 

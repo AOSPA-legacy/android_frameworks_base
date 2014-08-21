@@ -129,9 +129,9 @@ public class Peek implements SensorActivityHandler.SensorChangedCallback {
     }
 
     private void updateStatus() {
-        mEnabled = Settings.System.getIntForUser(
+        mEnabled = Settings.System.getInt(
                 mContext.getContentResolver(), Settings.System.PEEK_STATE,
-                0, UserHandle.USER_CURRENT) == 1 && !isPeekAppInstalled();
+                0) == 1 && !isPeekAppInstalled();
         if (mEnabled) {
             mSensorHandler.registerScreenReceiver();
         } else {

@@ -16,10 +16,14 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.EventLog;
@@ -43,8 +47,11 @@ public class NotificationPanelView extends PanelView {
     private boolean mOkToFlip;
     private static final float QUICK_PULL_DOWN_PERCENTAGE = 0.8f;
 
+    private int mCurrentUserId = 0;
+
     public NotificationPanelView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mCurrentUserId = ActivityManager.getCurrentUser();
     }
 
     public void setStatusBar(PhoneStatusBar bar) {
@@ -117,8 +124,9 @@ public class NotificationPanelView extends PanelView {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     mOkToFlip = getExpandedHeight() == 0;
-                    if(Settings.System.getInt(mContext.getContentResolver(),
-                                Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN, 0) != 2) {
+                    if(Settings.System.getIntForUser(mContext.getContentResolver(),
+                                Settings.System.QUICK_SETTINGS_QUICK_PULL_DOWN, 0,
+                                UserHandle.USER_CURRENT) != 2) {
                             if (event.getX(0) > mStatusBar.getStatusBarView().getWidth() * QUICK_PULL_DOWN_PERCENTAGE) {
                                 flip = true;
                             }

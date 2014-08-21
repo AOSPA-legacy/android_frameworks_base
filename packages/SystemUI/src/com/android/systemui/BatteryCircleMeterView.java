@@ -17,6 +17,7 @@
 
 package com.android.systemui;
 
+import android.app.ActivityManager;
 import android.view.ViewGroup.LayoutParams;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -36,7 +37,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.BatteryManager;
 import android.os.Handler;
-import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -96,6 +96,8 @@ public class BatteryCircleMeterView extends ImageView {
     private int mCircleTextChargingColor;
     private int mCircleAnimSpeed = 4;
 
+    private int mCurrentUserId = 0;
+
     private boolean mQS;
 
     // runnable to invalidate view via mHandler.postDelayed() call
@@ -111,7 +113,7 @@ public class BatteryCircleMeterView extends ImageView {
     class BatteryReceiver extends BroadcastReceiver {
         private boolean mIsRegistered = false;
 
-        public BatteryReceiver(Context context) {
+        public BatteryReceiver() {
         }
 
         @Override
@@ -131,7 +133,7 @@ public class BatteryCircleMeterView extends ImageView {
             }
         }
 
-        private void registerSelf() {
+        protected void registerSelf() {
             if (!mIsRegistered) {
                 mIsRegistered = true;
 
@@ -148,7 +150,7 @@ public class BatteryCircleMeterView extends ImageView {
             }
         }
 
-        private void updateRegistration() {
+        protected void updateRegistration() {
             if (mActivated && mAttached) {
                 registerSelf();
             } else {
@@ -183,7 +185,7 @@ public class BatteryCircleMeterView extends ImageView {
 
         mContext = context;
         mHandler = new Handler();
-        mBatteryReceiver = new BatteryReceiver(mContext);
+        mBatteryReceiver = new BatteryReceiver();
         updateSettings(false);
     }
 
@@ -302,7 +304,7 @@ public class BatteryCircleMeterView extends ImageView {
         Resources res = getResources();
         ContentResolver resolver = mContext.getContentResolver();
 
-
+        updateUser(ActivityManager.getCurrentUser());
         /*
          * initialize vars and force redraw
          */
@@ -310,8 +312,8 @@ public class BatteryCircleMeterView extends ImageView {
         mRectLeft = null;
         mCircleSize = 0;
 
-        int batteryStyle = Settings.System.getInt(getContext().getContentResolver(),
-                                Settings.System.STATUS_BAR_BATTERY_STYLE, 0);
+        int batteryStyle = Settings.System.getIntForUser(getContext().getContentResolver(),
+                                Settings.System.STATUS_BAR_BATTERY_STYLE, 0, mCurrentUserId);
 
         mCirclePercent = batteryStyle == 3;
         mActivated = (batteryStyle == 2 || mCirclePercent);
@@ -325,6 +327,10 @@ public class BatteryCircleMeterView extends ImageView {
         if (mActivated && mAttached) {
             invalidate();
         }
+    }
+
+    public void updateUser(int userId) {
+        mCurrentUserId = userId;
     }
 
     /***
@@ -455,4 +461,5 @@ public class BatteryCircleMeterView extends ImageView {
     private float getFloat(int resId) {
         return Float.parseFloat(getResources().getString(resId));
     }
+
 }

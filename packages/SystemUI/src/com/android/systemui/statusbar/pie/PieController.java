@@ -23,6 +23,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.service.gesture.EdgeGestureManager;
 import android.view.Gravity;
@@ -135,10 +136,10 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
     }
 
     private boolean showPie() {
-        final boolean pieEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.PIE_STATE, 0) == 1;
-        final int immersiveMode = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.IMMERSIVE_MODE, 0);
+        final boolean pieEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.PIE_STATE, 0, UserHandle.USER_CURRENT) == 1;
+        final int immersiveMode = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.IMMERSIVE_MODE, 0, UserHandle.USER_CURRENT);
         return pieEnabled && immersiveMode != IMMERSIVE_MODE_OFF
                 && immersiveMode != IMMERSIVE_MODE_HIDE_ONLY_STATUSBAR;
     }
@@ -255,7 +256,9 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
             boolean alt = (0 != (hints &
                     StatusBarManager.NAVIGATION_HINT_RECENT_ALT)
                             && !mKeyguardManager.isKeyguardLocked()
-                            && Settings.System.getInt(mContext.getContentResolver(), Settings.System.NAVBAR_RECENTS_CLEAR_ALL, 0) != 2);
+                            && Settings.System.getIntForUser(mContext.getContentResolver(),
+                                Settings.System.NAVBAR_RECENTS_CLEAR_ALL, 0,
+                                UserHandle.USER_CURRENT) != 2);
             mRecent.setIcon(alt ? R.drawable.ic_sysbar_recent_clear
                     : R.drawable.ic_sysbar_recent);
             mRecent.setName(alt ? CLEAR_ALL_BUTTON : RECENT_BUTTON);

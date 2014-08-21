@@ -18,9 +18,11 @@
 package com.android.systemui.statusbar.phone;
 
 import android.animation.LayoutTransition;
+import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -52,12 +54,17 @@ class QuickSettingsContainerView extends FrameLayout {
     // Edit mode changed listener
     private EditModeChangedListener mEditModeChangedListener;
 
+    private int mCurrentUserId = 0;
+
     public interface EditModeChangedListener {
         public abstract void onEditModeChanged(boolean enabled);
     }
 
     public QuickSettingsContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        mCurrentUserId = ActivityManager.getCurrentUser();
+
         updateResources();
     }
 
@@ -217,12 +224,12 @@ class QuickSettingsContainerView extends FrameLayout {
         if(!enabled) { // Store modifications
             ContentResolver resolver = getContext().getContentResolver();
             if(!tiles.isEmpty()) {
-                Settings.System.putString(resolver,
+                Settings.System.putStringForUser(resolver,
                         Settings.System.QUICK_SETTINGS_TILES,
-                                TextUtils.join(QuickSettings.DELIMITER, tiles));
+                                TextUtils.join(QuickSettings.DELIMITER, tiles), mCurrentUserId);
             } else { // No tiles
-                Settings.System.putString(resolver,
-                        Settings.System.QUICK_SETTINGS_TILES, QuickSettings.NO_TILES);
+                Settings.System.putStringForUser(resolver,
+                        Settings.System.QUICK_SETTINGS_TILES, QuickSettings.NO_TILES, mCurrentUserId);
             }
             updateSpan();
         }

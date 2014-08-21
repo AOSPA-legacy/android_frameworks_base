@@ -16,6 +16,8 @@
 
 package android.util;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -54,8 +56,10 @@ public class SettingConfirmationHelper {
      * @hide
      */
     public static void showConfirmationDialogForSetting(final Context mContext, String title, String msg, Drawable hint,
-                                                        final String setting, final OnSelectListener mListener) {
+                                                        final String setting,
+                                                        final OnSelectListener mListener) {
         mUiContext = ThemeUtils.createUiContext(mContext); // avoid package mismatch
+        final int mCurrentUserId = ActivityManager.getCurrentUser();
 
         int mCurrentStatus = Settings.System.getInt(/*use system context to read*/mContext.getContentResolver(), setting, NOT_SET);
         if (mCurrentStatus == ENABLED || mCurrentStatus == DISABLED) return;
@@ -72,7 +76,8 @@ public class SettingConfirmationHelper {
         builder.setPositiveButton(R.string.setting_confirmation_yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putInt(/*use system context to write*/mContext.getContentResolver(), setting, ENABLED);
+                        Settings.System.putIntForUser(/*use system context to write*/mContext
+                                .getContentResolver(), setting, ENABLED, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(true);
                     }
@@ -81,7 +86,8 @@ public class SettingConfirmationHelper {
         builder.setNeutralButton(R.string.setting_confirmation_ask_me_later,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putInt(/*use system context to write*/mContext.getContentResolver(), setting, ASK_LATER);
+                        Settings.System.putIntForUser(/*use system context to write*/mContext
+                                .getContentResolver(), setting, ASK_LATER, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(false);
                     }
@@ -90,7 +96,8 @@ public class SettingConfirmationHelper {
         builder.setNegativeButton(R.string.setting_confirmation_no,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putInt(/*use system context to write*/mContext.getContentResolver(), setting, DISABLED);
+                        Settings.System.putIntForUser(/*use system context to write*/mContext
+                                .getContentResolver(), setting, DISABLED, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(false);
                     }
