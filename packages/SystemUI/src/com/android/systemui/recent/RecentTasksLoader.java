@@ -331,9 +331,10 @@ public class RecentTasksLoader implements View.OnTouchListener {
                             //Log.v(TAG, "No edge found");
                             abHeight = 0;
 
-                            if (td.getABColor() != mDefaultAppBarColor) {
+                            int curColor = td.getABColor();
+                            if (curColor != 0 && curColor != mDefaultAppBarColor) {
                                 // Reuse existing color
-                                abColor = td.getABColor();
+                                abColor = curColor;
                             } else {
                                 // Take top color if its the same left and right
                                 if (pixelsRight[0] == pixelsLeft[0]) {
