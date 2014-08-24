@@ -41,7 +41,10 @@ import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class BatteryMeterView extends View implements DemoMode {
+import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
+
+public class BatteryMeterView extends View
+        implements DemoMode, BarBackgroundUpdater.UpdateListener {
     public static final String TAG = BatteryMeterView.class.getSimpleName();
     public static final String ACTION_LEVEL_TEST = "com.android.systemui.BATTERY_LEVEL_TEST";
 
@@ -55,6 +58,9 @@ public class BatteryMeterView extends View implements DemoMode {
     public static final float SUBPIXEL = 0.4f;  // inset rects for softer edges
 
     int[] mColors;
+
+    private boolean mQS = false;
+    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
 
     boolean mShowPercent = true;
     Paint mFramePaint, mBatteryPaint, mWarningTextPaint, mTextPaint, mBoltPaint;
@@ -211,9 +217,12 @@ public class BatteryMeterView extends View implements DemoMode {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         updateSettings(false);
+        BarBackgroundUpdater.addListener(this);
     }
 
     public void setColors(boolean qs) {
+        mQS = qs;
+
         Resources res = getResources();
         TypedArray levels = res.obtainTypedArray(R.array.batterymeter_color_levels);
         TypedArray colors = res.obtainTypedArray(qs ? R.array.qs_batterymeter_color_values :
@@ -263,16 +272,24 @@ public class BatteryMeterView extends View implements DemoMode {
     }
 
     private int getColorForLevel(int percent) {
+        final boolean doOverride = mOverrideIconColor != BarBackgroundUpdater.NO_OVERRIDE && !mQS;
+
         int thresh, color = 0;
         for (int i=0; i<mColors.length; i+=2) {
             thresh = mColors[i];
             color = mColors[i+1];
-            if (percent <= thresh) return color;
+            if (percent <= thresh) {
+                // just override the last level (full battery level)
+                return i == mColors.length - 2 && doOverride ? mOverrideIconColor : color;
+            }
         }
-        return color;
+
+        return doOverride ? mOverrideIconColor : color;
     }
 
     public void updateSettings(final boolean qs) {
+        mQS = qs;
+
         int batteryStyle = Settings.System.getIntForUser(getContext().getContentResolver(),
                                 Settings.System.STATUS_BAR_BATTERY_STYLE, 0,
                                 ActivityManager.getCurrentUser());
@@ -324,7 +341,9 @@ public class BatteryMeterView extends View implements DemoMode {
         c.drawRect(mFrame, mFramePaint);
 
         // fill 'er up
-        final int color = tracker.plugged ? mChargeColor : getColorForLevel(level);
+        final boolean doOverride = mOverrideIconColor != BarBackgroundUpdater.NO_OVERRIDE && !mQS;
+        final int color = tracker.plugged ? (doOverride ? mOverrideIconColor : mChargeColor) :
+            getColorForLevel(level);
         mBatteryPaint.setColor(color);
 
         if (level >= FULL) {
@@ -376,6 +395,8 @@ public class BatteryMeterView extends View implements DemoMode {
                             : (tracker.level == 100 ? 0.38f : 0.5f)));
             mTextHeight = -mTextPaint.getFontMetrics().ascent;
 
+            mTextPaint.setColor(doOverride ? mOverrideIconColor : 0xFF000000);
+
             final String str = String.valueOf(SINGLE_DIGIT_PERCENT ? (level/10) : level);
             final float x = mWidth * 0.5f;
             final float y = (mHeight + mTextHeight) * 0.47f;
@@ -410,4 +431,26 @@ public class BatteryMeterView extends View implements DemoMode {
            postInvalidate();
         }
     }
+
+    @Override
+    public void onUpdateStatusBarColor(final int color) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateStatusBarIconColor(final int iconColor) {
+        mOverrideIconColor = iconColor;
+        postInvalidate();
+    }
+
+    @Override
+    public void onUpdateNavigationBarColor(final int color) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateNavigationBarIconColor(final int iconColor) {
+        // noop
+    }
+
 }

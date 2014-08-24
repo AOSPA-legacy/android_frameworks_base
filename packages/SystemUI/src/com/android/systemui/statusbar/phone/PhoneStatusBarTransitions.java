@@ -19,7 +19,9 @@ package com.android.systemui.statusbar.phone;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.res.Resources;
+import android.os.Handler;
 import android.view.View;
 
 import com.android.systemui.R;
@@ -36,8 +38,7 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
     private Animator mCurrentAnimation;
 
     public PhoneStatusBarTransitions(PhoneStatusBarView view) {
-        super(view, R.drawable.status_background, R.color.status_bar_background_opaque,
-                R.color.status_bar_background_semi_transparent);
+        super(view, new PhoneStatusBarBackgroundDrawable(view.getContext()));
         mView = view;
         final Resources res = mView.getContext().getResources();
         mIconAlphaWhenOpaque = res.getFraction(R.dimen.status_bar_icon_drawing_alpha, 1, 1);
@@ -110,4 +111,72 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
             mClock.setAlpha(newAlphaBC);
         }
     }
+
+    protected static class PhoneStatusBarBackgroundDrawable extends BarBackgroundDrawable
+            implements BarBackgroundUpdater.UpdateListener {
+        private final Handler mHandler;
+
+        private int mOverrideColor = BarBackgroundUpdater.NO_OVERRIDE;
+
+        public PhoneStatusBarBackgroundDrawable(final Context context) {
+            super(context, R.drawable.status_background, R.color.status_bar_background_opaque,
+                R.color.status_bar_background_semi_transparent);
+
+            mHandler = new Handler();
+
+            BarBackgroundUpdater.addListener(this);
+            BarBackgroundUpdater.init(context);
+        }
+
+        @Override
+        public void onUpdateStatusBarColor(final int color) {
+            mOverrideColor = color;
+            mHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    forceStartAnimation();
+                }
+
+            });
+        }
+
+        @Override
+        public void onUpdateStatusBarIconColor(final int iconColor) {
+            // noop
+        }
+
+        @Override
+        public void onUpdateNavigationBarColor(final int color) {
+            // noop
+        }
+
+        @Override
+        public void onUpdateNavigationBarIconColor(final int iconColor) {
+            // noop
+        }
+
+        @Override
+        protected int getColorOpaque() {
+            return mOverrideColor == BarBackgroundUpdater.NO_OVERRIDE ?
+                super.getColorOpaque() : mOverrideColor;
+        }
+
+        @Override
+        protected int getColorSemiTransparent() {
+            return mOverrideColor == BarBackgroundUpdater.NO_OVERRIDE ?
+                super.getColorSemiTransparent() : (mOverrideColor & 0x00ffffff | 0x7f000000);
+        }
+
+        @Override
+        protected int getGradientAlphaOpaque() {
+            return 0; // TODO set as 0xff if user wants a gradient
+        }
+
+        @Override
+        protected int getGradientAlphaSemiTransparent() {
+            return 0; // TODO set as 0x7f if user wants a gradient
+        }
+    }
+
 }

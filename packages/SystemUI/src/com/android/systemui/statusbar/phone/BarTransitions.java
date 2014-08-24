@@ -55,12 +55,10 @@ public class BarTransitions {
 
     private int mMode;
 
-    public BarTransitions(View view, int gradientResourceId, int opaqueColorResourceId,
-            int semiTransparentColorResourceId) {
+    public BarTransitions(View view, BarBackgroundDrawable barBackground) {
         mTag = "BarTransitions." + view.getClass().getSimpleName();
         mView = view;
-        mBarBackground = new BarBackgroundDrawable(mView.getContext(), gradientResourceId,
-                opaqueColorResourceId, semiTransparentColorResourceId);
+        mBarBackground = barBackground;
         if (HIGH_END) {
             mView.setBackground(mBarBackground);
         }
@@ -121,7 +119,7 @@ public class BarTransitions {
         // for subclasses
     }
 
-    private static class BarBackgroundDrawable extends Drawable {
+    protected static class BarBackgroundDrawable extends Drawable {
         private final int mGradientResourceId;
         private final int mOpaqueColorResourceId;
         private final int mSemiTransparentColorResourceId;
@@ -156,6 +154,22 @@ public class BarTransitions {
             mGradientResourceId = gradientResourceId;
             mOpaqueColorResourceId = opaqueColorResourceId;
             mSemiTransparentColorResourceId = semiTransparentColorResourceId;
+        }
+
+        protected int getColorOpaque() {
+            return mOpaque;
+        }
+
+        protected int getColorSemiTransparent() {
+            return mSemiTransparent;
+        }
+
+        protected int getGradientAlphaOpaque() {
+            return 0;
+        }
+
+        protected int getGradientAlphaSemiTransparent() {
+            return 0;
         }
 
         public void updateResources(Resources res)  {
@@ -204,6 +218,16 @@ public class BarTransitions {
             return PixelFormat.TRANSLUCENT;
         }
 
+        protected void forceStartAnimation() {
+            mAnimating = true;
+            long now = SystemClock.elapsedRealtime();
+            mStartTime = now;
+            mEndTime = now + BACKGROUND_DURATION;
+            mGradientAlphaStart = mGradientAlpha;
+            mColorStart = mColor;
+            invalidateSelf();
+        }
+
         public void finishAnimation() {
             if (mAnimating) {
                 mAnimating = false;
@@ -217,11 +241,13 @@ public class BarTransitions {
             if (mMode == MODE_TRANSLUCENT) {
                 targetGradientAlpha = 0xff;
             } else if (mMode == MODE_SEMI_TRANSPARENT) {
-                targetColor = mSemiTransparent;
+                targetGradientAlpha = getGradientAlphaSemiTransparent();
+                targetColor = getColorSemiTransparent();
             } else if (mMode == MODE_TRANSPARENT) {
                 targetGradientAlpha = 0;
             } else {
-                targetColor = mOpaque;
+                targetGradientAlpha = getGradientAlphaOpaque();
+                targetColor = getColorOpaque();
             }
             if (!mAnimating) {
                 mColor = targetColor;

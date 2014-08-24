@@ -2703,6 +2703,22 @@ public final class Settings {
         public static final String PEEK_STATE = "peek_state";
 
         /**
+         * Whether the status bar is set to be colored dynamically
+         * 0 = disabled (default)
+         * 1 = enabled
+         * @hide
+         */
+        public static final String DYNAMIC_STATUS_BAR_STATE = "dynamic_status_bar_state";
+
+        /**
+         * Whether the navigation bar is set to be colored dynamically
+         * 0 = disabled (default)
+         * 1 = enabled
+         * @hide
+         */
+        public static final String DYNAMIC_NAVIGATION_BAR_STATE = "dynamic_navigation_bar_state";
+
+        /**
          * Whether incomming call UI stays in background
          *
          * @hide

@@ -46,6 +46,7 @@ import android.widget.ImageView;
 import com.android.internal.R;
 
 import com.android.systemui.BatteryMeterView;
+import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
 /***
  * Note about CircleBattery Implementation:
@@ -56,7 +57,8 @@ import com.android.systemui.BatteryMeterView;
  * monitoring battery level and battery settings.
  */
 
-public class BatteryCircleMeterView extends ImageView {
+public class BatteryCircleMeterView extends ImageView
+        implements BarBackgroundUpdater.UpdateListener {
     final static String QuickSettings = "quicksettings";
     final static String StatusBar = "statusbar";
     private Handler mHandler;
@@ -99,6 +101,8 @@ public class BatteryCircleMeterView extends ImageView {
     private int mCurrentUserId = 0;
 
     private boolean mQS;
+
+    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
 
     // runnable to invalidate view via mHandler.postDelayed() call
     private final Runnable mInvalidate = new Runnable() {
@@ -187,6 +191,7 @@ public class BatteryCircleMeterView extends ImageView {
         mHandler = new Handler();
         mBatteryReceiver = new BatteryReceiver();
         updateSettings(false);
+        BarBackgroundUpdater.addListener(this);
     }
 
     @Override
@@ -251,10 +256,14 @@ public class BatteryCircleMeterView extends ImageView {
         if (level < 100 && mCirclePercent) {
             if (level <= 14) {
                 mPaintFont.setColor(mPaintRed.getColor());
-            } else if (mIsCharging) {
-                mPaintFont.setColor(mCircleTextChargingColor);
+            } else if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE || mQS) {
+                if (mIsCharging) {
+                    mPaintFont.setColor(mCircleTextChargingColor);
+                } else {
+                    mPaintFont.setColor(mCircleTextColor);
+                }
             } else {
-                mPaintFont.setColor(mCircleTextColor);
+                mPaintFont.setColor(mOverrideIconColor);
             }
             canvas.drawText(Integer.toString(level), textX, mTextY, mPaintFont);
         }
@@ -276,7 +285,8 @@ public class BatteryCircleMeterView extends ImageView {
         mCircleTextChargingColor = chargingTextColor;
         mCircleColor = fgColor;
 
-        mPaintSystem.setColor(mCircleColor);
+        mPaintSystem.setColor(mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE || qs ?
+            mCircleColor : mOverrideIconColor);
         // could not find the darker definition anywhere in resources
         // do not want to use static 0x404040 color value. would break theming.
         mPaintGray.setColor(bgColor);
@@ -460,6 +470,32 @@ public class BatteryCircleMeterView extends ImageView {
 
     private float getFloat(int resId) {
         return Float.parseFloat(getResources().getString(resId));
+    }
+
+    @Override
+    public void onUpdateStatusBarColor(final int color) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateStatusBarIconColor(final int iconColor) {
+        mOverrideIconColor = iconColor;
+
+        mPaintSystem.setColor(mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE || mQS ?
+            mCircleColor : mOverrideIconColor);
+
+        mHandler.removeCallbacks(mInvalidate);
+        mHandler.postDelayed(mInvalidate, 50);
+    }
+
+    @Override
+    public void onUpdateNavigationBarColor(final int color) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateNavigationBarIconColor(final int iconColor) {
+        // noop
     }
 
 }

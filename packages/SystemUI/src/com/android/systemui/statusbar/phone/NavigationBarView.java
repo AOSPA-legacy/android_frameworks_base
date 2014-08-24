@@ -37,6 +37,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -69,7 +70,8 @@ import com.android.systemui.statusbar.policy.KeyButtonView;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
-public class NavigationBarView extends LinearLayout implements NavigationCallback {
+public class NavigationBarView extends LinearLayout
+        implements NavigationCallback, BarBackgroundUpdater.UpdateListener {
     final static boolean DEBUG = false;
     final static String TAG = "PhoneStatusBar/NavigationBarView";
 
@@ -229,6 +231,8 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
 
         mCameraDisabledByDpm = isCameraDisabledByDpm();
         watchForDevicePolicyChanges();
+
+        BarBackgroundUpdater.addListener(this);
     }
 
     private void watchForDevicePolicyChanges() {
@@ -282,29 +286,29 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
     }
 
     public View getRecentsButton() {
-        return mCurrentView.findViewById(R.id.recent_apps);
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.recent_apps);
     }
 
     public View getMenuButton() {
-        return mCurrentView.findViewById(R.id.menu);
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.menu);
     }
 
     public View getBackButton() {
-        return mCurrentView.findViewById(R.id.back);
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.back);
     }
 
     public View getHomeButton() {
-        return mCurrentView.findViewById(R.id.home);
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.home);
     }
 
     // for when home is disabled, but search isn't
     public View getSearchLight() {
-        return mCurrentView.findViewById(R.id.search_light);
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.search_light);
     }
 
     // shown when keyguard is visible and camera is available
     public View getCameraButton() {
-        return mCurrentView.findViewById(R.id.camera_button);
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.camera_button);
     }
 
     private void getIcons(Resources res) {
@@ -763,5 +767,49 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
         }
 
         return null;
+    }
+
+    @Override
+    public void onUpdateStatusBarColor(final int color) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateStatusBarIconColor(final int iconColor) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateNavigationBarColor(final int color) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateNavigationBarIconColor(final int iconColor) {
+        final ImageView[] buttons = new ImageView[] {
+            (ImageView) getRecentsButton(),
+            (ImageView) getMenuButton(),
+            (ImageView) getBackButton(),
+            (ImageView) getHomeButton(),
+            (ImageView) getSearchLight(),
+            (ImageView) getCameraButton()
+        };
+
+        for (final ImageView button : buttons) {
+            if (button != null) {
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (iconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+                            button.setColorFilter(null);
+                        } else {
+                            button.setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+                        }
+                    }
+
+                });
+            }
+        }
     }
 }

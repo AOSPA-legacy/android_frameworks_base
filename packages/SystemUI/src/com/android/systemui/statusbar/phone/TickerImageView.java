@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2014 Valter Strods for ParanoidAndroid Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,24 @@
 package com.android.systemui.statusbar.phone;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextSwitcher;
-import android.widget.TextView;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 
 import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
-public class TickerView extends TextSwitcher implements BarBackgroundUpdater.UpdateListener
-{
-    Ticker mTicker;
-
+public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdater.UpdateListener {
     private final Handler mHandler;
-    private int mOverrideTextColor = BarBackgroundUpdater.NO_OVERRIDE;
+    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
 
-    public TickerView(Context context, AttributeSet attrs) {
+    public TickerImageView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         mHandler = new Handler();
         BarBackgroundUpdater.addListener(this);
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        mTicker.reflowText();
-    }
-
-    public void setTicker(Ticker t) {
-        mTicker = t;
     }
 
     /**
@@ -54,10 +42,13 @@ public class TickerView extends TextSwitcher implements BarBackgroundUpdater.Upd
      */
     @Override
     public void addView(final View child, final int index, final ViewGroup.LayoutParams params) {
-        if (child instanceof TextView) {
-            ((TextView) child).setTextColor(
-                    mOverrideTextColor == BarBackgroundUpdater.NO_OVERRIDE ?
-                            0xffffffff : mOverrideTextColor);
+        if (child instanceof ImageView) {
+            if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+                ((ImageView) child).setColorFilter(null);
+            } else {
+                ((ImageView) child).setColorFilter(mOverrideIconColor,
+                        PorterDuff.Mode.MULTIPLY);
+            }
         }
 
         super.addView(child, index, params);
@@ -70,17 +61,20 @@ public class TickerView extends TextSwitcher implements BarBackgroundUpdater.Upd
 
     @Override
     public void onUpdateStatusBarIconColor(final int iconColor) {
-        mOverrideTextColor = iconColor;
+        mOverrideIconColor = iconColor;
         mHandler.post(new Runnable() {
 
             @Override
             public void run() {
                 final int childCount = getChildCount();
                 for (int i = 0; i < childCount; i++) {
-                    final TextView tv = (TextView) getChildAt(i);
-                    if (tv != null) {
-                        tv.setTextColor(mOverrideTextColor == BarBackgroundUpdater.NO_OVERRIDE ?
-                                0xffffffff : mOverrideTextColor);
+                    final ImageView iv = (ImageView) getChildAt(i);
+                    if (iv != null) {
+                        if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+                            iv.setColorFilter(null);
+                        } else {
+                            iv.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+                        }
                     }
                 }
             }

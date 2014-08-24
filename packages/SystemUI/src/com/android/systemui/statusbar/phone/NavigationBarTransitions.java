@@ -19,10 +19,13 @@ package com.android.systemui.statusbar.phone;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.os.Handler;
 import android.os.ServiceManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+import android.widget.ImageView;
 
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.systemui.R;
@@ -42,8 +45,7 @@ public final class NavigationBarTransitions extends BarTransitions {
     private boolean mStickyTransparent;
 
     public NavigationBarTransitions(NavigationBarView view) {
-        super(view, R.drawable.nav_background, R.color.navigation_bar_background_opaque,
-                R.color.navigation_bar_background_semi_transparent);
+        super(view, new NavigationBarBackgroundDrawable(view.getContext()));
         mView = view;
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
@@ -210,4 +212,60 @@ public final class NavigationBarTransitions extends BarTransitions {
             return false;
         }
     };
+
+    protected static class NavigationBarBackgroundDrawable extends BarBackgroundDrawable
+            implements BarBackgroundUpdater.UpdateListener {
+        private final Handler mHandler;
+
+        private int mOverrideColor = BarBackgroundUpdater.NO_OVERRIDE;
+
+        public NavigationBarBackgroundDrawable(final Context context) {
+            super(context, R.drawable.nav_background, R.color.navigation_bar_background_opaque,
+                R.color.navigation_bar_background_semi_transparent);
+
+            mHandler = new Handler();
+            BarBackgroundUpdater.addListener(this);
+            BarBackgroundUpdater.init(context);
+        }
+
+        @Override
+        protected int getColorOpaque() {
+            return mOverrideColor == BarBackgroundUpdater.NO_OVERRIDE ?
+                super.getColorOpaque() : mOverrideColor;
+        }
+
+        @Override
+        protected int getColorSemiTransparent() {
+            return mOverrideColor == BarBackgroundUpdater.NO_OVERRIDE ?
+                super.getColorSemiTransparent() : (mOverrideColor & 0x00ffffff | 0x7f000000);
+        }
+
+        @Override
+        public void onUpdateStatusBarColor(final int color) {
+            // noop
+        }
+
+        @Override
+        public void onUpdateStatusBarIconColor(final int iconColor) {
+            // noop
+        }
+
+        @Override
+        public void onUpdateNavigationBarColor(final int color) {
+            mOverrideColor = color;
+            mHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    forceStartAnimation();
+                }
+
+            });
+        }
+
+        @Override
+        public void onUpdateNavigationBarIconColor(final int iconColor) {
+            // noop
+        }
+    }
 }

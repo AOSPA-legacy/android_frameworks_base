@@ -24,8 +24,10 @@ import android.content.res.ThemeConfig;
 import android.database.ContentObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.os.UserHandle;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -36,10 +38,12 @@ import android.widget.ImageView;
 
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.systemui.R;
+import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
 import java.text.NumberFormat;
 
-public class StatusBarIconView extends AnimatedImageView {
+public class StatusBarIconView extends AnimatedImageView
+        implements BarBackgroundUpdater.UpdateListener {
     private static final String TAG = "StatusBarIconView";
 
     private StatusBarIcon mIcon;
@@ -50,6 +54,9 @@ public class StatusBarIconView extends AnimatedImageView {
     private int mNumberY;
     private String mNumberText;
     private Notification mNotification;
+
+    private final Handler mHandler;
+    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
 
     public StatusBarIconView(Context context, String slot, Notification notification) {
         super(context);
@@ -73,6 +80,9 @@ public class StatusBarIconView extends AnimatedImageView {
         }
 
         setScaleType(ImageView.ScaleType.CENTER);
+
+        mHandler = new Handler();
+        BarBackgroundUpdater.addListener(this);
     }
 
     public StatusBarIconView(Context context, AttributeSet attrs) {
@@ -83,6 +93,9 @@ public class StatusBarIconView extends AnimatedImageView {
         final float scale = (float)imageBounds / (float)outerBounds;
         setScaleX(scale);
         setScaleY(scale);
+
+        mHandler = new Handler();
+        BarBackgroundUpdater.addListener(this);
     }
 
     private static boolean streq(String a, String b) {
@@ -145,6 +158,11 @@ public class StatusBarIconView extends AnimatedImageView {
     }
 
     private boolean updateDrawable(boolean withClear) {
+        if (mIcon == null) {
+            // we are not yet ready; just ignore
+            return false;
+        }
+
         Drawable drawable = getIcon(mIcon);
         if (drawable == null) {
             Log.w(TAG, "No icon for slot " + mSlot);
@@ -154,6 +172,13 @@ public class StatusBarIconView extends AnimatedImageView {
             setImageDrawable(null);
         }
         setImageDrawable(drawable);
+
+        if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+            setColorFilter(null);
+        } else {
+            setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+        }
+
         return true;
     }
 
@@ -171,6 +196,10 @@ public class StatusBarIconView extends AnimatedImageView {
      */
     public static Drawable getIcon(Context context, StatusBarIcon icon) {
         Resources r = null;
+
+        if (icon == null) {
+            return null;
+        }
 
         if (icon.iconPackage != null) {
             try {
@@ -296,4 +325,33 @@ public class StatusBarIconView extends AnimatedImageView {
         return "StatusBarIconView(slot=" + mSlot + " icon=" + mIcon
             + " notification=" + mNotification + ")";
     }
+
+    @Override
+    public void onUpdateStatusBarColor(final int color) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateStatusBarIconColor(final int iconColor) {
+        mOverrideIconColor = iconColor;
+        mHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                updateDrawable();
+            }
+
+        });
+    }
+
+    @Override
+    public void onUpdateNavigationBarColor(final int color) {
+        // noop
+    }
+
+    @Override
+    public void onUpdateNavigationBarIconColor(final int iconColor) {
+        // noop
+    }
+
 }
