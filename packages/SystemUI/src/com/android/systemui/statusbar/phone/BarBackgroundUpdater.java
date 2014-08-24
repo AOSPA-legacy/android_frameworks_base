@@ -39,7 +39,7 @@ public class BarBackgroundUpdater {
     private final static boolean DEBUG = false;
     private final static String LOG_TAG = BarBackgroundUpdater.class.getSimpleName();
 
-    private final static int DELAY_IN_MILLIS = 1000 / 30;
+    private final static int DELAY_IN_MILLIS = 1000 / 15;
 
     private final static Thread THREAD = new Thread(new Runnable() {
 
