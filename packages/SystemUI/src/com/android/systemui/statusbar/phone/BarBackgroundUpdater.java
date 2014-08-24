@@ -100,6 +100,21 @@ public class BarBackgroundUpdater {
                         r.getIdentifier("navigation_bar_height" + (isLandscape ?
                             "_landscape" : ""), "dimen", "android"));
 
+                    if (navigationBarHeight <= 0 && navigationEnabled) {
+                        // the navigation bar height is not positive - no dynamic navigation bar
+                        Settings.System.putInt(context.getContentResolver(),
+                            Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0);
+
+                        // just drop this check and retry in a bit as configuration has changed
+                        try {
+                            Thread.sleep(DELAY_IN_MILLIS);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+
+                        continue;
+                    }
+
                     final int xForStatusBar = -(2 + (isLandscape ? navigationBarHeight : 0));
                     final int yBelowStatusBar = statusBarHeight + 2;
                     final int yAboveNavigationBar = -(navigationBarHeight + 2);
