@@ -368,6 +368,14 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             mWaitingToShow = true;
             refreshRecentTasksList(recentTaskDescriptions, firstScreenful);
             showIfReady();
+            if (mUseCardStack) {
+                // Avoid blank recents screen
+                post(new Runnable() {
+                    public void run() {
+                        refreshViews();
+                    }
+                });
+            }
         } else {
             showImpl(false);
         }
