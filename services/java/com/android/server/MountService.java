@@ -1229,9 +1229,31 @@ class MountService extends IMountService.Stub
         mVolumeStates.clear();
 
         Resources resources = mContext.getResources();
-
         int id = com.android.internal.R.xml.storage_list;
-        XmlResourceParser parser = resources.getXml(id);
+        String pkg = mContext.getPackageName();
+        int idAlt = resources.getIdentifier("storage_list_legacy", "xml", pkg);
+        String legacy = SystemProperties.get("sys.storage_legacy", "");
+        int idLvm = resources.getIdentifier("storage_list_lvm", "xml", pkg);
+        String lvm = SystemProperties.get("ro.lvm_storage", "0");
+        XmlResourceParser parser = null;
+
+        if ((lvm.equals("1") || lvm.equalsIgnoreCase("true")) && idLvm != 0) {
+            parser = resources.getXml(idLvm);
+            Slog.i(TAG, "readStorageListLocked: using LVM storage list");
+        }
+
+        if ((legacy.equals("1") || legacy.equalsIgnoreCase("true")) && idAlt != 0 && parser == null) {
+            parser = resources.getXml(idAlt);
+            Slog.i(TAG, "readStorageListLocked: using legacy storage list");
+        }
+
+        if (parser == null) {
+            Slog.i(TAG, "readStorageListLocked: using default storage list");
+            parser = resources.getXml(id);
+        }
+
+        //int id = com.android.internal.R.xml.storage_list;
+        //XmlResourceParser parser = resources.getXml(id);
         AttributeSet attrs = Xml.asAttributeSet(parser);
 
         try {
