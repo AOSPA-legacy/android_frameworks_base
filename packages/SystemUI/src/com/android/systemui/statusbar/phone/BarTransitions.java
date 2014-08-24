@@ -218,13 +218,27 @@ public class BarTransitions {
             return PixelFormat.TRANSLUCENT;
         }
 
-        protected void forceStartAnimation() {
+        protected synchronized void forceStartAnimation() {
+            final long now = SystemClock.elapsedRealtime();
+
+            if (!mAnimating || now >= mEndTime) {
+                mGradientAlphaStart = mGradientAlpha;
+                mColorStart = mColor;
+            } else {
+                final float t = (now - mStartTime) / (float)(mEndTime - mStartTime);
+                final float v = Math.max(0, Math.min(mInterpolator.getInterpolation(t), 1));
+                mGradientAlphaStart = (int)(v * mGradientAlpha + mGradientAlphaStart * (1 - v));
+                mColorStart = Color.argb(
+                      (int)(v * Color.alpha(mColor) + Color.alpha(mColorStart) * (1 - v)),
+                      (int)(v * Color.red(mColor) + Color.red(mColorStart) * (1 - v)),
+                      (int)(v * Color.green(mColor) + Color.green(mColorStart) * (1 - v)),
+                      (int)(v * Color.blue(mColor) + Color.blue(mColorStart) * (1 - v)));
+            }
+
             mAnimating = true;
-            long now = SystemClock.elapsedRealtime();
             mStartTime = now;
             mEndTime = now + BACKGROUND_DURATION;
-            mGradientAlphaStart = mGradientAlpha;
-            mColorStart = mColor;
+
             invalidateSelf();
         }
 
