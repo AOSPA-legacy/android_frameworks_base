@@ -19,7 +19,9 @@ package com.android.systemui.statusbar.phone;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.provider.Settings;
 import android.util.Log;
@@ -119,16 +121,12 @@ public class BarBackgroundUpdater {
                     final int yBelowStatusBar = statusBarHeight + 2;
                     final int yAboveNavigationBar = -(navigationBarHeight + 2);
 
-                    // TODO actually fix rotation - possibly see the activity manager for this
-                    final Bitmap screenshot;
-                    if (isLandscape) {
-                        // we have to manually handle landscape since it is not handled by the API
-                        screenshot = SurfaceControl.screenshot(p.y, p.x);
-                    } else {
-                        screenshot = SurfaceControl.screenshot(p.x, p.y);
-                    }
+                    // we have to manually handle landscape since it is not handled by the API
+                    final int width = isLandscape ? p.y : p.x;
+                    final int height = isLandscape ? p.x : p.y;
 
-                    if (screenshot == null) {
+                    final Bitmap rawScreen = SurfaceControl.screenshot(width, height);
+                    if (rawScreen == null) {
                         // something went wrong during the screenshot grabbing; retry in a bit
 
                         try {
@@ -140,28 +138,53 @@ public class BarBackgroundUpdater {
                         continue;
                     }
 
-                    final int sbColorOne = getPixel(screenshot, rotation, 1, 1);
-                    final int sbColorTwo = getPixel(screenshot, rotation, 1, 5);
+                    final Bitmap screenshot = Bitmap.createBitmap(width, height,
+                        rawScreen.getConfig());
 
-                    final int nbColorOne = getPixel(screenshot, rotation, -1, -1);
-                    final int nbColorTwo = getPixel(screenshot, rotation, -1, -5);
+                    final Matrix matrix = new Matrix();
+                    switch (rotation) {
+                    case Surface.ROTATION_0:
+                        matrix.reset();
+                        break;
+                    case Surface.ROTATION_90:
+                        matrix.setRotate(270, 0, 0);
+                        matrix.postTranslate(0, width);
+                        break;
+                    case Surface.ROTATION_180:
+                        matrix.setRotate(180, 0, 0);
+                        matrix.postTranslate(width, height);
+                        break;
+                    case Surface.ROTATION_270:
+                        matrix.setRotate(90, 0, 0);
+                        matrix.postTranslate(height, 0);
+                        break;
+                    }
 
-                    final int topLeftColor = getPixel(screenshot, rotation,
-                        1, yBelowStatusBar);
-                    final int topRightColor = getPixel(screenshot, rotation,
-                        xForStatusBar, yBelowStatusBar);
-                    final int topCenterColor = getPixel(screenshot, rotation,
-                        (int) (xForStatusBar / 2), yBelowStatusBar);
+                    final Canvas canvas = new Canvas(screenshot);
+                    canvas.drawColor(0xFF000000);
+                    canvas.drawBitmap(rawScreen, matrix, null);
+                    canvas.setBitmap(null);
+                    rawScreen.recycle();
 
-                    final int botLeftColor = getPixel(screenshot, rotation,
-                        1, yAboveNavigationBar);
-                    final int botRightColor = getPixel(screenshot, rotation,
-                        xForStatusBar, yAboveNavigationBar);
-                    final int botCenterColor = getPixel(screenshot, rotation,
-                        (int) (xForStatusBar / 2), yAboveNavigationBar);
+                    final int sbColorOne = getPixel(screenshot, 1, 1);
+                    final int sbColorTwo = getPixel(screenshot, 1, 5);
 
-                    // clean up now since no more colors are needed
-                    screenshot.recycle();
+                    final int nbColorOne = getPixel(screenshot, -1, -1);
+                    final int nbColorTwo = getPixel(screenshot, -1, -5);
+
+                    final int topLeftColor = getPixel(screenshot, 1, yBelowStatusBar);
+                    final int topRightColor = getPixel(screenshot, xForStatusBar,
+                        yBelowStatusBar);
+                    final int topCenterColor = getPixel(screenshot, (int) (xForStatusBar / 2),
+                        yBelowStatusBar);
+
+                    final int botLeftColor = getPixel(screenshot, 1, yAboveNavigationBar);
+                    final int botRightColor = getPixel(screenshot, xForStatusBar,
+                        yAboveNavigationBar);
+                    final int botCenterColor = getPixel(screenshot, (int) (xForStatusBar / 2),
+                        yAboveNavigationBar);
+
+                    screenshot.recycle(); // no more colors are needed - clean up
 
                     final boolean isStatusBarConsistent = sbColorOne == sbColorTwo;
                     final boolean isNavigationBarConsistent = nbColorOne == nbColorTwo;
@@ -393,8 +416,7 @@ public class BarBackgroundUpdater {
         return Color.argb((int) alpha, (int) red, (int) green, (int) blue);
     }
 
-    private static int getPixel(final Bitmap bitmap, final int rotation,
-            final int x, final int y) {
+    private static int getPixel(final Bitmap bitmap, final int x, final int y) {
         if (bitmap == null) {
             // just silently ignore this
             return 0xFF000000;
@@ -408,29 +430,6 @@ public class BarBackgroundUpdater {
         if (y == 0) {
             Log.w(LOG_TAG, "getPixel for y=0 is not allowed; returning a black pixel");
             return 0xFF000000;
-        }
-
-        if (rotation == Surface.ROTATION_180) {
-            // turned upside down; invert all the things
-            return bitmap.getPixel(x > 0 ? bitmap.getWidth() + x : x,
-                y > 0 ? bitmap.getHeight() + y : y);
-        }
-
-        if (rotation == Surface.ROTATION_90) {
-            // turned counter-clockwise; invert some of the things
-            return bitmap.getPixel(x > 0 ? x : bitmap.getWidth() + x,
-                y > 0 ? y : bitmap.getHeight() + y);
-        }
-
-        if (rotation == Surface.ROTATION_270) {
-            // turned clockwise; invert some of the things
-            return bitmap.getPixel(x > 0 ? x : bitmap.getWidth() + x,
-                y > 0 ? y : bitmap.getHeight() + y);
-        }
-
-        if (rotation != Surface.ROTATION_0) {
-            Log.w(LOG_TAG, "getPixel for rotation=" + Integer.toString(rotation) +
-                " is assuming natural orientation");
         }
 
         return bitmap.getPixel(x > 0 ? x : bitmap.getWidth() + x,
