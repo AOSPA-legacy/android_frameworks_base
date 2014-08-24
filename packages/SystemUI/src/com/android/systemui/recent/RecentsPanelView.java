@@ -104,6 +104,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private boolean mFitThumbnailToXY;
     private int mRecentItemLayoutId;
     private boolean mHighEndGfx;
+    private int mDefaultAppBarColor;
     private int mAppColorBarHeight;
     private int mAppColorBarLabelColorDark;
     private int mAppColorBarLabelColorLight;
@@ -215,7 +216,14 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                 updateIcon(holder, td.getIcon(), true, false);
             }
             if (mUseCardStack) {
-                holder.appColorBarView.setBackgroundColor(td.getABColor());
+                int abColor = td.getABColor();
+                if (abColor == 0) {
+                    // sometimes we get an empty td here, fill with default
+                    abColor = mDefaultAppBarColor;;
+                    td.setABColor(abColor);
+                    td.setABUseLight(false);
+                }
+                holder.appColorBarView.setBackgroundColor(abColor);
                 int topPadding = mAppColorBarHeight - td.getABHeight();
                 holder.thumbnailViewImage.setPadding(0, topPadding, 0, 0);
                 holder.labelView.setTextColor(td.getABUseLight() ?
@@ -316,6 +324,8 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             mRecentItemLayoutId = a.getResourceId(R.styleable.RecentsPanelView_recentItemLayout, 0);
         } else {
             mRecentItemLayoutId = R.layout.status_bar_recent_card;
+            mDefaultAppBarColor = getResources().getColor(
+                    R.color.status_bar_recents_app_bar_color);
             mAppColorBarHeight = getResources().getDimensionPixelSize(
                     R.dimen.status_bar_recents_app_color_bar_height);
             mAppColorBarLabelColorDark = getResources().getColor(
