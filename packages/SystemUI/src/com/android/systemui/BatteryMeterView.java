@@ -280,7 +280,7 @@ public class BatteryMeterView extends View
             color = mColors[i+1];
             if (percent <= thresh) {
                 // just override the last level (full battery level)
-                return i == mColors.length - 2 && doOverride ? mOverrideIconColor : color;
+                return (doOverride && i == mColors.length - 2) ? mOverrideIconColor : color;
             }
         }
 
