@@ -19,9 +19,13 @@ package com.android.systemui.statusbar.phone;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.ServiceManager;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -216,14 +220,27 @@ public final class NavigationBarTransitions extends BarTransitions {
     protected static class NavigationBarBackgroundDrawable extends BarBackgroundDrawable
             implements BarBackgroundUpdater.UpdateListener {
         private final Handler mHandler;
+        private final Context mContext;
 
         private int mOverrideColor = BarBackgroundUpdater.NO_OVERRIDE;
+        private int mGradientAlpha = 0;
 
         public NavigationBarBackgroundDrawable(final Context context) {
             super(context, R.drawable.nav_background, R.color.navigation_bar_background_opaque,
                 R.color.navigation_bar_background_semi_transparent);
 
             mHandler = new Handler();
+            mContext = context;
+
+            final GradientObserver obs = new GradientObserver(this, mHandler);
+            (mContext.getContentResolver()).registerContentObserver(
+                    GradientObserver.DYNAMIC_SYSTEM_BARS_GRADIENT_URI,
+                    false, obs, UserHandle.USER_ALL);
+
+            mGradientAlpha = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE, 0) == 1 ?
+                            0xff : 0;
+
             BarBackgroundUpdater.addListener(this);
             BarBackgroundUpdater.init(context);
         }
@@ -238,6 +255,16 @@ public final class NavigationBarTransitions extends BarTransitions {
         protected int getColorSemiTransparent() {
             return mOverrideColor == BarBackgroundUpdater.NO_OVERRIDE ?
                 super.getColorSemiTransparent() : (mOverrideColor & 0x00ffffff | 0x7f000000);
+        }
+
+        @Override
+        protected int getGradientAlphaOpaque() {
+            return mGradientAlpha;
+        }
+
+        @Override
+        protected int getGradientAlphaSemiTransparent() {
+            return mGradientAlpha & 0x7f;
         }
 
         @Override
@@ -266,6 +293,38 @@ public final class NavigationBarTransitions extends BarTransitions {
         @Override
         public void onUpdateNavigationBarIconColor(final int iconColor) {
             // noop
+        }
+
+        public void setGradientAlpha(final int alpha) {
+            mGradientAlpha = alpha;
+            mHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    forceStartAnimation();
+                }
+
+            });
+        }
+    }
+
+    private static final class GradientObserver extends ContentObserver {
+        private static final Uri DYNAMIC_SYSTEM_BARS_GRADIENT_URI = Settings.System.getUriFor(
+                Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE);
+
+        private final NavigationBarBackgroundDrawable mDrawable;
+
+        private GradientObserver(final NavigationBarBackgroundDrawable drawable,
+                final Handler handler) {
+            super(handler);
+            mDrawable = drawable;
+        }
+
+        @Override
+        public void onChange(final boolean selfChange) {
+            mDrawable.setGradientAlpha(Settings.System.getInt(
+                    mDrawable.mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE, 0) == 1 ? 0xff : 0);
         }
     }
 }

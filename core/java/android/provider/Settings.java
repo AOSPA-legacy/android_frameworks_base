@@ -2719,6 +2719,24 @@ public final class Settings {
         public static final String DYNAMIC_NAVIGATION_BAR_STATE = "dynamic_navigation_bar_state";
 
         /**
+         * Whether the dynamic system bars are set to have a gradient overlay
+         * 0 = disabled (default)
+         * 1 = enabled
+         * @hide
+         */
+        public static final String DYNAMIC_SYSTEM_BARS_GRADIENT_STATE =
+                "dynamic_system_bars_gradient_state";
+
+        /**
+         * Whether the dynamic status bar is set to have a (darkening) filter overlay
+         * 0 = disabled (default)
+         * 1 = enabled
+         * @hide
+         */
+        public static final String DYNAMIC_STATUS_BAR_FILTER_STATE =
+                "dynamic_status_bar_filter_state";
+
+        /**
          * Whether incomming call UI stays in background
          *
          * @hide

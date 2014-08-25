@@ -21,7 +21,11 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Handler;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.view.View;
 
 import com.android.systemui.R;
@@ -115,14 +119,26 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
     protected static class PhoneStatusBarBackgroundDrawable extends BarBackgroundDrawable
             implements BarBackgroundUpdater.UpdateListener {
         private final Handler mHandler;
+        private final Context mContext;
 
         private int mOverrideColor = BarBackgroundUpdater.NO_OVERRIDE;
+        private int mGradientAlpha = 0;
 
         public PhoneStatusBarBackgroundDrawable(final Context context) {
             super(context, R.drawable.status_background, R.color.status_bar_background_opaque,
                 R.color.status_bar_background_semi_transparent);
 
             mHandler = new Handler();
+            mContext = context;
+
+            final GradientObserver obs = new GradientObserver(this, mHandler);
+            (mContext.getContentResolver()).registerContentObserver(
+                    GradientObserver.DYNAMIC_SYSTEM_BARS_GRADIENT_URI,
+                    false, obs, UserHandle.USER_ALL);
+
+            mGradientAlpha = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE, 0) == 1 ?
+                            0xff : 0;
 
             BarBackgroundUpdater.addListener(this);
             BarBackgroundUpdater.init(context);
@@ -170,13 +186,44 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
 
         @Override
         protected int getGradientAlphaOpaque() {
-            return 0; // TODO set as 0xff if user wants a gradient
+            return mGradientAlpha;
         }
 
         @Override
         protected int getGradientAlphaSemiTransparent() {
-            return 0; // TODO set as 0x7f if user wants a gradient
+            return mGradientAlpha & 0x7f;
+        }
+
+        public void setGradientAlpha(final int alpha) {
+            mGradientAlpha = alpha;
+            mHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    forceStartAnimation();
+                }
+
+            });
         }
     }
 
+    private static final class GradientObserver extends ContentObserver {
+        private static final Uri DYNAMIC_SYSTEM_BARS_GRADIENT_URI = Settings.System.getUriFor(
+                Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE);
+
+        private final PhoneStatusBarBackgroundDrawable mDrawable;
+
+        private GradientObserver(final PhoneStatusBarBackgroundDrawable drawable,
+                final Handler handler) {
+            super(handler);
+            mDrawable = drawable;
+        }
+
+        @Override
+        public void onChange(final boolean selfChange) {
+            mDrawable.setGradientAlpha(Settings.System.getInt(
+                    mDrawable.mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE, 0) == 1 ? 0xff : 0);
+        }
+    }
 }

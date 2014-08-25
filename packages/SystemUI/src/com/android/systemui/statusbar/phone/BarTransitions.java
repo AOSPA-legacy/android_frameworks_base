@@ -283,12 +283,12 @@ public class BarTransitions {
                           (int)(v * Color.blue(targetColor) + Color.blue(mColorStart) * (1 - v)));
                 }
             }
+            if (Color.alpha(mColor) > 0) {
+                canvas.drawColor(mColor);
+            }
             if (mGradientAlpha > 0) {
                 mGradient.setAlpha(mGradientAlpha);
                 mGradient.draw(canvas);
-            }
-            if (Color.alpha(mColor) > 0) {
-                canvas.drawColor(mColor);
             }
             if (mAnimating) {
                 invalidateSelf();  // keep going

@@ -21,11 +21,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.os.Handler;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Surface;
@@ -109,14 +112,7 @@ public class BarBackgroundUpdater {
                 final int navigationBarOverrideColor;
                 final int navigationBarIconOverrideColor;
 
-                // TODO switch these over to static values that get updated by an observer
-                final boolean statusEnabled = Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.DYNAMIC_STATUS_BAR_STATE, 0) == 1;
-                final boolean navigationEnabled = Settings.System.getInt(
-                    context.getContentResolver(), Settings.System.DYNAMIC_NAVIGATION_BAR_STATE,
-                    0) == 1;
-
-                if (statusEnabled || navigationEnabled) {
+                if (mStatusEnabled || mNavigationEnabled) {
                     final WindowManager wm =
                         (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 
@@ -134,7 +130,7 @@ public class BarBackgroundUpdater {
                         r.getIdentifier("navigation_bar_height" + (isLandscape ?
                             "_landscape" : ""), "dimen", "android"));
 
-                    if (navigationBarHeight <= 0 && navigationEnabled) {
+                    if (navigationBarHeight <= 0 && mNavigationEnabled) {
                         // the navigation bar height is not positive - no dynamic navigation bar
                         Settings.System.putInt(context.getContentResolver(),
                             Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0);
@@ -221,20 +217,22 @@ public class BarBackgroundUpdater {
                     final boolean isStatusBarConsistent = sbColorOne == sbColorTwo;
                     final boolean isNavigationBarConsistent = nbColorOne == nbColorTwo;
 
-                    // TODO implement status bar color darkening based on user configuration
-                    if (statusEnabled) {
+                    if (mStatusEnabled) {
+                        final int tmp;
+
                         if (topColorLeft == topColorRight) {
                             // status bar appears to be completely uniform
-                            statusBarOverrideColor = topColorLeft;
+                            tmp = topColorLeft;
                         } else if (topColorLeft == topColorCenter ||
                                 topColorRight == topColorCenter) {
                             // a side of the status bar appears to be uniform
-                            statusBarOverrideColor = topColorCenter;
+                            tmp = topColorCenter;
                         } else {
                             // status bar does not appear to be uniform at all
-                            statusBarOverrideColor = sampleColors(topColorLeft, topColorRight,
-                                topColorCenter);
+                            tmp = sampleColors(topColorLeft, topColorRight, topColorCenter);
                         }
+
+                        statusBarOverrideColor = mStatusFilterEnabled ? filter(tmp, -30) : tmp;
 
                         final float statusBarBrightness =
                             (0.299f * Color.red(statusBarOverrideColor) +
@@ -247,7 +245,7 @@ public class BarBackgroundUpdater {
                         statusBarIconOverrideColor = NO_OVERRIDE;
                     }
 
-                    if (navigationEnabled) {
+                    if (mNavigationEnabled) {
                         if (botColorLeft == botColorRight) {
                             // navigation bar appears to be completely uniform
                             navigationBarOverrideColor = botColorLeft;
@@ -405,15 +403,19 @@ public class BarBackgroundUpdater {
         THREAD.start();
     }
 
+    private static boolean mStatusEnabled = false;
+    private static boolean mStatusFilterEnabled = false;
     private static int mStatusBarOverrideColor = NO_OVERRIDE;
     private static int mStatusBarIconOverrideColor = NO_OVERRIDE;
 
+    private static boolean mNavigationEnabled = false;
     private static int mNavigationBarOverrideColor = NO_OVERRIDE;
     private static int mNavigationBarIconOverrideColor = NO_OVERRIDE;
 
     private static Context mContext = null;
     private static ArrayList<WeakReference<UpdateListener>> mListeners =
         new ArrayList<WeakReference<UpdateListener>>();
+    private static SettingsObserver mObserver = null;
 
     private BarBackgroundUpdater() {
     }
@@ -421,6 +423,10 @@ public class BarBackgroundUpdater {
     public synchronized static void init(final Context context) {
         if (mContext != null) {
             mContext.unregisterReceiver(RECEIVER);
+
+            if (mObserver != null) {
+                mContext.getContentResolver().unregisterContentObserver(mObserver);
+            }
         }
 
         mContext = context;
@@ -429,6 +435,27 @@ public class BarBackgroundUpdater {
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         mContext.registerReceiver(RECEIVER, filter);
+
+        if (mObserver == null) {
+            mObserver = new SettingsObserver(new Handler());
+        }
+
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.DYNAMIC_STATUS_BAR_STATE),
+                false, mObserver, UserHandle.USER_ALL);
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.DYNAMIC_NAVIGATION_BAR_STATE),
+                false, mObserver, UserHandle.USER_ALL);
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE),
+                false, mObserver, UserHandle.USER_ALL);
+
+        mStatusEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.DYNAMIC_STATUS_BAR_STATE, 0) == 1;
+        mNavigationEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0) == 1;
+        mStatusFilterEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0) == 1;
     }
 
     public synchronized static void addListener(final UpdateListener... listeners) {
@@ -460,6 +487,31 @@ public class BarBackgroundUpdater {
     private static int ensureNotPureWhite(final int original) {
         // TODO investigate why full white fails to apply
         return original == 0xFFFFFFFF ? 0xFFFEFEFE : original;
+    }
+
+    private static int filter(final int original, final float diff) {
+        final int red = (int) (Color.red(original) + diff); // 0.299f * diff
+        final int green = (int) (Color.green(original) + diff); // 0.587f * diff
+        final int blue = (int) (Color.blue(original) + diff); // 0.114f * diff
+
+        return original == NO_OVERRIDE ? NO_OVERRIDE : Color.argb(
+                Color.alpha(original),
+                red > 0 ?
+                        red < 255 ?
+                                red :
+                                255 :
+                        0,
+                green > 0 ?
+                        green < 255 ?
+                                green :
+                                255 :
+                        0,
+                blue > 0 ?
+                        blue < 255 ?
+                                blue :
+                                255 :
+                        0
+        );
     }
 
     private static int sampleColors(final int... originals) {
@@ -508,6 +560,22 @@ public class BarBackgroundUpdater {
         public void onUpdateNavigationBarColor(final int color);
 
         public void onUpdateNavigationBarIconColor(final int iconColor);
+    }
+
+    private static final class SettingsObserver extends ContentObserver {
+        private SettingsObserver(final Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(final boolean selfChange) {
+            mStatusEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_STATUS_BAR_STATE, 0) == 1;
+            mNavigationEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0) == 1;
+            mStatusFilterEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0) == 1;
+        }
     }
 
 }
