@@ -16,7 +16,10 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -39,13 +42,42 @@ public class BarBackgroundUpdater {
     private final static boolean DEBUG = false;
     private final static String LOG_TAG = BarBackgroundUpdater.class.getSimpleName();
 
+    private final static int MAX_DELAY_IN_MILLIS = 2 * 1000;
     private final static int DELAY_IN_MILLIS = 1000 / 15;
+    private static boolean PAUSED = false;
+
+    private final static BroadcastReceiver RECEIVER = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            synchronized(BarBackgroundUpdater.class) {
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                    PAUSED = true;
+                } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                    PAUSED = false;
+                }
+            }
+        }
+
+    };
 
     private final static Thread THREAD = new Thread(new Runnable() {
 
         @Override
         public void run() {
+            int delayInMillis = DELAY_IN_MILLIS;
+
             while (true) {
+                while (PAUSED) {
+                    // we have been told to do nothing; wait for a second
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+
                 if (DELAY_IN_MILLIS <= 0) {
                     // we have been told to delay for a weird timespan; retry in a second
 
@@ -64,7 +96,7 @@ public class BarBackgroundUpdater {
                     // we haven't been initiated yet; retry in a bit
 
                     try {
-                        Thread.sleep(DELAY_IN_MILLIS);
+                        Thread.sleep(delayInMillis = DELAY_IN_MILLIS);
                     } catch (InterruptedException e) {
                         return;
                     }
@@ -109,7 +141,7 @@ public class BarBackgroundUpdater {
 
                         // just drop this check and retry in a bit as configuration has changed
                         try {
-                            Thread.sleep(DELAY_IN_MILLIS);
+                            Thread.sleep(delayInMillis = DELAY_IN_MILLIS);
                         } catch (InterruptedException e) {
                             return;
                         }
@@ -130,7 +162,7 @@ public class BarBackgroundUpdater {
                         // something went wrong during the screenshot grabbing; retry in a bit
 
                         try {
-                            Thread.sleep(DELAY_IN_MILLIS);
+                            Thread.sleep(delayInMillis = DELAY_IN_MILLIS);
                         } catch (InterruptedException e) {
                             return;
                         }
@@ -261,8 +293,11 @@ public class BarBackgroundUpdater {
                     }
                 }
 
+                boolean anythingUpdated = false;
+
                 // update the status bar itself, if needed
                 if (mStatusBarOverrideColor != statusBarOverrideColor) {
+                    anythingUpdated = true;
                     synchronized(BarBackgroundUpdater.class) {
                         mStatusBarOverrideColor = statusBarOverrideColor;
 
@@ -283,6 +318,7 @@ public class BarBackgroundUpdater {
 
                 // update the status bar icons, if needed
                 if (mStatusBarIconOverrideColor != statusBarIconOverrideColor) {
+                    anythingUpdated = true;
                     synchronized(BarBackgroundUpdater.class) {
                         mStatusBarIconOverrideColor = statusBarIconOverrideColor;
 
@@ -303,6 +339,7 @@ public class BarBackgroundUpdater {
 
                 // update the navigation bar itself, if needed
                 if (mNavigationBarOverrideColor != navigationBarOverrideColor) {
+                    anythingUpdated = true;
                     synchronized(BarBackgroundUpdater.class) {
                         mNavigationBarOverrideColor = navigationBarOverrideColor;
 
@@ -323,6 +360,7 @@ public class BarBackgroundUpdater {
 
                 // update the navigation bar icons, if needed
                 if (mNavigationBarIconOverrideColor != navigationBarIconOverrideColor) {
+                    anythingUpdated = true;
                     synchronized(BarBackgroundUpdater.class) {
                         mNavigationBarIconOverrideColor = navigationBarIconOverrideColor;
 
@@ -341,8 +379,17 @@ public class BarBackgroundUpdater {
                     }
                 }
 
+                if (anythingUpdated) {
+                    delayInMillis = DELAY_IN_MILLIS;
+                } else {
+                    delayInMillis *= 2;
+                    if (delayInMillis > MAX_DELAY_IN_MILLIS) {
+                        delayInMillis = MAX_DELAY_IN_MILLIS;
+                    }
+                }
+
                 try {
-                    Thread.sleep(DELAY_IN_MILLIS);
+                    Thread.sleep(delayInMillis);
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -369,7 +416,16 @@ public class BarBackgroundUpdater {
     }
 
     public synchronized static void init(final Context context) {
+        if (mContext != null) {
+            mContext.unregisterReceiver(RECEIVER);
+        }
+
         mContext = context;
+
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        mContext.registerReceiver(RECEIVER, filter);
     }
 
     public synchronized static void addListener(final UpdateListener... listeners) {
