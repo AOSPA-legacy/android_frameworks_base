@@ -28,7 +28,7 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 public class PhoneStatusBarClock extends Clock implements BarBackgroundUpdater.UpdateListener {
     private final Handler mHandler;
 
-    private int mOverrideTextColor = BarBackgroundUpdater.NO_OVERRIDE;
+    private Integer mOverrideTextColor = null;
 
     public PhoneStatusBarClock(final Context context) {
         this(context, null);
@@ -47,31 +47,31 @@ public class PhoneStatusBarClock extends Clock implements BarBackgroundUpdater.U
     }
 
     @Override
-    public void onUpdateStatusBarColor(final int color) {
+    public void onUpdateStatusBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateStatusBarIconColor(final int iconColor) {
+    public void onUpdateStatusBarIconColor(final Integer iconColor) {
         mOverrideTextColor = iconColor;
         mHandler.post(new Runnable() {
 
             @Override
             public void run() {
-                setTextColor(mOverrideTextColor == BarBackgroundUpdater.NO_OVERRIDE ?
-                    0xffffffff : mOverrideTextColor);
+                // TODO themeability - use the resource instead of a hardcoded value
+                setTextColor(mOverrideTextColor == null ? 0xffffffff : mOverrideTextColor);
             }
 
         });
     }
 
     @Override
-    public void onUpdateNavigationBarColor(final int color) {
+    public void onUpdateNavigationBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarIconColor(final int iconColor) {
+    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
         // noop
     }
 

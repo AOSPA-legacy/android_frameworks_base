@@ -121,7 +121,7 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
         private final Handler mHandler;
         private final Context mContext;
 
-        private int mOverrideColor = BarBackgroundUpdater.NO_OVERRIDE;
+        private Integer mOverrideColor = null;
         private int mGradientAlpha = 0;
 
         public PhoneStatusBarBackgroundDrawable(final Context context) {
@@ -145,7 +145,7 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
         }
 
         @Override
-        public void onUpdateStatusBarColor(final int color) {
+        public void onUpdateStatusBarColor(final Integer color) {
             mOverrideColor = color;
             mHandler.post(new Runnable() {
 
@@ -158,30 +158,29 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
         }
 
         @Override
-        public void onUpdateStatusBarIconColor(final int iconColor) {
+        public void onUpdateStatusBarIconColor(final Integer iconColor) {
             // noop
         }
 
         @Override
-        public void onUpdateNavigationBarColor(final int color) {
+        public void onUpdateNavigationBarColor(final Integer color) {
             // noop
         }
 
         @Override
-        public void onUpdateNavigationBarIconColor(final int iconColor) {
+        public void onUpdateNavigationBarIconColor(final Integer iconColor) {
             // noop
         }
 
         @Override
         protected int getColorOpaque() {
-            return mOverrideColor == BarBackgroundUpdater.NO_OVERRIDE ?
-                super.getColorOpaque() : mOverrideColor;
+            return mOverrideColor == null ? super.getColorOpaque() : mOverrideColor;
         }
 
         @Override
         protected int getColorSemiTransparent() {
-            return mOverrideColor == BarBackgroundUpdater.NO_OVERRIDE ?
-                super.getColorSemiTransparent() : (mOverrideColor & 0x00ffffff | 0x7f000000);
+            return mOverrideColor == null ? super.getColorSemiTransparent() :
+                    (mOverrideColor & 0x00ffffff | 0x7f000000);
         }
 
         @Override

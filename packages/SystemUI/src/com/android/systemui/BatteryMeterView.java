@@ -60,7 +60,7 @@ public class BatteryMeterView extends View
     int[] mColors;
 
     private boolean mQS = false;
-    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
+    private Integer mOverrideIconColor = null;
 
     boolean mShowPercent = true;
     Paint mFramePaint, mBatteryPaint, mWarningTextPaint, mTextPaint, mBoltPaint;
@@ -272,7 +272,7 @@ public class BatteryMeterView extends View
     }
 
     private int getColorForLevel(int percent) {
-        final boolean doOverride = mOverrideIconColor != BarBackgroundUpdater.NO_OVERRIDE && !mQS;
+        final boolean doOverride = mOverrideIconColor != null && !mQS;
 
         int thresh, color = 0;
         for (int i=0; i<mColors.length; i+=2) {
@@ -341,7 +341,7 @@ public class BatteryMeterView extends View
         c.drawRect(mFrame, mFramePaint);
 
         // fill 'er up
-        final boolean doOverride = mOverrideIconColor != BarBackgroundUpdater.NO_OVERRIDE && !mQS;
+        final boolean doOverride = mOverrideIconColor != null && !mQS;
         final int color = tracker.plugged ? (doOverride ? mOverrideIconColor : mChargeColor) :
             getColorForLevel(level);
         mBatteryPaint.setColor(color);
@@ -433,23 +433,23 @@ public class BatteryMeterView extends View
     }
 
     @Override
-    public void onUpdateStatusBarColor(final int color) {
+    public void onUpdateStatusBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateStatusBarIconColor(final int iconColor) {
+    public void onUpdateStatusBarIconColor(final Integer iconColor) {
         mOverrideIconColor = iconColor;
         postInvalidate();
     }
 
     @Override
-    public void onUpdateNavigationBarColor(final int color) {
+    public void onUpdateNavigationBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarIconColor(final int iconColor) {
+    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
         // noop
     }
 

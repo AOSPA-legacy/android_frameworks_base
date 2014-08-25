@@ -54,7 +54,7 @@ public class SignalClusterView
     View mSpacer;
 
     private final Handler mHandler;
-    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
+    private Integer mOverrideIconColor = null;
 
     public SignalClusterView(Context context) {
         this(context, null);
@@ -173,7 +173,7 @@ public class SignalClusterView
         if (mWifiVisible) {
             mWifi.setImageResource(mWifiStrengthId);
 
-            if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+            if (mOverrideIconColor == null) {
                 mWifi.setColorFilter(null);
             } else {
                 mWifi.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
@@ -194,7 +194,7 @@ public class SignalClusterView
             mMobile.setImageResource(mMobileStrengthId);
             mMobileType.setImageResource(mMobileTypeId);
 
-            if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+            if (mOverrideIconColor == null) {
                 mMobile.setColorFilter(null);
                 mMobileType.setColorFilter(null);
             } else {
@@ -211,7 +211,7 @@ public class SignalClusterView
         if (mIsAirplaneMode) {
             mAirplane.setImageResource(mAirplaneIconId);
 
-            if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+            if (mOverrideIconColor == null) {
                 mAirplane.setColorFilter(null);
             } else {
                 mAirplane.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
@@ -238,12 +238,12 @@ public class SignalClusterView
     }
 
     @Override
-    public void onUpdateStatusBarColor(final int color) {
+    public void onUpdateStatusBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateStatusBarIconColor(final int iconColor) {
+    public void onUpdateStatusBarIconColor(final Integer iconColor) {
         mOverrideIconColor = iconColor;
         mHandler.post(new Runnable() {
 
@@ -256,12 +256,12 @@ public class SignalClusterView
     }
 
     @Override
-    public void onUpdateNavigationBarColor(final int color) {
+    public void onUpdateNavigationBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarIconColor(final int iconColor) {
+    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
         // noop
     }
 

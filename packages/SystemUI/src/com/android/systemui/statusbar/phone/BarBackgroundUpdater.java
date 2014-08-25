@@ -40,8 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BarBackgroundUpdater {
-    public final static int NO_OVERRIDE = -1;
-
     private final static boolean DEBUG = false;
     private final static String LOG_TAG = BarBackgroundUpdater.class.getSimpleName();
 
@@ -107,10 +105,10 @@ public class BarBackgroundUpdater {
                     continue;
                 }
 
-                final int statusBarOverrideColor;
-                final int statusBarIconOverrideColor;
-                final int navigationBarOverrideColor;
-                final int navigationBarIconOverrideColor;
+                final Integer statusBarOverrideColor;
+                final Integer statusBarIconOverrideColor;
+                final Integer navigationBarOverrideColor;
+                final Integer navigationBarIconOverrideColor;
 
                 if (mStatusEnabled || mNavigationEnabled) {
                     final WindowManager wm =
@@ -241,8 +239,8 @@ public class BarBackgroundUpdater {
                         statusBarIconOverrideColor = statusBarBrightness > 0.7f &&
                             isStatusBarConsistent ? 0x95000000 : 0xFFFFFFFF;
                     } else {
-                        statusBarOverrideColor = NO_OVERRIDE;
-                        statusBarIconOverrideColor = NO_OVERRIDE;
+                        statusBarOverrideColor = null;
+                        statusBarIconOverrideColor = null;
                     }
 
                     if (mNavigationEnabled) {
@@ -266,14 +264,14 @@ public class BarBackgroundUpdater {
                         navigationBarIconOverrideColor = navigationBarBrightness > 0.7f &&
                             isNavigationBarConsistent ? 0x95000000 : 0xFFFFFFFF;
                     } else {
-                        navigationBarOverrideColor = NO_OVERRIDE;
-                        navigationBarIconOverrideColor = NO_OVERRIDE;
+                        navigationBarOverrideColor = null;
+                        navigationBarIconOverrideColor = null;
                     }
                 } else {
-                    statusBarOverrideColor = NO_OVERRIDE;
-                    statusBarIconOverrideColor = NO_OVERRIDE;
-                    navigationBarOverrideColor = NO_OVERRIDE;
-                    navigationBarIconOverrideColor = NO_OVERRIDE;
+                    statusBarOverrideColor = null;
+                    statusBarIconOverrideColor = null;
+                    navigationBarOverrideColor = null;
+                    navigationBarIconOverrideColor = null;
                 }
 
                 // do a quick cleanup of the listener list
@@ -295,15 +293,14 @@ public class BarBackgroundUpdater {
                 boolean anythingUpdated = false;
 
                 // update the status bar itself, if needed
-                final int sbOverrideColor = ensureNotPureWhite(statusBarOverrideColor);
-                if (mStatusBarOverrideColor != sbOverrideColor) {
+                if (mStatusBarOverrideColor != statusBarOverrideColor) {
                     anythingUpdated = true;
                     synchronized(BarBackgroundUpdater.class) {
-                        mStatusBarOverrideColor = sbOverrideColor;
+                        mStatusBarOverrideColor = statusBarOverrideColor;
 
                         if (DEBUG) {
                             Log.d(LOG_TAG, "statusBarOverrideColor=" +
-                                (mStatusBarOverrideColor == NO_OVERRIDE ? "NO_OVERRIDE" :
+                                (mStatusBarOverrideColor == null ? "none" :
                                     "0x" + Integer.toHexString(mStatusBarOverrideColor)));
                         }
 
@@ -323,8 +320,8 @@ public class BarBackgroundUpdater {
                         mStatusBarIconOverrideColor = statusBarIconOverrideColor;
 
                         if (DEBUG) {
-                            Log.d(LOG_TAG, "statusBarIconOverrideColor=0x" +
-                                (mStatusBarIconOverrideColor == NO_OVERRIDE ? "NO_OVERRIDE" :
+                            Log.d(LOG_TAG, "statusBarIconOverrideColor=" +
+                                (mStatusBarIconOverrideColor == null ? "none" :
                                     "0x" + Integer.toHexString(mStatusBarIconOverrideColor)));
                         }
 
@@ -338,15 +335,14 @@ public class BarBackgroundUpdater {
                 }
 
                 // update the navigation bar itself, if needed
-                final int nbOverrideColor = ensureNotPureWhite(navigationBarOverrideColor);
-                if (mNavigationBarOverrideColor != nbOverrideColor) {
+                if (mNavigationBarOverrideColor != navigationBarOverrideColor) {
                     anythingUpdated = true;
                     synchronized(BarBackgroundUpdater.class) {
-                        mNavigationBarOverrideColor = nbOverrideColor;
+                        mNavigationBarOverrideColor = navigationBarOverrideColor;
 
                         if (DEBUG) {
-                            Log.d(LOG_TAG, "navigationBarOverrideColor=0x" +
-                                (mNavigationBarOverrideColor == NO_OVERRIDE ? "NO_OVERRIDE" :
+                            Log.d(LOG_TAG, "navigationBarOverrideColor=" +
+                                (mNavigationBarOverrideColor == null ? "none" :
                                     "0x" + Integer.toHexString(mNavigationBarOverrideColor)));
                         }
 
@@ -366,8 +362,8 @@ public class BarBackgroundUpdater {
                         mNavigationBarIconOverrideColor = navigationBarIconOverrideColor;
 
                         if (DEBUG) {
-                            Log.d(LOG_TAG, "navigationBarIconOverrideColor=0x" +
-                                (mNavigationBarIconOverrideColor == NO_OVERRIDE ? "NO_OVERRIDE" :
+                            Log.d(LOG_TAG, "navigationBarIconOverrideColor=" +
+                                (mNavigationBarIconOverrideColor == null ? "none" :
                                     "0x" + Integer.toHexString(mNavigationBarIconOverrideColor)));
                         }
 
@@ -405,12 +401,12 @@ public class BarBackgroundUpdater {
 
     private static boolean mStatusEnabled = false;
     private static boolean mStatusFilterEnabled = false;
-    private static int mStatusBarOverrideColor = NO_OVERRIDE;
-    private static int mStatusBarIconOverrideColor = NO_OVERRIDE;
+    private static Integer mStatusBarOverrideColor = null;
+    private static Integer mStatusBarIconOverrideColor = null;
 
     private static boolean mNavigationEnabled = false;
-    private static int mNavigationBarOverrideColor = NO_OVERRIDE;
-    private static int mNavigationBarIconOverrideColor = NO_OVERRIDE;
+    private static Integer mNavigationBarOverrideColor = null;
+    private static Integer mNavigationBarIconOverrideColor = null;
 
     private static Context mContext = null;
     private static ArrayList<WeakReference<UpdateListener>> mListeners =
@@ -484,17 +480,16 @@ public class BarBackgroundUpdater {
         }
     }
 
-    private static int ensureNotPureWhite(final int original) {
-        // TODO investigate why full white fails to apply
-        return original == 0xFFFFFFFF ? 0xFFFEFEFE : original;
-    }
+    private static Integer filter(final Integer original, final float diff) {
+        if (original == null) {
+            return null;
+        }
 
-    private static int filter(final int original, final float diff) {
         final int red = (int) (Color.red(original) + diff); // 0.299f * diff
         final int green = (int) (Color.green(original) + diff); // 0.587f * diff
         final int blue = (int) (Color.blue(original) + diff); // 0.114f * diff
 
-        return original == NO_OVERRIDE ? NO_OVERRIDE : Color.argb(
+        return Color.argb(
                 Color.alpha(original),
                 red > 0 ?
                         red < 255 ?
@@ -514,7 +509,7 @@ public class BarBackgroundUpdater {
         );
     }
 
-    private static int sampleColors(final int... originals) {
+    private static Integer sampleColors(final Integer... originals) {
         final int n = originals.length;
 
         float alpha = 0;
@@ -522,11 +517,13 @@ public class BarBackgroundUpdater {
         float green = 0;
         float blue = 0;
 
-        for (final int original : originals) {
-            alpha += Color.alpha(original) / n;
-            red += Color.red(original) / n;
-            green += Color.green(original) / n;
-            blue += Color.blue(original) / n;
+        for (final Integer original : originals) {
+            if (original != null) {
+                alpha += Color.alpha(original) / n;
+                red += Color.red(original) / n;
+                green += Color.green(original) / n;
+                blue += Color.blue(original) / n;
+            }
         }
 
         return Color.argb((int) alpha, (int) red, (int) green, (int) blue);
@@ -553,13 +550,13 @@ public class BarBackgroundUpdater {
     }
 
     public static interface UpdateListener {
-        public void onUpdateStatusBarColor(final int color);
+        public void onUpdateStatusBarColor(final Integer color);
 
-        public void onUpdateStatusBarIconColor(final int iconColor);
+        public void onUpdateStatusBarIconColor(final Integer iconColor);
 
-        public void onUpdateNavigationBarColor(final int color);
+        public void onUpdateNavigationBarColor(final Integer color);
 
-        public void onUpdateNavigationBarIconColor(final int iconColor);
+        public void onUpdateNavigationBarIconColor(final Integer iconColor);
     }
 
     private static final class SettingsObserver extends ContentObserver {

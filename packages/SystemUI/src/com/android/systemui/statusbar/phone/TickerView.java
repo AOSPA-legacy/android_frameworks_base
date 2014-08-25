@@ -31,7 +31,7 @@ public class TickerView extends TextSwitcher implements BarBackgroundUpdater.Upd
     Ticker mTicker;
 
     private final Handler mHandler;
-    private int mOverrideTextColor = BarBackgroundUpdater.NO_OVERRIDE;
+    private Integer mOverrideTextColor = null;
 
     public TickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -55,21 +55,21 @@ public class TickerView extends TextSwitcher implements BarBackgroundUpdater.Upd
     @Override
     public void addView(final View child, final int index, final ViewGroup.LayoutParams params) {
         if (child instanceof TextView) {
-            ((TextView) child).setTextColor(
-                    mOverrideTextColor == BarBackgroundUpdater.NO_OVERRIDE ?
-                            0xffffffff : mOverrideTextColor);
+            // TODO themeability - use the resource instead of a hardcoded value
+            ((TextView) child).setTextColor(mOverrideTextColor == null ?
+                    0xffffffff : mOverrideTextColor);
         }
 
         super.addView(child, index, params);
     }
 
     @Override
-    public void onUpdateStatusBarColor(final int color) {
+    public void onUpdateStatusBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateStatusBarIconColor(final int iconColor) {
+    public void onUpdateStatusBarIconColor(final Integer iconColor) {
         mOverrideTextColor = iconColor;
         mHandler.post(new Runnable() {
 
@@ -79,7 +79,8 @@ public class TickerView extends TextSwitcher implements BarBackgroundUpdater.Upd
                 for (int i = 0; i < childCount; i++) {
                     final TextView tv = (TextView) getChildAt(i);
                     if (tv != null) {
-                        tv.setTextColor(mOverrideTextColor == BarBackgroundUpdater.NO_OVERRIDE ?
+                        // TODO themeability - use the resource instead of a hardcoded value
+                        tv.setTextColor(mOverrideTextColor == null ?
                                 0xffffffff : mOverrideTextColor);
                     }
                 }
@@ -89,12 +90,12 @@ public class TickerView extends TextSwitcher implements BarBackgroundUpdater.Upd
     }
 
     @Override
-    public void onUpdateNavigationBarColor(final int color) {
+    public void onUpdateNavigationBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarIconColor(final int iconColor) {
+    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
         // noop
     }
 }

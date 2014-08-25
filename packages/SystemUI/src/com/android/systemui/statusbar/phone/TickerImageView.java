@@ -29,7 +29,7 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
 public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdater.UpdateListener {
     private final Handler mHandler;
-    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
+    private Integer mOverrideIconColor = null;
 
     public TickerImageView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -43,7 +43,7 @@ public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdat
     @Override
     public void addView(final View child, final int index, final ViewGroup.LayoutParams params) {
         if (child instanceof ImageView) {
-            if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+            if (mOverrideIconColor == null) {
                 ((ImageView) child).setColorFilter(null);
             } else {
                 ((ImageView) child).setColorFilter(mOverrideIconColor,
@@ -55,12 +55,12 @@ public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdat
     }
 
     @Override
-    public void onUpdateStatusBarColor(final int color) {
+    public void onUpdateStatusBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateStatusBarIconColor(final int iconColor) {
+    public void onUpdateStatusBarIconColor(final Integer iconColor) {
         mOverrideIconColor = iconColor;
         mHandler.post(new Runnable() {
 
@@ -70,7 +70,7 @@ public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdat
                 for (int i = 0; i < childCount; i++) {
                     final ImageView iv = (ImageView) getChildAt(i);
                     if (iv != null) {
-                        if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+                        if (mOverrideIconColor == null) {
                             iv.setColorFilter(null);
                         } else {
                             iv.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
@@ -83,13 +83,12 @@ public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdat
     }
 
     @Override
-    public void onUpdateNavigationBarColor(final int color) {
+    public void onUpdateNavigationBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarIconColor(final int iconColor) {
+    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
         // noop
     }
 }
-

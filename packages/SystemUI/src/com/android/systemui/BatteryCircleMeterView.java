@@ -102,7 +102,7 @@ public class BatteryCircleMeterView extends ImageView
 
     private boolean mQS;
 
-    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
+    private Integer mOverrideIconColor = null;
 
     // runnable to invalidate view via mHandler.postDelayed() call
     private final Runnable mInvalidate = new Runnable() {
@@ -256,7 +256,7 @@ public class BatteryCircleMeterView extends ImageView
         if (level < 100 && mCirclePercent) {
             if (level <= 14) {
                 mPaintFont.setColor(mPaintRed.getColor());
-            } else if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE || mQS) {
+            } else if (mOverrideIconColor == null || mQS) {
                 if (mIsCharging) {
                     mPaintFont.setColor(mCircleTextChargingColor);
                 } else {
@@ -285,8 +285,7 @@ public class BatteryCircleMeterView extends ImageView
         mCircleTextChargingColor = chargingTextColor;
         mCircleColor = fgColor;
 
-        mPaintSystem.setColor(mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE || qs ?
-            mCircleColor : mOverrideIconColor);
+        mPaintSystem.setColor(mOverrideIconColor == null || qs ? mCircleColor : mOverrideIconColor);
         // could not find the darker definition anywhere in resources
         // do not want to use static 0x404040 color value. would break theming.
         mPaintGray.setColor(bgColor);
@@ -473,28 +472,28 @@ public class BatteryCircleMeterView extends ImageView
     }
 
     @Override
-    public void onUpdateStatusBarColor(final int color) {
+    public void onUpdateStatusBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateStatusBarIconColor(final int iconColor) {
+    public void onUpdateStatusBarIconColor(final Integer iconColor) {
         mOverrideIconColor = iconColor;
 
-        mPaintSystem.setColor(mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE || mQS ?
-            mCircleColor : mOverrideIconColor);
+        mPaintSystem.setColor(mOverrideIconColor == null || mQS ?
+                mCircleColor : mOverrideIconColor);
 
         mHandler.removeCallbacks(mInvalidate);
         mHandler.postDelayed(mInvalidate, 50);
     }
 
     @Override
-    public void onUpdateNavigationBarColor(final int color) {
+    public void onUpdateNavigationBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarIconColor(final int iconColor) {
+    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
         // noop
     }
 

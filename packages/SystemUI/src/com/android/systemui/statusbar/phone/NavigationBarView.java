@@ -770,22 +770,22 @@ public class NavigationBarView extends LinearLayout
     }
 
     @Override
-    public void onUpdateStatusBarColor(final int color) {
+    public void onUpdateStatusBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateStatusBarIconColor(final int iconColor) {
+    public void onUpdateStatusBarIconColor(final Integer iconColor) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarColor(final int color) {
+    public void onUpdateNavigationBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarIconColor(final int iconColor) {
+    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
         final ImageView[] buttons = new ImageView[] {
             (ImageView) getRecentsButton(),
             (ImageView) getMenuButton(),
@@ -801,7 +801,7 @@ public class NavigationBarView extends LinearLayout
 
                     @Override
                     public void run() {
-                        if (iconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+                        if (iconColor == null) {
                             button.setColorFilter(null);
                         } else {
                             button.setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);

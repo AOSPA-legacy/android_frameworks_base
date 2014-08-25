@@ -56,7 +56,7 @@ public class StatusBarIconView extends AnimatedImageView
     private Notification mNotification;
 
     private final Handler mHandler;
-    private int mOverrideIconColor = BarBackgroundUpdater.NO_OVERRIDE;
+    private Integer mOverrideIconColor = null;
 
     public StatusBarIconView(Context context, String slot, Notification notification) {
         super(context);
@@ -173,7 +173,7 @@ public class StatusBarIconView extends AnimatedImageView
         }
         setImageDrawable(drawable);
 
-        if (mOverrideIconColor == BarBackgroundUpdater.NO_OVERRIDE) {
+        if (mOverrideIconColor == null) {
             setColorFilter(null);
         } else {
             setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
@@ -327,12 +327,12 @@ public class StatusBarIconView extends AnimatedImageView
     }
 
     @Override
-    public void onUpdateStatusBarColor(final int color) {
+    public void onUpdateStatusBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateStatusBarIconColor(final int iconColor) {
+    public void onUpdateStatusBarIconColor(final Integer iconColor) {
         mOverrideIconColor = iconColor;
         mHandler.post(new Runnable() {
 
@@ -345,12 +345,12 @@ public class StatusBarIconView extends AnimatedImageView
     }
 
     @Override
-    public void onUpdateNavigationBarColor(final int color) {
+    public void onUpdateNavigationBarColor(final Integer color) {
         // noop
     }
 
     @Override
-    public void onUpdateNavigationBarIconColor(final int iconColor) {
+    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
         // noop
     }
 
