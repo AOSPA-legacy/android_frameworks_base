@@ -204,16 +204,16 @@ public class BarBackgroundUpdater {
                     final int nbColorOne = getPixel(screenshot, -1, -1);
                     final int nbColorTwo = getPixel(screenshot, -1, -5);
 
-                    final int topLeftColor = getPixel(screenshot, 1, yBelowStatusBar);
-                    final int topRightColor = getPixel(screenshot, xForStatusBar,
+                    final int topColorLeft = getPixel(screenshot, 1, yBelowStatusBar);
+                    final int topColorRight = getPixel(screenshot, xForStatusBar,
                         yBelowStatusBar);
-                    final int topCenterColor = getPixel(screenshot, (int) (xForStatusBar / 2),
+                    final int topColorCenter = getPixel(screenshot, (int) (xForStatusBar / 2),
                         yBelowStatusBar);
 
-                    final int botLeftColor = getPixel(screenshot, 1, yAboveNavigationBar);
-                    final int botRightColor = getPixel(screenshot, xForStatusBar,
+                    final int botColorLeft = getPixel(screenshot, 1, yAboveNavigationBar);
+                    final int botColorRight = getPixel(screenshot, xForStatusBar,
                         yAboveNavigationBar);
-                    final int botCenterColor = getPixel(screenshot, (int) (xForStatusBar / 2),
+                    final int botColorCenter = getPixel(screenshot, (int) (xForStatusBar / 2),
                         yAboveNavigationBar);
 
                     screenshot.recycle(); // no more colors are needed - clean up
@@ -223,16 +223,17 @@ public class BarBackgroundUpdater {
 
                     // TODO implement status bar color darkening based on user configuration
                     if (statusEnabled) {
-                        if (topLeftColor == topRightColor) {
-                            // status bar appears to be uniform
-                            // TODO investigate why full white fails to apply
-                            statusBarOverrideColor = topLeftColor == 0xFFFFFFFF ?
-                                0xFFFEFEFE : topLeftColor;
+                        if (topColorLeft == topColorRight) {
+                            // status bar appears to be completely uniform
+                            statusBarOverrideColor = topColorLeft;
+                        } else if (topColorLeft == topColorCenter ||
+                                topColorRight == topColorCenter) {
+                            // a side of the status bar appears to be uniform
+                            statusBarOverrideColor = topColorCenter;
                         } else {
-                            // status bar does not appear to be uniform
-                            // TODO investigate why full white fails to apply
-                            int override = sampleColors(topLeftColor, topRightColor, topCenterColor);
-                            statusBarOverrideColor = override == 0xFFFFFFFF ? 0xFFFEFEFE : override;
+                            // status bar does not appear to be uniform at all
+                            statusBarOverrideColor = sampleColors(topColorLeft, topColorRight,
+                                topColorCenter);
                         }
 
                         final float statusBarBrightness =
@@ -247,17 +248,17 @@ public class BarBackgroundUpdater {
                     }
 
                     if (navigationEnabled) {
-                        if (botLeftColor == botRightColor) {
-                            // navigation bar appears to be uniform
-                            // TODO investigate why full white fails to apply
-                            navigationBarOverrideColor = botLeftColor == 0xFFFFFFFF ?
-                                0xFFFEFEFE : botLeftColor;
+                        if (botColorLeft == botColorRight) {
+                            // navigation bar appears to be completely uniform
+                            navigationBarOverrideColor = botColorLeft;
+                        } else if (botColorLeft == botColorCenter ||
+                                botColorRight == botColorCenter) {
+                            // a side of the navigation bar appears to be uniform
+                            navigationBarOverrideColor = botColorCenter;
                         } else {
-                            // navigation bar does not appear to be uniform
-                            // TODO investigate why full white fails to apply
-                            int override = sampleColors(botLeftColor, botRightColor, botCenterColor);
-                            navigationBarOverrideColor = override == 0xFFFFFFFF ?
-                                0xFFFEFEFE : override;
+                            // navigation bar does not appear to be uniform at all
+                            navigationBarOverrideColor = sampleColors(botColorLeft, botColorRight,
+                                botColorCenter);
                         }
 
                         final float navigationBarBrightness =
@@ -296,10 +297,11 @@ public class BarBackgroundUpdater {
                 boolean anythingUpdated = false;
 
                 // update the status bar itself, if needed
-                if (mStatusBarOverrideColor != statusBarOverrideColor) {
+                final int sbOverrideColor = ensureNotPureWhite(statusBarOverrideColor);
+                if (mStatusBarOverrideColor != sbOverrideColor) {
                     anythingUpdated = true;
                     synchronized(BarBackgroundUpdater.class) {
-                        mStatusBarOverrideColor = statusBarOverrideColor;
+                        mStatusBarOverrideColor = sbOverrideColor;
 
                         if (DEBUG) {
                             Log.d(LOG_TAG, "statusBarOverrideColor=" +
@@ -338,10 +340,11 @@ public class BarBackgroundUpdater {
                 }
 
                 // update the navigation bar itself, if needed
-                if (mNavigationBarOverrideColor != navigationBarOverrideColor) {
+                final int nbOverrideColor = ensureNotPureWhite(navigationBarOverrideColor);
+                if (mNavigationBarOverrideColor != nbOverrideColor) {
                     anythingUpdated = true;
                     synchronized(BarBackgroundUpdater.class) {
-                        mNavigationBarOverrideColor = navigationBarOverrideColor;
+                        mNavigationBarOverrideColor = nbOverrideColor;
 
                         if (DEBUG) {
                             Log.d(LOG_TAG, "navigationBarOverrideColor=0x" +
@@ -452,6 +455,11 @@ public class BarBackgroundUpdater {
                 mListeners.add(new WeakReference<UpdateListener>(l));
             }
         }
+    }
+
+    private static int ensureNotPureWhite(final int original) {
+        // TODO investigate why full white fails to apply
+        return original == 0xFFFFFFFF ? 0xFFFEFEFE : original;
     }
 
     private static int sampleColors(final int... originals) {
