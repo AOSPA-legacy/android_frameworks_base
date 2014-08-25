@@ -232,7 +232,7 @@ public class BarBackgroundUpdater {
                             tmp = sampleColors(topColorLeft, topColorRight, topColorCenter);
                         }
 
-                        statusBarOverrideColor = mStatusFilterEnabled ? filter(tmp, -30) : tmp;
+                        statusBarOverrideColor = mStatusFilterEnabled ? filter(tmp, -10) : tmp;
 
                         final float statusBarBrightness =
                             (0.299f * Color.red(statusBarOverrideColor) +
