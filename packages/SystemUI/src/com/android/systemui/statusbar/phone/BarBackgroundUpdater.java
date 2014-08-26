@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Valter Strods for ParanoidAndroid Project
+ * Copyright (C) 2014 ParanoidAndroid Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -232,6 +232,7 @@ public class BarBackgroundUpdater {
 
                         statusBarOverrideColor = mStatusFilterEnabled ? filter(tmp, -10) : tmp;
 
+                        // magic from the suggestion at http://www.w3.org/TR/AERT#color-contrast
                         final float statusBarBrightness =
                             (0.299f * Color.red(statusBarOverrideColor) +
                             0.587f * Color.green(statusBarOverrideColor) +
@@ -257,6 +258,7 @@ public class BarBackgroundUpdater {
                                 botColorCenter);
                         }
 
+                        // magic from the suggestion at http://www.w3.org/TR/AERT#color-contrast
                         final float navigationBarBrightness =
                             (0.299f * Color.red(navigationBarOverrideColor) +
                             0.587f * Color.green(navigationBarOverrideColor) +
@@ -485,9 +487,9 @@ public class BarBackgroundUpdater {
             return null;
         }
 
-        final int red = (int) (Color.red(original) + diff); // 0.299f * diff
-        final int green = (int) (Color.green(original) + diff); // 0.587f * diff
-        final int blue = (int) (Color.blue(original) + diff); // 0.114f * diff
+        final int red = (int) (Color.red(original) + diff);
+        final int green = (int) (Color.green(original) + diff);
+        final int blue = (int) (Color.blue(original) + diff);
 
         return Color.argb(
                 Color.alpha(original),
@@ -532,17 +534,17 @@ public class BarBackgroundUpdater {
     private static int getPixel(final Bitmap bitmap, final int x, final int y) {
         if (bitmap == null) {
             // just silently ignore this
-            return 0xFF000000;
+            return Color.BLACK;
         }
 
         if (x == 0) {
             Log.w(LOG_TAG, "getPixel for x=0 is not allowed; returning a black pixel");
-            return 0xFF000000;
+            return Color.BLACK;
         }
 
         if (y == 0) {
             Log.w(LOG_TAG, "getPixel for y=0 is not allowed; returning a black pixel");
-            return 0xFF000000;
+            return Color.BLACK;
         }
 
         return bitmap.getPixel(x > 0 ? x : bitmap.getWidth() + x,
