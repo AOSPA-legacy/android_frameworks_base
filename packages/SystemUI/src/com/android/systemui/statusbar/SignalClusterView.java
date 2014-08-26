@@ -32,9 +32,8 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 import com.android.systemui.statusbar.policy.NetworkController;
 
 // Intimately tied to the design of res/layout/signal_cluster_view.xml
-public class SignalClusterView
-        extends LinearLayout
-        implements NetworkController.SignalCluster, BarBackgroundUpdater.UpdateListener {
+public class SignalClusterView extends LinearLayout
+        implements NetworkController.SignalCluster {
 
     static final boolean DEBUG = false;
     static final String TAG = "SignalClusterView";
@@ -54,7 +53,7 @@ public class SignalClusterView
     View mSpacer;
 
     private final Handler mHandler;
-    private Integer mOverrideIconColor = null;
+    private int mOverrideIconColor = 0;
 
     public SignalClusterView(Context context) {
         this(context, null);
@@ -67,7 +66,35 @@ public class SignalClusterView
     public SignalClusterView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mHandler = new Handler();
-        BarBackgroundUpdater.addListener(this);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public void onResetStatusBarIconColor() {
+                mOverrideIconColor = 0;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        apply();
+                    }
+
+                });
+            }
+
+            @Override
+            public void onUpdateStatusBarIconColor(final int iconColor) {
+                mOverrideIconColor = iconColor;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        apply();
+                    }
+
+                });
+            }
+
+        });
     }
 
     public void setNetworkController(NetworkController nc) {
@@ -173,7 +200,7 @@ public class SignalClusterView
         if (mWifiVisible) {
             mWifi.setImageResource(mWifiStrengthId);
 
-            if (mOverrideIconColor == null) {
+            if (mOverrideIconColor == 0) {
                 mWifi.setColorFilter(null);
             } else {
                 mWifi.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
@@ -194,7 +221,7 @@ public class SignalClusterView
             mMobile.setImageResource(mMobileStrengthId);
             mMobileType.setImageResource(mMobileTypeId);
 
-            if (mOverrideIconColor == null) {
+            if (mOverrideIconColor == 0) {
                 mMobile.setColorFilter(null);
                 mMobileType.setColorFilter(null);
             } else {
@@ -211,7 +238,7 @@ public class SignalClusterView
         if (mIsAirplaneMode) {
             mAirplane.setImageResource(mAirplaneIconId);
 
-            if (mOverrideIconColor == null) {
+            if (mOverrideIconColor == 0) {
                 mAirplane.setColorFilter(null);
             } else {
                 mAirplane.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
@@ -237,33 +264,4 @@ public class SignalClusterView
                 !mWifiVisible ? View.VISIBLE : View.GONE);
     }
 
-    @Override
-    public void onUpdateStatusBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateStatusBarIconColor(final Integer iconColor) {
-        mOverrideIconColor = iconColor;
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                apply();
-            }
-
-        });
-    }
-
-    @Override
-    public void onUpdateNavigationBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
-        // noop
-    }
-
 }
-

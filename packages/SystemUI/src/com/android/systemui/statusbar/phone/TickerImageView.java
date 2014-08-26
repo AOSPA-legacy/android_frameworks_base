@@ -27,14 +27,54 @@ import android.widget.ImageView;
 
 import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
-public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdater.UpdateListener {
+public class TickerImageView extends ImageSwitcher {
     private final Handler mHandler;
-    private Integer mOverrideIconColor = null;
+    private int mOverrideIconColor = 0;
 
     public TickerImageView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         mHandler = new Handler();
-        BarBackgroundUpdater.addListener(this);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public void onResetStatusBarIconColor() {
+                mOverrideIconColor = 0;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        final int childCount = getChildCount();
+                        for (int i = 0; i < childCount; i++) {
+                            final ImageView iv = (ImageView) getChildAt(i);
+                            if (iv != null) {
+                                iv.setColorFilter(null);
+                            }
+                        }
+                    }
+
+                });
+            }
+
+            @Override
+            public void onUpdateStatusBarIconColor(final int iconColor) {
+                mOverrideIconColor = iconColor;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        final int childCount = getChildCount();
+                        for (int i = 0; i < childCount; i++) {
+                            final ImageView iv = (ImageView) getChildAt(i);
+                            if (iv != null) {
+                                iv.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+                            }
+                        }
+                    }
+
+                });
+            }
+
+        });
     }
 
     /**
@@ -43,7 +83,7 @@ public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdat
     @Override
     public void addView(final View child, final int index, final ViewGroup.LayoutParams params) {
         if (child instanceof ImageView) {
-            if (mOverrideIconColor == null) {
+            if (mOverrideIconColor == 0) {
                 ((ImageView) child).setColorFilter(null);
             } else {
                 ((ImageView) child).setColorFilter(mOverrideIconColor,
@@ -54,41 +94,4 @@ public class TickerImageView extends ImageSwitcher implements BarBackgroundUpdat
         super.addView(child, index, params);
     }
 
-    @Override
-    public void onUpdateStatusBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateStatusBarIconColor(final Integer iconColor) {
-        mOverrideIconColor = iconColor;
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                final int childCount = getChildCount();
-                for (int i = 0; i < childCount; i++) {
-                    final ImageView iv = (ImageView) getChildAt(i);
-                    if (iv != null) {
-                        if (mOverrideIconColor == null) {
-                            iv.setColorFilter(null);
-                        } else {
-                            iv.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
-                        }
-                    }
-                }
-            }
-
-        });
-    }
-
-    @Override
-    public void onUpdateNavigationBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
-        // noop
-    }
 }

@@ -26,17 +26,57 @@ import android.widget.TextView;
 
 import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
-public class TickerView extends TextSwitcher implements BarBackgroundUpdater.UpdateListener
-{
+public class TickerView extends TextSwitcher {
     Ticker mTicker;
 
     private final Handler mHandler;
-    private Integer mOverrideTextColor = null;
+    private int mOverrideTextColor = 0;
 
     public TickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mHandler = new Handler();
-        BarBackgroundUpdater.addListener(this);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public void onResetStatusBarIconColor() {
+                mOverrideTextColor = 0;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        final int childCount = getChildCount();
+                        for (int i = 0; i < childCount; i++) {
+                            final TextView tv = (TextView) getChildAt(i);
+                            if (tv != null) {
+                                // TODO themeability - use the resource instead of a hardcoded value
+                                tv.setTextColor(0xffffffff);
+                            }
+                        }
+                    }
+
+                });
+            }
+
+            @Override
+            public void onUpdateStatusBarIconColor(final int iconColor) {
+                mOverrideTextColor = iconColor;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        final int childCount = getChildCount();
+                        for (int i = 0; i < childCount; i++) {
+                            final TextView tv = (TextView) getChildAt(i);
+                            if (tv != null) {
+                                tv.setTextColor(mOverrideTextColor);
+                            }
+                        }
+                    }
+
+                });
+            }
+
+        });
     }
 
     @Override
@@ -56,47 +96,10 @@ public class TickerView extends TextSwitcher implements BarBackgroundUpdater.Upd
     public void addView(final View child, final int index, final ViewGroup.LayoutParams params) {
         if (child instanceof TextView) {
             // TODO themeability - use the resource instead of a hardcoded value
-            ((TextView) child).setTextColor(mOverrideTextColor == null ?
+            ((TextView) child).setTextColor(mOverrideTextColor == 0 ?
                     0xffffffff : mOverrideTextColor);
         }
 
         super.addView(child, index, params);
     }
-
-    @Override
-    public void onUpdateStatusBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateStatusBarIconColor(final Integer iconColor) {
-        mOverrideTextColor = iconColor;
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                final int childCount = getChildCount();
-                for (int i = 0; i < childCount; i++) {
-                    final TextView tv = (TextView) getChildAt(i);
-                    if (tv != null) {
-                        // TODO themeability - use the resource instead of a hardcoded value
-                        tv.setTextColor(mOverrideTextColor == null ?
-                                0xffffffff : mOverrideTextColor);
-                    }
-                }
-            }
-
-        });
-    }
-
-    @Override
-    public void onUpdateNavigationBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
-        // noop
-    }
 }
-

@@ -116,12 +116,11 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
         }
     }
 
-    protected static class PhoneStatusBarBackgroundDrawable extends BarBackgroundDrawable
-            implements BarBackgroundUpdater.UpdateListener {
+    protected static class PhoneStatusBarBackgroundDrawable extends BarBackgroundDrawable {
         private final Handler mHandler;
         private final Context mContext;
 
-        private Integer mOverrideColor = null;
+        private int mOverrideColor = 0;
         private int mGradientAlpha = 0;
 
         public PhoneStatusBarBackgroundDrawable(final Context context) {
@@ -140,46 +139,46 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
                     Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE, 0) == 1 ?
                             0xff : 0;
 
-            BarBackgroundUpdater.addListener(this);
+            BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+                @Override
+                public void onResetStatusBarColor() {
+                    mOverrideColor = 0;
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            forceStartAnimation();
+                        }
+
+                    });
+                }
+
+                @Override
+                public void onUpdateStatusBarColor(final int color) {
+                    mOverrideColor = color;
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            forceStartAnimation();
+                        }
+
+                    });
+                }
+
+            });
             BarBackgroundUpdater.init(context);
         }
 
         @Override
-        public void onUpdateStatusBarColor(final Integer color) {
-            mOverrideColor = color;
-            mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    forceStartAnimation();
-                }
-
-            });
-        }
-
-        @Override
-        public void onUpdateStatusBarIconColor(final Integer iconColor) {
-            // noop
-        }
-
-        @Override
-        public void onUpdateNavigationBarColor(final Integer color) {
-            // noop
-        }
-
-        @Override
-        public void onUpdateNavigationBarIconColor(final Integer iconColor) {
-            // noop
-        }
-
-        @Override
         protected int getColorOpaque() {
-            return mOverrideColor == null ? super.getColorOpaque() : mOverrideColor;
+            return mOverrideColor == 0 ? super.getColorOpaque() : mOverrideColor;
         }
 
         @Override
         protected int getColorSemiTransparent() {
-            return mOverrideColor == null ? super.getColorSemiTransparent() :
+            return mOverrideColor == 0 ? super.getColorSemiTransparent() :
                     (mOverrideColor & 0x00ffffff | 0x7f000000);
         }
 

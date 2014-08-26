@@ -25,10 +25,8 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 /**
  * Digital clock exclusively for the phone status bar.
  */
-public class PhoneStatusBarClock extends Clock implements BarBackgroundUpdater.UpdateListener {
+public class PhoneStatusBarClock extends Clock {
     private final Handler mHandler;
-
-    private Integer mOverrideTextColor = null;
 
     public PhoneStatusBarClock(final Context context) {
         this(context, null);
@@ -43,36 +41,34 @@ public class PhoneStatusBarClock extends Clock implements BarBackgroundUpdater.U
         super(context, attrs, defStyle);
 
         mHandler = new Handler();
-        BarBackgroundUpdater.addListener(this);
-    }
-
-    @Override
-    public void onUpdateStatusBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateStatusBarIconColor(final Integer iconColor) {
-        mOverrideTextColor = iconColor;
-        mHandler.post(new Runnable() {
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void run() {
-                // TODO themeability - use the resource instead of a hardcoded value
-                setTextColor(mOverrideTextColor == null ? 0xffffffff : mOverrideTextColor);
+            public void onResetStatusBarIconColor() {
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // TODO themeability - use the resource instead of a hardcoded value
+                        setTextColor(0xffffffff);
+                    }
+
+                });
+            }
+
+            @Override
+            public void onUpdateStatusBarIconColor(final int iconColor) {
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        setTextColor(iconColor);
+                    }
+
+                });
             }
 
         });
-    }
-
-    @Override
-    public void onUpdateNavigationBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
-        // noop
     }
 
 }

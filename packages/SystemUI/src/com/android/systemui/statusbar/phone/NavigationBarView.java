@@ -70,8 +70,7 @@ import com.android.systemui.statusbar.policy.KeyButtonView;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
-public class NavigationBarView extends LinearLayout
-        implements NavigationCallback, BarBackgroundUpdater.UpdateListener {
+public class NavigationBarView extends LinearLayout implements NavigationCallback {
     final static boolean DEBUG = false;
     final static String TAG = "PhoneStatusBar/NavigationBarView";
 
@@ -232,7 +231,59 @@ public class NavigationBarView extends LinearLayout
         mCameraDisabledByDpm = isCameraDisabledByDpm();
         watchForDevicePolicyChanges();
 
-        BarBackgroundUpdater.addListener(this);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public void onResetNavigationBarIconColor() {
+                final ImageView[] buttons = new ImageView[] {
+                    (ImageView) getRecentsButton(),
+                    (ImageView) getMenuButton(),
+                    (ImageView) getBackButton(),
+                    (ImageView) getHomeButton(),
+                    (ImageView) getSearchLight(),
+                    (ImageView) getCameraButton()
+                };
+
+                for (final ImageView button : buttons) {
+                    if (button != null) {
+                        mHandler.post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                button.setColorFilter(null);
+                            }
+
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onUpdateNavigationBarIconColor(final int iconColor) {
+                final ImageView[] buttons = new ImageView[] {
+                    (ImageView) getRecentsButton(),
+                    (ImageView) getMenuButton(),
+                    (ImageView) getBackButton(),
+                    (ImageView) getHomeButton(),
+                    (ImageView) getSearchLight(),
+                    (ImageView) getCameraButton()
+                };
+
+                for (final ImageView button : buttons) {
+                    if (button != null) {
+                        mHandler.post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                button.setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+                            }
+
+                        });
+                    }
+                }
+            }
+
+        });
     }
 
     private void watchForDevicePolicyChanges() {
@@ -769,47 +820,4 @@ public class NavigationBarView extends LinearLayout
         return null;
     }
 
-    @Override
-    public void onUpdateStatusBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateStatusBarIconColor(final Integer iconColor) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateNavigationBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
-        final ImageView[] buttons = new ImageView[] {
-            (ImageView) getRecentsButton(),
-            (ImageView) getMenuButton(),
-            (ImageView) getBackButton(),
-            (ImageView) getHomeButton(),
-            (ImageView) getSearchLight(),
-            (ImageView) getCameraButton()
-        };
-
-        for (final ImageView button : buttons) {
-            if (button != null) {
-                mHandler.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if (iconColor == null) {
-                            button.setColorFilter(null);
-                        } else {
-                            button.setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
-                        }
-                    }
-
-                });
-            }
-        }
-    }
 }

@@ -42,8 +42,7 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
 import java.text.NumberFormat;
 
-public class StatusBarIconView extends AnimatedImageView
-        implements BarBackgroundUpdater.UpdateListener {
+public class StatusBarIconView extends AnimatedImageView {
     private static final String TAG = "StatusBarIconView";
 
     private StatusBarIcon mIcon;
@@ -56,7 +55,7 @@ public class StatusBarIconView extends AnimatedImageView
     private Notification mNotification;
 
     private final Handler mHandler;
-    private Integer mOverrideIconColor = null;
+    private int mOverrideIconColor = 0;
 
     public StatusBarIconView(Context context, String slot, Notification notification) {
         super(context);
@@ -82,7 +81,35 @@ public class StatusBarIconView extends AnimatedImageView
         setScaleType(ImageView.ScaleType.CENTER);
 
         mHandler = new Handler();
-        BarBackgroundUpdater.addListener(this);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public void onResetStatusBarIconColor() {
+                mOverrideIconColor = 0;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        updateDrawable();
+                    }
+
+                });
+            }
+
+            @Override
+            public void onUpdateStatusBarIconColor(final int iconColor) {
+                mOverrideIconColor = iconColor;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        updateDrawable();
+                    }
+
+                });
+            }
+
+        });
     }
 
     public StatusBarIconView(Context context, AttributeSet attrs) {
@@ -95,7 +122,35 @@ public class StatusBarIconView extends AnimatedImageView
         setScaleY(scale);
 
         mHandler = new Handler();
-        BarBackgroundUpdater.addListener(this);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public void onResetStatusBarIconColor() {
+                mOverrideIconColor = 0;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        updateDrawable();
+                    }
+
+                });
+            }
+
+            @Override
+            public void onUpdateStatusBarIconColor(final int iconColor) {
+                mOverrideIconColor = iconColor;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        updateDrawable();
+                    }
+
+                });
+            }
+
+        });
     }
 
     private static boolean streq(String a, String b) {
@@ -173,7 +228,7 @@ public class StatusBarIconView extends AnimatedImageView
         }
         setImageDrawable(drawable);
 
-        if (mOverrideIconColor == null) {
+        if (mOverrideIconColor == 0) {
             setColorFilter(null);
         } else {
             setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
@@ -324,34 +379,6 @@ public class StatusBarIconView extends AnimatedImageView
     public String toString() {
         return "StatusBarIconView(slot=" + mSlot + " icon=" + mIcon
             + " notification=" + mNotification + ")";
-    }
-
-    @Override
-    public void onUpdateStatusBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateStatusBarIconColor(final Integer iconColor) {
-        mOverrideIconColor = iconColor;
-        mHandler.post(new Runnable() {
-
-            @Override
-            public void run() {
-                updateDrawable();
-            }
-
-        });
-    }
-
-    @Override
-    public void onUpdateNavigationBarColor(final Integer color) {
-        // noop
-    }
-
-    @Override
-    public void onUpdateNavigationBarIconColor(final Integer iconColor) {
-        // noop
     }
 
 }
