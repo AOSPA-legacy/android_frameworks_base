@@ -43,8 +43,7 @@ public class BarBackgroundUpdater {
     private final static boolean DEBUG = false;
     private final static String LOG_TAG = BarBackgroundUpdater.class.getSimpleName();
 
-    private final static int DELAY_IN_MILLIS = 1000 / 10;
-    private static boolean PAUSED = false;
+    private static boolean PAUSED = true;
 
     private final static BroadcastReceiver RECEIVER = new BroadcastReceiver() {
 
@@ -66,35 +65,13 @@ public class BarBackgroundUpdater {
         @Override
         public void run() {
             while (true) {
-                while (PAUSED) {
-                    // we have been told to do nothing; stall for a bit
+                final long now = System.currentTimeMillis();
+
+                if (PAUSED) {
+                    // we have been told to do nothing; retry in a bit
 
                     try {
                         Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                }
-
-                if (DELAY_IN_MILLIS <= 0) {
-                    // we have been told to delay for a weird timespan; retry in a bit
-
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-
-                    continue;
-                }
-
-                final Context context = mContext;
-
-                if (context == null) {
-                    // we haven't been initiated yet; retry in a bit
-
-                    try {
-                        Thread.sleep(DELAY_IN_MILLIS);
                     } catch (InterruptedException e) {
                         return;
                     }
@@ -103,11 +80,22 @@ public class BarBackgroundUpdater {
                 }
 
                 if (mStatusEnabled || mNavigationEnabled) {
+                    final Context context = mContext;
+
+                    if (context == null) {
+                        // we haven't been initiated yet; retry in a bit
+
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+
+                        continue;
+                    }
+
                     final WindowManager wm =
                         (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-
-                    final Point p = new Point();
-                    wm.getDefaultDisplay().getSize(p);
 
                     final int rotation = wm.getDefaultDisplay().getRotation();
                     final boolean isLandscape = rotation == Surface.ROTATION_90 ||
@@ -125,9 +113,9 @@ public class BarBackgroundUpdater {
                         Settings.System.putInt(context.getContentResolver(),
                             Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0);
 
-                        // just drop this check and retry in a bit as configuration has changed
+                        // configuration has changed - abort and retry in a bit
                         try {
-                            Thread.sleep(DELAY_IN_MILLIS);
+                            Thread.sleep(2000);
                         } catch (InterruptedException e) {
                             return;
                         }
@@ -135,95 +123,14 @@ public class BarBackgroundUpdater {
                         continue;
                     }
 
-                    final int xForStatusBar = -(2 + (isLandscape ? navigationBarHeight : 0));
-                    final int yBelowStatusBar = statusBarHeight + 2;
-                    final int yAboveNavigationBar = -(navigationBarHeight + 2);
-
-                    // we have to manually handle landscape since it is not handled by the API
-                    final int width = isLandscape ? p.y : p.x;
-                    final int height = isLandscape ? p.x : p.y;
-
-                    final Matrix matrix = new Matrix();
-                    switch (rotation) {
-                    case Surface.ROTATION_0:
-                        matrix.reset();
-                        break;
-                    case Surface.ROTATION_90:
-                        matrix.setRotate(270, 0, 0);
-                        matrix.postTranslate(0, width);
-                        break;
-                    case Surface.ROTATION_180:
-                        matrix.setRotate(180, 0, 0);
-                        matrix.postTranslate(width, height);
-                        break;
-                    case Surface.ROTATION_270:
-                        matrix.setRotate(90, 0, 0);
-                        matrix.postTranslate(height, 0);
-                        break;
-                    }
-
-                    final Bitmap rawScreen = SurfaceControl.screenshot(width, height);
-                    if (rawScreen == null) {
-                        // something went wrong during the screenshot grabbing; retry in a bit
-
-                        try {
-                            Thread.sleep(DELAY_IN_MILLIS);
-                        } catch (InterruptedException e) {
-                            return;
-                        }
-
-                        continue;
-                    }
-
-                    final Bitmap screenshot = Bitmap.createBitmap(width, height,
-                        rawScreen.getConfig());
-
-                    final Canvas canvas = new Canvas(screenshot);
-                    canvas.drawColor(0xFF000000);
-                    canvas.drawBitmap(rawScreen, matrix, null);
-                    canvas.setBitmap(null);
-                    rawScreen.recycle();
-
-                    final int sbColorOne = getPixel(screenshot, 1, 1);
-                    final int sbColorTwo = getPixel(screenshot, 1, 5);
-
-                    final int nbColorOne = getPixel(screenshot, -1, -1);
-                    final int nbColorTwo = getPixel(screenshot, -1, -5);
-
-                    final int topColorLeft = getPixel(screenshot, 1, yBelowStatusBar);
-                    final int topColorRight = getPixel(screenshot, xForStatusBar,
-                        yBelowStatusBar);
-                    final int topColorCenter = getPixel(screenshot, (int) (xForStatusBar / 2),
-                        yBelowStatusBar);
-
-                    final int botColorLeft = getPixel(screenshot, 1, yAboveNavigationBar);
-                    final int botColorRight = getPixel(screenshot, xForStatusBar,
-                        yAboveNavigationBar);
-                    final int botColorCenter = getPixel(screenshot, (int) (xForStatusBar / 2),
-                        yAboveNavigationBar);
-
-                    screenshot.recycle(); // no more colors are needed - clean up
-
-                    final boolean isStatusBarConsistent = sbColorOne == sbColorTwo;
-                    final boolean isNavigationBarConsistent = nbColorOne == nbColorTwo;
+                    final int[] colors = BarBackgroundUpdaterNative.getColors(statusBarHeight,
+                            navigationBarHeight, 2 + (isLandscape ? navigationBarHeight : 0));
 
                     if (mStatusEnabled) {
-                        final int tmp;
-
-                        if (topColorLeft == topColorRight) {
-                            // status bar appears to be completely uniform
-                            tmp = topColorLeft;
-                        } else if (topColorLeft == topColorCenter ||
-                                topColorRight == topColorCenter) {
-                            // a side of the status bar appears to be uniform
-                            tmp = topColorCenter;
-                        } else {
-                            // status bar does not appear to be uniform at all
-                            tmp = sampleColors(topColorLeft, topColorRight, topColorCenter);
-                        }
-
                         final int statusBarOverrideColor = mStatusFilterEnabled ?
-                                filter(tmp, -10) : tmp;
+                                filter(colors[0], -10) : colors[0];
+                        final boolean isStatusBarConsistent = colors[1] == 1;
+
                         if (mStatusBarOverrideColor != statusBarOverrideColor) {
                             updateStatusBarColor(statusBarOverrideColor);
 
@@ -242,19 +149,8 @@ public class BarBackgroundUpdater {
                     }
 
                     if (mNavigationEnabled) {
-                        final int navigationBarOverrideColor;
-                        if (botColorLeft == botColorRight) {
-                            // navigation bar appears to be completely uniform
-                            navigationBarOverrideColor = botColorLeft;
-                        } else if (botColorLeft == botColorCenter ||
-                                botColorRight == botColorCenter) {
-                            // a side of the navigation bar appears to be uniform
-                            navigationBarOverrideColor = botColorCenter;
-                        } else {
-                            // navigation bar does not appear to be uniform at all
-                            navigationBarOverrideColor = sampleColors(botColorLeft, botColorRight,
-                                botColorCenter);
-                        }
+                        final int navigationBarOverrideColor = colors[2];
+                        final boolean isNavigationBarConsistent = colors[3] == 1;
 
                         if (mNavigationBarOverrideColor != navigationBarOverrideColor) {
                             updateNavigationBarColor(navigationBarOverrideColor);
@@ -295,8 +191,16 @@ public class BarBackgroundUpdater {
                     }
                 }
 
+                final long delta = System.currentTimeMillis() - now;
+                final long delay = Math.max(1000 / 10, delta * 2); // max 10 fps
+
+                if (DEBUG) {
+                    Log.d(LOG_TAG, "delta=" + Long.toString(delta) + "ms " +
+                            "delay=" + Long.toString(delay) + "ms");
+                }
+
                 try {
-                    Thread.sleep(DELAY_IN_MILLIS);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -361,6 +265,8 @@ public class BarBackgroundUpdater {
                 Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0) == 1;
         mStatusFilterEnabled = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0) == 1;
+
+        PAUSED = false;
     }
 
     public synchronized static void addListener(final UpdateListener... listeners) {
@@ -430,24 +336,6 @@ public class BarBackgroundUpdater {
                                 255 :
                         0
         );
-    }
-
-    private static int sampleColors(final int... originals) {
-        final int n = originals.length;
-
-        float alpha = 0;
-        float red = 0;
-        float green = 0;
-        float blue = 0;
-
-        for (final int original : originals) {
-            alpha += Color.alpha(original) / n;
-            red += Color.red(original) / n;
-            green += Color.green(original) / n;
-            blue += Color.blue(original) / n;
-        }
-
-        return Color.argb((int) alpha, (int) red, (int) green, (int) blue);
     }
 
     private static int getPixel(final Bitmap bitmap, final int x, final int y) {
