@@ -64,7 +64,16 @@ uint32_t getPixel(int32_t dx, int32_t dy)
 
     if (shotFormat == PIXEL_FORMAT_RGBA_8888)
     {
-        return * (uint32_t *) (((char *) shotBase) + y * shotStride * 4 + x * 4);
+        // this is stored as BGRA behind the scenes, it seems
+        // wonders of interacting with the lower level
+
+        uint32_t color = * (uint32_t *) (((char *) shotBase) + y * shotStride * 4 + x * 4);
+
+        char blue = (color & 0x00FF0000) >> 16;
+        char green = (color & 0x0000FF00) >> 8;
+        char red = color & 0x000000FF;
+
+        return (255 << 24) | (red << 16) | (green << 8) | blue;
     }
     else if (shotFormat == PIXEL_FORMAT_RGB_565)
     {
