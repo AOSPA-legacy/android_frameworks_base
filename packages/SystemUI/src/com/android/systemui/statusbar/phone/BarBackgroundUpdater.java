@@ -123,8 +123,9 @@ public class BarBackgroundUpdater {
                         continue;
                     }
 
-                    final int[] colors = BarBackgroundUpdaterNative.getColors(statusBarHeight,
-                            navigationBarHeight, 2 + (isLandscape ? navigationBarHeight : 0));
+                    final int[] colors = BarBackgroundUpdaterNative.getColors(rotation,
+                            statusBarHeight, navigationBarHeight,
+                            2 + (isLandscape ? navigationBarHeight : 0));
 
                     if (mStatusEnabled) {
                         final int statusBarOverrideColor = mStatusFilterEnabled ?

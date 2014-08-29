@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative
  * Method:    getColors
- * Signature: (III)[I
+ * Signature: (IIII)[I
  */
 JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_getColors
-  (JNIEnv *, jclass, jint, jint, jint);
+  (JNIEnv *, jclass, jint, jint, jint, jint);
 
 #ifdef __cplusplus
 }

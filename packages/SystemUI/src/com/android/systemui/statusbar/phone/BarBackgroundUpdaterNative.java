@@ -17,7 +17,8 @@
 package com.android.systemui.statusbar.phone;
 
 public class BarBackgroundUpdaterNative {
-    public static native int[] getColors(int statusBarHeight, int navigationBarHeight, int xFromRightSide);
+    public static native int[] getColors(int rotation, int statusBarHeight,
+            int navigationBarHeight, int xFromRightSide);
 
     static {
         System.load("SystemUI.so");

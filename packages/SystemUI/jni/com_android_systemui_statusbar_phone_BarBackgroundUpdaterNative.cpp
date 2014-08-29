@@ -5,6 +5,15 @@
 
 using namespace android;
 
+int screenRotation;
+
+void const * shotBase;
+
+uint32_t shotWidth;
+uint32_t shotHeight;
+uint32_t shotStride;
+PixelFormat shotFormat;
+
 uint32_t sampleColors(int n, uint32_t sources[])
 {
     float red = 0;
@@ -23,15 +32,43 @@ uint32_t sampleColors(int n, uint32_t sources[])
     return (255 << 24) | (((char) red) << 16) | (((char) green) << 8) | ((char) blue);
 }
 
-uint32_t getPixel(void const * base, PixelFormat format, uint32_t stride, uint32_t x, uint32_t y)
+uint32_t getPixel(int32_t dx, int32_t dy)
 {
-    if (format == PIXEL_FORMAT_RGBA_8888)
+    uint32_t x = 0;
+    uint32_t y = 0;
+
+    switch (screenRotation)
     {
-        return * (uint32_t *) (((char *) base) + y * stride * 4 + x * 4);
+    case 1: // ROTATION_90
+        // turned counter-clockwise;  invert some of the things
+        x = (dy >= 0) ? (shotWidth - 1 - dy) : -dy;
+        y = (dx >= 0) ? dx : (shotHeight - 1 + dx);
+        break;
+    case 2: // ROTATION_180
+        // turned upside down; invert all the things
+        x = (dx >= 0) ? (shotWidth - 1 - dx) : -dx;
+        y = (dy >= 0) ? (shotHeight - 1 - dy) : -dy;
+        break;
+    case 3: // ROTATION_270
+        // turned clockwise; invert some of the things
+        x = (dy >= 0) ? dy : (shotWidth - 1 + dy);
+        y = (dx >= 0) ? (shotHeight - 1 - dx) : -dx;
+        break;
+    case 0: // ROTATION_0
+    default: // Just smile and wave, boys. Smile and wave.
+        // natural orientation; don't invert anything
+        x = (dx >= 0) ? dx : (shotWidth - 1 + dx);
+        y = (dy >= 0) ? dy : (shotHeight - 1 + dy);
+        break;
     }
-    else if (format == PIXEL_FORMAT_RGB_565)
+
+    if (shotFormat == PIXEL_FORMAT_RGBA_8888)
     {
-        uint16_t color = * (uint16_t *) (((char *) base) + y * stride * 2 + x * 2);
+        return * (uint32_t *) (((char *) shotBase) + y * shotStride * 4 + x * 4);
+    }
+    else if (shotFormat == PIXEL_FORMAT_RGB_565)
+    {
+        uint16_t color = * (uint16_t *) (((char *) shotBase) + y * shotStride * 2 + x * 2);
 
         uint32_t red = ((color & 0xF800) >> 11) * 255 / 31;
         uint32_t green = ((color & 0x07E0) >> 5) * 255 / 63;
@@ -44,41 +81,48 @@ uint32_t getPixel(void const * base, PixelFormat format, uint32_t stride, uint32
 }
 
 JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_getColors
-        (JNIEnv * je, jclass jc, jint statusBarHeight, jint navigationBarHeight, jint xFromRightSide)
+        (JNIEnv * je, jclass jc, jint rotation, jint statusBarHeight, jint navigationBarHeight, jint xFromRightSide)
 {
-    jint response[4];
+    jint response[4] = { 0, 0, 0, 0 };
+    screenRotation = rotation;
 
     sp<IBinder> display = SurfaceComposerClient::getBuiltInDisplay(ISurfaceComposer::eDisplayIdMain);
     ScreenshotClient screenshot;
 
     if (display == NULL)
     {
-        return NULL;
+        jintArray arr = je->NewIntArray(4);
+        je->SetIntArrayRegion(arr, 0, 4, response);
+        return arr;
     }
 
     if (screenshot.update(display) != NO_ERROR)
     {
-        return NULL;
+        jintArray arr = je->NewIntArray(4);
+        je->SetIntArrayRegion(arr, 0, 4, response);
+        return arr;
     }
 
-    void const * base = screenshot.getPixels();
+    shotBase = screenshot.getPixels();
 
-    if (base == NULL)
+    if (shotBase == NULL)
     {
-        return NULL;
+        jintArray arr = je->NewIntArray(4);
+        je->SetIntArrayRegion(arr, 0, 4, response);
+        return arr;
     }
 
-    uint32_t width = screenshot.getWidth();
-    uint32_t height = screenshot.getHeight();
-    uint32_t stride = screenshot.getStride();
-    PixelFormat format = screenshot.getFormat();
+    shotWidth = screenshot.getWidth();
+    shotHeight = screenshot.getHeight();
+    shotStride = screenshot.getStride();
+    shotFormat = screenshot.getFormat();
 
-    uint32_t colorSbOne = getPixel(base, format, stride, 1, 1);
-    uint32_t colorSbTwo = getPixel(base, format, stride, 1, 5);
+    uint32_t colorSbOne = getPixel(1, 1);
+    uint32_t colorSbTwo = getPixel(1, 5);
 
-    uint32_t colorTopLeft = getPixel(base, format, stride, 1, statusBarHeight + 2);
-    uint32_t colorTopRight = getPixel(base, format, stride, width - 1 - xFromRightSide, statusBarHeight + 2);
-    uint32_t colorTopCenter = getPixel(base, format, stride, width - 1 - (xFromRightSide / 2), statusBarHeight + 2);
+    uint32_t colorTopLeft = getPixel(1, 2 + statusBarHeight);
+    uint32_t colorTopRight = getPixel(-1 - xFromRightSide, 2 + statusBarHeight);
+    uint32_t colorTopCenter = getPixel(-1 - (xFromRightSide / 2), 2 + statusBarHeight);
 
     if (colorTopLeft == colorTopRight)
     {
@@ -99,12 +143,12 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
 
     response[1] = colorSbOne == colorSbTwo ? 1 : 0;
 
-    uint32_t colorNbOne = getPixel(base, format, stride, width - 2, height - 2);
-    uint32_t colorNbTwo = getPixel(base, format, stride, width - 2, height - 6);
+    uint32_t colorNbOne = getPixel(-1, -1);
+    uint32_t colorNbTwo = getPixel(-1, -5);
 
-    uint32_t colorBotLeft = getPixel(base, format, stride, 1, height - navigationBarHeight - 3);
-    uint32_t colorBotRight = getPixel(base, format, stride, width - 1 - xFromRightSide, height - navigationBarHeight - 3);
-    uint32_t colorBotCenter = getPixel(base, format, stride, width - 1 - (xFromRightSide / 2), height - navigationBarHeight - 3);
+    uint32_t colorBotLeft = getPixel(1, -2 - navigationBarHeight);
+    uint32_t colorBotRight = getPixel(-1 - xFromRightSide, -2 - navigationBarHeight);
+    uint32_t colorBotCenter = getPixel(-1 - (xFromRightSide / 2), -2 - navigationBarHeight);
 
     if (colorBotLeft == colorBotRight)
     {
@@ -127,6 +171,5 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
 
     jintArray arr = je->NewIntArray(4);
     je->SetIntArrayRegion(arr, 0, 4, response);
-
     return arr;
 }
