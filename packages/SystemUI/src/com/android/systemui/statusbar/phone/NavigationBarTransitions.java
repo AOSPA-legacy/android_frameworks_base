@@ -218,7 +218,6 @@ public final class NavigationBarTransitions extends BarTransitions {
     };
 
     protected static class NavigationBarBackgroundDrawable extends BarBackgroundDrawable {
-        private final Handler mHandler;
         private final Context mContext;
 
         private int mOverrideColor = 0;
@@ -228,10 +227,9 @@ public final class NavigationBarTransitions extends BarTransitions {
             super(context, R.drawable.nav_background, R.color.navigation_bar_background_opaque,
                 R.color.navigation_bar_background_semi_transparent);
 
-            mHandler = new Handler();
             mContext = context;
 
-            final GradientObserver obs = new GradientObserver(this, mHandler);
+            final GradientObserver obs = new GradientObserver(this, new Handler());
             (mContext.getContentResolver()).registerContentObserver(
                     GradientObserver.DYNAMIC_SYSTEM_BARS_GRADIENT_URI,
                     false, obs, UserHandle.USER_ALL);
@@ -245,27 +243,13 @@ public final class NavigationBarTransitions extends BarTransitions {
                 @Override
                 public void onResetNavigationBarColor() {
                     mOverrideColor = 0;
-                    mHandler.post(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            forceStartAnimation();
-                        }
-
-                    });
+                    forceStartAnimation();
                 }
 
                 @Override
                 public void onUpdateNavigationBarColor(final int color) {
                     mOverrideColor = color;
-                    mHandler.post(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            forceStartAnimation();
-                        }
-
-                    });
+                    forceStartAnimation();
                 }
 
             });
@@ -295,14 +279,7 @@ public final class NavigationBarTransitions extends BarTransitions {
 
         public void setGradientAlpha(final int alpha) {
             mGradientAlpha = alpha;
-            mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    forceStartAnimation();
-                }
-
-            });
+            forceStartAnimation();
         }
     }
 

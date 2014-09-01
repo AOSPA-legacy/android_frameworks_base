@@ -27,6 +27,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -124,6 +125,15 @@ public class BarTransitions {
         private final int mOpaqueColorResourceId;
         private final int mSemiTransparentColorResourceId;
         private final TimeInterpolator mInterpolator;
+        private final Handler mHandler;
+        private final Runnable mInvalidateSelf = new Runnable() {
+
+            @Override
+            public void run() {
+                invalidateSelf();
+            }
+
+        };
 
         private int mOpaque;
         private int mSemiTransparent;
@@ -154,6 +164,7 @@ public class BarTransitions {
             mGradientResourceId = gradientResourceId;
             mOpaqueColorResourceId = opaqueColorResourceId;
             mSemiTransparentColorResourceId = semiTransparentColorResourceId;
+            mHandler = new Handler();
         }
 
         protected int getColorOpaque() {
@@ -235,11 +246,12 @@ public class BarTransitions {
                       (int)(v * Color.blue(mColor) + Color.blue(mColorStart) * (1 - v)));
             }
 
-            mAnimating = true;
             mStartTime = now;
             mEndTime = now + BACKGROUND_DURATION;
+            mAnimating = true;
 
-            invalidateSelf();
+            mHandler.removeCallbacks(mInvalidateSelf);
+            mHandler.postDelayed(mInvalidateSelf, 50);
         }
 
         public void finishAnimation() {
