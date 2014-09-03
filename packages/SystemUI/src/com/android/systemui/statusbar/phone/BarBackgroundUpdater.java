@@ -135,19 +135,16 @@ public class BarBackgroundUpdater {
                     if (mStatusEnabled) {
                         final int statusBarOverrideColor = mStatusFilterEnabled ?
                                 filter(colors[0], -10) : colors[0];
+                        updateStatusBarColor(statusBarOverrideColor);
+
+                        // magic from http://www.w3.org/TR/AERT#color-contrast
+                        final float statusBarBrightness =
+                                (0.299f * Color.red(statusBarOverrideColor) +
+                                0.587f * Color.green(statusBarOverrideColor) +
+                                0.114f * Color.blue(statusBarOverrideColor)) / 255;
                         final boolean isStatusBarConsistent = colors[1] == 1;
-
-                        if (mStatusBarOverrideColor != statusBarOverrideColor) {
-                            updateStatusBarColor(statusBarOverrideColor);
-
-                            // magic from http://www.w3.org/TR/AERT#color-contrast
-                            final float statusBarBrightness =
-                                    (0.299f * Color.red(statusBarOverrideColor) +
-                                    0.587f * Color.green(statusBarOverrideColor) +
-                                    0.114f * Color.blue(statusBarOverrideColor)) / 255;
-                            updateStatusBarIconColor(statusBarBrightness > 0.7f &&
-                                    isStatusBarConsistent ? 0x95000000 : 0xFFFFFFFF);
-                        }
+                        updateStatusBarIconColor(statusBarBrightness > 0.7f &&
+                                isStatusBarConsistent ? 0x95000000 : 0xFFFFFFFF);
                     } else {
                         // dynamic status bar is disabled
                         updateStatusBarColor(0);
@@ -156,19 +153,16 @@ public class BarBackgroundUpdater {
 
                     if (mNavigationEnabled) {
                         final int navigationBarOverrideColor = colors[2];
+                        updateNavigationBarColor(navigationBarOverrideColor);
+
+                        // magic from http://www.w3.org/TR/AERT#color-contrast
+                        final float navigationBarBrightness =
+                                (0.299f * Color.red(navigationBarOverrideColor) +
+                                0.587f * Color.green(navigationBarOverrideColor) +
+                                0.114f * Color.blue(navigationBarOverrideColor)) / 255;
                         final boolean isNavigationBarConsistent = colors[3] == 1;
-
-                        if (mNavigationBarOverrideColor != navigationBarOverrideColor) {
-                            updateNavigationBarColor(navigationBarOverrideColor);
-
-                            // magic from http://www.w3.org/TR/AERT#color-contrast
-                            final float navigationBarBrightness =
-                                    (0.299f * Color.red(navigationBarOverrideColor) +
-                                    0.587f * Color.green(navigationBarOverrideColor) +
-                                    0.114f * Color.blue(navigationBarOverrideColor)) / 255;
-                            updateNavigationBarIconColor(navigationBarBrightness > 0.7f &&
-                                    isNavigationBarConsistent ? 0x95000000 : 0xFFFFFFFF);
-                        }
+                        updateNavigationBarIconColor(navigationBarBrightness > 0.7f &&
+                                isNavigationBarConsistent ? 0x95000000 : 0xFFFFFFFF);
                     } else {
                         // dynamic navigation bar is disabled
                         updateNavigationBarColor(0);
