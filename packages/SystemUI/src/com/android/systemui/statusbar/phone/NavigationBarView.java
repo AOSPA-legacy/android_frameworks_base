@@ -91,6 +91,7 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
     int mDisabledFlags = 0;
     int mNavigationIconHints = 0;
 
+    private int mOverrideIconColor = 0;
     private Drawable mBackIcon, mBackLandIcon, mBackAltIcon, mBackAltLandIcon,
             mRecentIcon, mRecentLandIcon, mRecentAltIcon, mRecentAltLandIcon,
             mHomeIcon, mHomeLandIcon;
@@ -235,55 +236,45 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
 
             @Override
             public void onResetNavigationBarIconColor() {
-                final ImageView[] buttons = new ImageView[] {
-                    (ImageView) getRecentsButton(),
-                    (ImageView) getMenuButton(),
-                    (ImageView) getBackButton(),
-                    (ImageView) getHomeButton(),
-                    (ImageView) getSearchLight(),
-                    (ImageView) getCameraButton()
-                };
-
-                for (final ImageView button : buttons) {
-                    if (button != null) {
-                        mHandler.post(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                button.setColorFilter(null);
-                            }
-
-                        });
-                    }
-                }
+                mOverrideIconColor = 0;
+                updateButtonColors();
             }
 
             @Override
             public void onUpdateNavigationBarIconColor(final int iconColor) {
-                final ImageView[] buttons = new ImageView[] {
-                    (ImageView) getRecentsButton(),
-                    (ImageView) getMenuButton(),
-                    (ImageView) getBackButton(),
-                    (ImageView) getHomeButton(),
-                    (ImageView) getSearchLight(),
-                    (ImageView) getCameraButton()
-                };
-
-                for (final ImageView button : buttons) {
-                    if (button != null) {
-                        mHandler.post(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                button.setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
-                            }
-
-                        });
-                    }
-                }
+                mOverrideIconColor = iconColor;
+                updateButtonColors();
             }
 
         });
+    }
+
+    private void updateButtonColors() {
+        final ImageView[] buttons = new ImageView[] {
+            (ImageView) getRecentsButton(),
+            (ImageView) getMenuButton(),
+            (ImageView) getBackButton(),
+            (ImageView) getHomeButton(),
+            (ImageView) getSearchLight(),
+            (ImageView) getCameraButton()
+        };
+
+        for (final ImageView button : buttons) {
+            if (button != null) {
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (mOverrideIconColor == 0) {
+                            button.setColorFilter(null);
+                        } else {
+                            button.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+                        }
+                    }
+
+                });
+            }
+        }
     }
 
     private void watchForDevicePolicyChanges() {
@@ -606,6 +597,8 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
 
         mCurrentView = mRotatedViews[Surface.ROTATION_0];
 
+        updateButtonColors();
+
         watchForAccessibilityChanges();
     }
 
@@ -679,6 +672,8 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
         // Reset recents hints after reorienting
         ((ImageView)getRecentsButton()).setImageDrawable(mVertical
                 ? mRecentLandIcon : mRecentIcon);
+
+        updateButtonColors();
     }
 
     @Override
