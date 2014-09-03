@@ -40,8 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BarBackgroundUpdater {
-    private final static boolean DEBUG = false;
+    private final static boolean DEBUG_ALL = false;
     private final static String LOG_TAG = BarBackgroundUpdater.class.getSimpleName();
+
+    private final static boolean DEBUG_COLOR_CHANGE = DEBUG_ALL || false;
+    private final static boolean DEBUG_EXCESSIVE_DELAY = DEBUG_ALL || false;
+
+    private final static long MIN_DELAY = 1000 / 10; // max 10 fps
 
     private static boolean PAUSED = true;
 
@@ -193,11 +198,13 @@ public class BarBackgroundUpdater {
                 }
 
                 final long delta = System.currentTimeMillis() - now;
-                final long delay = Math.max(1000 / 10, delta * 2); // max 10 fps
+                final long delay = Math.max(MIN_DELAY, delta * 2);
 
-                if (DEBUG) {
-                    Log.d(LOG_TAG, "delta=" + Long.toString(delta) + "ms " +
-                            "delay=" + Long.toString(delay) + "ms");
+                if (delay > MIN_DELAY) {
+                    if (DEBUG_EXCESSIVE_DELAY) {
+                        Log.d(LOG_TAG, "delta=" + Long.toString(delta) + "ms " +
+                                "delay=" + Long.toString(delay) + "ms");
+                    }
                 }
 
                 try {
@@ -366,7 +373,7 @@ public class BarBackgroundUpdater {
 
         mStatusBarOverrideColor = newColor;
 
-        if (DEBUG) {
+        if (DEBUG_COLOR_CHANGE) {
             Log.d(LOG_TAG, "statusBarOverrideColor=" + (newColor == 0 ? "none" :
                     "0x" + Integer.toHexString(newColor)));
         }
@@ -387,7 +394,7 @@ public class BarBackgroundUpdater {
 
         mStatusBarIconOverrideColor = newColor;
 
-        if (DEBUG) {
+        if (DEBUG_COLOR_CHANGE) {
             Log.d(LOG_TAG, "statusBarIconOverrideColor=" + (newColor == 0 ? "none" :
                     "0x" + Integer.toHexString(newColor)));
         }
@@ -408,7 +415,7 @@ public class BarBackgroundUpdater {
 
         mNavigationBarOverrideColor = newColor;
 
-        if (DEBUG) {
+        if (DEBUG_COLOR_CHANGE) {
             Log.d(LOG_TAG, "navigationBarOverrideColor=" + (newColor == 0 ? "none" :
                     "0x" + Integer.toHexString(newColor)));
         }
@@ -429,7 +436,7 @@ public class BarBackgroundUpdater {
 
         mNavigationBarIconOverrideColor = newColor;
 
-        if (DEBUG) {
+        if (DEBUG_COLOR_CHANGE) {
             Log.d(LOG_TAG, "navigationBarIconOverrideColor=" + (newColor == 0 ? "none" :
                     "0x" + Integer.toHexString(newColor)));
         }
