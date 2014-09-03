@@ -216,12 +216,13 @@ public class BarTransitions {
             mAnimating = animate;
             if (animate) {
                 long now = SystemClock.elapsedRealtime();
-                mStartTime = now;
-                mEndTime = now + BACKGROUND_DURATION;
+                mStartTime = now + 50;
+                mEndTime = mStartTime + BACKGROUND_DURATION;
                 mGradientAlphaStart = mGradientAlpha;
                 mColorStart = mColor;
             }
-            invalidateSelf();
+            mHandler.removeCallbacks(mInvalidateSelf);
+            mHandler.postDelayed(mInvalidateSelf, 50);
         }
 
         @Override
@@ -236,7 +237,7 @@ public class BarTransitions {
                 mGradientAlphaStart = mGradientAlpha;
                 mColorStart = mColor;
             } else {
-                final float t = (now - mStartTime) / (float)(mEndTime - mStartTime);
+                final float t = Math.max(0, now - mStartTime) / (float)(mEndTime - mStartTime);
                 final float v = Math.max(0, Math.min(mInterpolator.getInterpolation(t), 1));
                 mGradientAlphaStart = (int)(v * mGradientAlpha + mGradientAlphaStart * (1 - v));
                 mColorStart = Color.argb(
@@ -246,8 +247,8 @@ public class BarTransitions {
                       (int)(v * Color.blue(mColor) + Color.blue(mColorStart) * (1 - v)));
             }
 
-            mStartTime = now;
-            mEndTime = now + BACKGROUND_DURATION;
+            mStartTime = now + 50;
+            mEndTime = mStartTime + BACKGROUND_DURATION;
             mAnimating = true;
 
             mHandler.removeCallbacks(mInvalidateSelf);
@@ -257,7 +258,8 @@ public class BarTransitions {
         public void finishAnimation() {
             if (mAnimating) {
                 mAnimating = false;
-                invalidateSelf();
+                mHandler.removeCallbacks(mInvalidateSelf);
+                mHandler.postDelayed(mInvalidateSelf, 50);
             }
         }
 
@@ -285,7 +287,7 @@ public class BarTransitions {
                     mColor = targetColor;
                     mGradientAlpha = targetGradientAlpha;
                 } else {
-                    final float t = (now - mStartTime) / (float)(mEndTime - mStartTime);
+                    final float t = Math.max(0, now - mStartTime) / (float)(mEndTime - mStartTime);
                     final float v = Math.max(0, Math.min(mInterpolator.getInterpolation(t), 1));
                     mGradientAlpha = (int)(v * targetGradientAlpha + mGradientAlphaStart * (1 - v));
                     mColor = Color.argb(
@@ -303,7 +305,9 @@ public class BarTransitions {
                 mGradient.draw(canvas);
             }
             if (mAnimating) {
-                invalidateSelf();  // keep going
+                // keep going
+                mHandler.removeCallbacks(mInvalidateSelf);
+                mHandler.postDelayed(mInvalidateSelf, 50);
             }
         }
     }
