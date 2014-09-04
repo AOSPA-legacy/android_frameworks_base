@@ -3780,7 +3780,6 @@ ssize_t ResTable::getBagLocked(uint32_t resID, const bag_entry** outBag,
                 if ((!isInside) || oldName != newName) {
                     // This is a new attribute...  figure out what to do with it.
                     // Need to alloc more memory...
-                    size_t prevEntry = curEntry;
                     curEntry = set->availAttrs;
                     set->availAttrs++;
                     const size_t newAvail = set->availAttrs;
@@ -3795,8 +3794,8 @@ ssize_t ResTable::getBagLocked(uint32_t resID, const bag_entry** outBag,
                                  set, entries, set->availAttrs));
                     if (isInside) {
                         // Going in the middle, need to make space.
-                        memmove(entries+prevEntry+1, entries+prevEntry,
-                                sizeof(bag_entry)*(set->numAttrs-prevEntry));
+                        memmove(entries+curEntry+1, entries+curEntry,
+                                sizeof(bag_entry)*(set->numAttrs-curEntry));
                     }
                     TABLE_NOISY(printf("#%d: Inserting new attribute: 0x%08x\n",
                                  curEntry, newName));
