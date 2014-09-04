@@ -142,57 +142,65 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
     shotStride = screenshot.getStride();
     shotFormat = screenshot.getFormat();
 
-    uint32_t colorSbOne = getPixel(1, 1);
-    uint32_t colorSbTwo = getPixel(1, 5);
-
-    uint32_t colorTopLeft = getPixel(1, 2 + statusBarHeight);
-    uint32_t colorTopRight = getPixel(-1 - xFromRightSide, 2 + statusBarHeight);
-    uint32_t colorTopCenter = getPixel(-1 - (xFromRightSide / 2), 2 + statusBarHeight);
+    int fsbh = 2 + statusBarHeight;
+    uint32_t colorTopLeft = getPixel(1, fsbh);
+    uint32_t colorTopLeftPadding = getPixel(1 + 10, fsbh);
+    uint32_t colorTopRight = getPixel(-1 - xFromRightSide, fsbh);
+    uint32_t colorTopRightPadding = getPixel(-1 - xFromRightSide - 10, fsbh);
 
     if (colorTopLeft == colorTopRight)
     {
         // status bar appears to be completely uniform
         response[0] = colorTopLeft;
     }
-    else if (colorTopLeft == colorTopCenter || colorTopRight == colorTopCenter)
+    else if (colorTopRightPadding == colorTopRight)
     {
-        // a side of the status bar appears to be uniform
-        response[0] = colorTopCenter;
+        // the right side of the status bar appears to be uniform
+        response[0] = colorTopRight;
+    }
+    else if (colorTopLeftPadding == colorTopLeft)
+    {
+        // the left side of the status bar appears to be uniform
+        response[0] = colorTopLeft;
     }
     else
     {
         // status bar does not appear to be uniform at all
-        uint32_t colorsTop[3] = { colorTopLeft, colorTopCenter, colorTopRight };
-        response[0] = sampleColors(3, colorsTop);
+        uint32_t colorsTop[4] = { colorTopLeft, colorTopLeftPadding, colorTopRight, colorTopRightPadding };
+        response[0] = sampleColors(4, colorsTop);
     }
 
-    response[1] = colorSbOne == colorSbTwo ? 1 : 0;
+    response[1] = getPixel(1, 1) == getPixel(1, 5) ? 1 : 0;
 
-    uint32_t colorNbOne = getPixel(-1, -1);
-    uint32_t colorNbTwo = getPixel(-1, -5);
-
-    uint32_t colorBotLeft = getPixel(1, -2 - navigationBarHeight);
-    uint32_t colorBotRight = getPixel(-1 - xFromRightSide, -2 - navigationBarHeight);
-    uint32_t colorBotCenter = getPixel(-1 - (xFromRightSide / 2), -2 - navigationBarHeight);
+    int fnbh = -2 - navigationBarHeight;
+    uint32_t colorBotLeft = getPixel(1, fnbh);
+    uint32_t colorBotLeftPadding = getPixel(1 + 10, fnbh);
+    uint32_t colorBotRight = getPixel(-1 - xFromRightSide, fnbh);
+    uint32_t colorBotRightPadding = getPixel(-1 - xFromRightSide - 10, fnbh);
 
     if (colorBotLeft == colorBotRight)
     {
         // navigation bar appears to be completely uniform
         response[2] = colorBotLeft;
     }
-    else if (colorBotLeft == colorBotCenter || colorBotRight == colorBotCenter)
+    else if (colorBotRightPadding == colorBotRight)
     {
-        // a side of the navigation bar appears to be uniform
-        response[2] = colorBotCenter;
+        // the right side of the navigation bar appears to be uniform
+        response[2] = colorBotRight;
+    }
+    else if (colorBotLeftPadding == colorBotLeft)
+    {
+        // the left side of the navigation bar appears to be uniform
+        response[2] = colorBotLeft;
     }
     else
     {
         // navigation bar does not appear to be uniform at all
-        uint32_t colorsBot[3] = { colorBotLeft, colorBotCenter, colorBotRight };
-        response[2] = sampleColors(3, colorsBot);
+        uint32_t colorsBot[4] = { colorBotLeft, colorBotLeftPadding, colorBotRight, colorBotRightPadding };
+        response[2] = sampleColors(4, colorsBot);
     }
 
-    response[3] = colorNbOne == colorNbTwo ? 1 : 0;
+    response[3] = getPixel(-1, -1) == getPixel(-1, -5) ? 1 : 0;
 
     jintArray arr = je->NewIntArray(4);
     je->SetIntArrayRegion(arr, 0, 4, response);
