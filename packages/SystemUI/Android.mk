@@ -24,7 +24,8 @@ LOCAL_SRC_FILES := \
 
 LOCAL_SHARED_LIBRARIES := \
     libutils \
-    libgui
+    libgui \
+    liblog
 
 LOCAL_MODULE := SystemUI
 # LOCAL_CERTIFICATE := platform

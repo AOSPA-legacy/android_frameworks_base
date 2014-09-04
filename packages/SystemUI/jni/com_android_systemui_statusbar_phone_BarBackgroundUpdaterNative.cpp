@@ -16,8 +16,11 @@
 
 #include <jni/com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative.h>
 
+#define LOG_TAG "BarBackgroundUpdaterNative"
+
 #include <gui/ISurfaceComposer.h>
 #include <gui/SurfaceComposerClient.h>
+#include <utils/Log.h>
 
 using namespace android;
 
@@ -121,7 +124,7 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
         return arr;
     }
 
-    if (screenshot.update(display) != NO_ERROR)
+    if (screenshot.updateDSB(display) != NO_ERROR)
     {
         jintArray arr = je->NewIntArray(4);
         je->SetIntArrayRegion(arr, 0, 4, response);
@@ -147,6 +150,9 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
     uint32_t colorTopLeftPadding = getPixel(1 + 10, fsbh);
     uint32_t colorTopRight = getPixel(-1 - xFromRightSide, fsbh);
     uint32_t colorTopRightPadding = getPixel(-1 - xFromRightSide - 10, fsbh);
+
+    ALOGD("width=%d height=%d ctl=%d ctlp=%d ctr=%d ctrp=%d",
+            shotWidth, shotHeight, colorTopLeft, colorTopLeftPadding, colorTopRight, colorTopRightPadding);
 
     if (colorTopLeft == colorTopRight)
     {
