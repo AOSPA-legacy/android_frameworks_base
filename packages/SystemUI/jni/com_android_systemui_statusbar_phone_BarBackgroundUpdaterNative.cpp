@@ -17,6 +17,7 @@
 #include <jni/com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative.h>
 
 #define LOG_TAG "BarBackgroundUpdaterNative"
+#define DEBUG_FLOOD false
 
 #include <gui/ISurfaceComposer.h>
 #include <gui/SurfaceComposerClient.h>
@@ -151,9 +152,6 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
     uint32_t colorTopRight = getPixel(-1 - xFromRightSide, fsbh);
     uint32_t colorTopRightPadding = getPixel(-1 - xFromRightSide - 10, fsbh);
 
-    ALOGD("width=%d height=%d ctl=%d ctlp=%d ctr=%d ctrp=%d",
-            shotWidth, shotHeight, colorTopLeft, colorTopLeftPadding, colorTopRight, colorTopRightPadding);
-
     if (colorTopLeft == colorTopRight)
     {
         // status bar appears to be completely uniform
@@ -207,6 +205,12 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
     }
 
     response[3] = getPixel(-1, -1) == getPixel(-1, -5) ? 1 : 0;
+
+    if (DEBUG_FLOOD) {
+        ALOGD("width=%d height=%d tl=%d tlp=%d tr=%d trp=%d bl=%d blp=%d br=%d brp=%d",
+                shotWidth, shotHeight, colorTopLeft, colorTopLeftPadding, colorTopRight, colorTopRightPadding,
+                colorBotLeft, colorBotLeftPadding, colorBotRight, colorBotRightPadding);
+    }
 
     jintArray arr = je->NewIntArray(4);
     je->SetIntArrayRegion(arr, 0, 4, response);
