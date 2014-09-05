@@ -251,8 +251,12 @@ public class BarTransitions {
             mEndTime = mStartTime + BACKGROUND_DURATION;
             mAnimating = true;
 
-            mHandler.removeCallbacks(mInvalidateSelf);
-            mHandler.postDelayed(mInvalidateSelf, 50);
+            // only invalidate when we will need to use these colors for sure
+            if (mMode == MODE_OPAQUE || mMode == MODE_LIGHTS_OUT ||
+                    mMode == MODE_SEMI_TRANSPARENT) {
+                mHandler.removeCallbacks(mInvalidateSelf);
+                mHandler.postDelayed(mInvalidateSelf, 50);
+            }
         }
 
         public void finishAnimation() {
