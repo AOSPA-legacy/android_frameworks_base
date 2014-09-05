@@ -45,6 +45,7 @@ public class BarBackgroundUpdater {
 
     private final static boolean DEBUG_COLOR_CHANGE = DEBUG_ALL || false;
     private final static boolean DEBUG_EXCESSIVE_DELAY = DEBUG_ALL || false;
+    private final static boolean DEBUG_FLOOD_ALL_DELAY = DEBUG_ALL || false;
 
     private final static long MIN_DELAY = 1000 / 10; // max 10 fps
 
@@ -194,11 +195,9 @@ public class BarBackgroundUpdater {
                 final long delta = System.currentTimeMillis() - now;
                 final long delay = Math.max(MIN_DELAY, delta * 2);
 
-                if (delay > MIN_DELAY) {
-                    if (DEBUG_EXCESSIVE_DELAY) {
-                        Log.d(LOG_TAG, "delta=" + Long.toString(delta) + "ms " +
-                                "delay=" + Long.toString(delay) + "ms");
-                    }
+                if (DEBUG_FLOOD_ALL_DELAY || (DEBUG_EXCESSIVE_DELAY && delay > MIN_DELAY)) {
+                    Log.d(LOG_TAG, "delta=" + Long.toString(delta) + "ms " +
+                            "delay=" + Long.toString(delay) + "ms");
                 }
 
                 try {
