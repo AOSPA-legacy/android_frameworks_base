@@ -125,7 +125,7 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
         return arr;
     }
 
-    if (screenshot.updateArea(display, 0, 0) != NO_ERROR)
+    if (screenshot.update(display,800,800,0,-1UL) != NO_ERROR)
     {
         jintArray arr = je->NewIntArray(4);
         je->SetIntArrayRegion(arr, 0, 4, response);
@@ -214,5 +214,6 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
 
     jintArray arr = je->NewIntArray(4);
     je->SetIntArrayRegion(arr, 0, 4, response);
+
     return arr;
 }

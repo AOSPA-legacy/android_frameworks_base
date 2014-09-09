@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -257,6 +259,36 @@ public class BarTransitions {
                 mHandler.removeCallbacks(mInvalidateSelf);
                 mHandler.postDelayed(mInvalidateSelf, 50);
             }
+        }
+
+        public synchronized void doColorTranistion() {
+            final long now = SystemClock.elapsedRealtime();
+
+            if (!mAnimating || now >= mEndTime) {
+                mGradientAlphaStart = mGradientAlpha;
+                mColorStart = mColor;
+            } else {
+                final float t = Math.max(0, now - mStartTime) / (float)(mEndTime - mStartTime);
+                final float v = Math.max(0, Math.min(mInterpolator.getInterpolation(t), 1));
+                mGradientAlphaStart = (int)(v * mGradientAlpha + mGradientAlphaStart * (1 - v));
+                mColorStart = Color.argb(
+                      (int)(v * Color.alpha(mColor) + Color.alpha(mColorStart) * (1 - v)),
+                      (int)(v * Color.red(mColor) + Color.red(mColorStart) * (1 - v)),
+                      (int)(v * Color.green(mColor) + Color.green(mColorStart) * (1 - v)),
+                      (int)(v * Color.blue(mColor) + Color.blue(mColorStart) * (1 - v)));
+            }
+
+            mStartTime = now + 50;
+            mEndTime = mStartTime + 350;
+            mAnimating = true;
+
+            // only invalidate when we will need to use these colors for sure
+            if (mMode == MODE_OPAQUE || mMode == MODE_LIGHTS_OUT ||
+                    mMode == MODE_SEMI_TRANSPARENT) {
+                mHandler.removeCallbacks(mInvalidateSelf);
+                mHandler.postDelayed(mInvalidateSelf, 25);
+            }
+
         }
 
         public void finishAnimation() {

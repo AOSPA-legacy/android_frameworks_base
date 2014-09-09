@@ -20,6 +20,7 @@ package com.android.systemui.statusbar.phone;
 import android.animation.LayoutTransition;
 import android.animation.LayoutTransition.TransitionListener;
 import android.animation.ObjectAnimator;
+import android.animation.ArgbEvaluator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.app.ActivityManagerNative;
@@ -268,7 +269,12 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
                         if (mOverrideIconColor == 0) {
                             button.setColorFilter(null);
                         } else {
-                            button.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+                            //Imageviews have no way to get the current color store the last one in a tag
+                            Integer currentColor = (Integer) button.getTag();
+                            ObjectAnimator.ofObject(button, "tint", new ArgbEvaluator(), currentColor.intValue(), mOverrideIconColor)
+	                            .setDuration(500)
+                                .start();
+                            button.setTag(new Integer(mOverrideIconColor));
                         }
                     }
 

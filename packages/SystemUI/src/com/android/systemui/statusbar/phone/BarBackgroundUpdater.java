@@ -49,7 +49,7 @@ public class BarBackgroundUpdater {
     private final static boolean DEBUG_EXCESSIVE_DELAY = DEBUG_ALL || false;
     private final static boolean DEBUG_FLOOD_ALL_DELAY = DEBUG_ALL || false;
 
-    private final static long MIN_DELAY = 1000 / 10; // max 10 fps
+    private final static long MIN_DELAY = 450; // ~2 fps a frame capture takes ~50 ms
 
     private static boolean PAUSED = true;
 

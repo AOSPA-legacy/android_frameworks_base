@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Handler;
@@ -66,7 +68,9 @@ public class TickerImageView extends ImageSwitcher {
                         for (int i = 0; i < childCount; i++) {
                             final ImageView iv = (ImageView) getChildAt(i);
                             if (iv != null) {
-                                iv.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+                                ObjectAnimator.ofObject(iv, "tint", new ArgbEvaluator(), iv.getColorFilter(), iconColor)
+	                                .setDuration(500)
+                                    .start();
                             }
                         }
                     }

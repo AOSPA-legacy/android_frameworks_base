@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.policy;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -62,9 +64,11 @@ public class PhoneStatusBarClock extends Clock {
 
                     @Override
                     public void run() {
-                        setTextColor(iconColor);
+                        int currentColor = getTextColors().getDefaultColor();
+                        ObjectAnimator.ofObject(this, "textColor", new ArgbEvaluator(), currentColor, iconColor)
+                            .setDuration(500)
+                            .start();
                     }
-
                 });
             }
 

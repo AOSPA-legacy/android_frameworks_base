@@ -17,6 +17,9 @@
 
 package com.android.systemui;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.view.ViewGroup.LayoutParams;
 import android.content.BroadcastReceiver;
@@ -108,6 +111,14 @@ public class BatteryCircleMeterView extends ImageView {
         public void run() {
             if(mActivated && mAttached) {
                 invalidate();
+            }
+        }
+    };
+
+    private final Runnable mColorTransition = new Runnable() {
+        public void run() {
+            if(mActivated && mAttached) {
+                buildAnimator(mPaintSystem, mOverrideIconColor).start();
             }
         }
     };
@@ -206,7 +217,11 @@ public class BatteryCircleMeterView extends ImageView {
             public void onUpdateStatusBarIconColor(final int iconColor) {
                 mOverrideIconColor = iconColor;
 
-                mPaintSystem.setColor(mQS ? mCircleColor : mOverrideIconColor);
+                if (mQS) {
+                    mPaintSystem.setColor(mCircleColor);
+                } else {
+                     mHandler.post(mColorTransition);
+                }
 
                 mHandler.removeCallbacks(mInvalidate);
                 mHandler.postDelayed(mInvalidate, 50);
@@ -289,6 +304,13 @@ public class BatteryCircleMeterView extends ImageView {
             canvas.drawText(Integer.toString(level), textX, mTextY, mPaintFont);
         }
 
+    }
+
+    // BatteryMeterView calls invalidate already no need to do it here
+    private ObjectAnimator buildAnimator(Paint painter, int toColor)  {
+         ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "color", new ArgbEvaluator(), painter.getColor(), toColor);
+              colorFader.setDuration(500);
+        return colorFader;
     }
 
     public void setColors(boolean qs) {

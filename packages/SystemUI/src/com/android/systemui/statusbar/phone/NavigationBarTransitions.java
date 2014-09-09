@@ -17,6 +17,8 @@
 package com.android.systemui.statusbar.phone;
 
 import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.database.ContentObserver;
@@ -249,7 +251,7 @@ public final class NavigationBarTransitions extends BarTransitions {
                 @Override
                 public void onUpdateNavigationBarColor(final int color) {
                     mOverrideColor = color;
-                    forceStartAnimation();
+                    doColorTranistion();
                 }
 
             });

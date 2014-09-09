@@ -16,6 +16,10 @@
 
 package com.android.systemui;
 
+
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.database.ContentObserver;
@@ -232,6 +236,19 @@ public class BatteryMeterView extends View implements DemoMode {
 
         });
     }
+
+    private ObjectAnimator buildAnimator(Paint painter, int toColor)  {
+         ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "backgroundColor", new ArgbEvaluator(), painter.getColor(), toColor);
+              colorFader.setDuration(500);
+              colorFader.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    invalidate();
+                }
+            });
+        return colorFader;
+    }
+
 
     public void setColors(boolean qs) {
         mQS = qs;

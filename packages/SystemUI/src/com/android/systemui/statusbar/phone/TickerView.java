@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -68,7 +70,10 @@ public class TickerView extends TextSwitcher {
                         for (int i = 0; i < childCount; i++) {
                             final TextView tv = (TextView) getChildAt(i);
                             if (tv != null) {
-                                tv.setTextColor(mOverrideTextColor);
+                                int currentColor = tv.getTextColors().getDefaultColor();
+                                ObjectAnimator.ofObject(tv, "textColor", new ArgbEvaluator(), currentColor, iconColor)
+                                    .setDuration(500)
+                                    .start();
                             }
                         }
                     }
