@@ -305,6 +305,14 @@ public class BatteryCircleMeterView extends ImageView {
         ContentResolver resolver = mContext.getContentResolver();
 
         updateUser(ActivityManager.getCurrentUser());
+
+        int defaultColor = res.getColor(com.android.systemui.R.color.sb_batterymeter_circle_text_charging);
+
+        mCircleTextColor = defaultColor;
+        mCircleTextChargingColor = defaultColor;
+        mCircleColor = defaultColor;
+
+        mPaintSystem.setColor(mCircleColor);
         /*
          * initialize vars and force redraw
          */
@@ -323,6 +331,30 @@ public class BatteryCircleMeterView extends ImageView {
         if (mBatteryReceiver != null) {
             mBatteryReceiver.updateRegistration();
         }
+
+        if (mActivated && mAttached) {
+            invalidate();
+        }
+    }
+
+    public void updateSettings(int defaultColor) {
+
+        mCircleTextColor = defaultColor;
+        mCircleTextChargingColor = defaultColor;
+        mCircleColor = defaultColor;
+
+        mPaintSystem.setColor(mCircleColor);
+        mRectLeft = null;
+        mCircleSize = 0;
+
+        int batteryStyle = Settings.System.getIntForUser(getContext().getContentResolver(),
+                                Settings.System.STATUS_BAR_BATTERY_STYLE, 0
+                                , mCurrentUserId);
+
+        mCirclePercent = batteryStyle == 4;
+        mActivated = (batteryStyle == 3 || mCirclePercent);
+
+        setVisibility(mActivated ? View.VISIBLE : View.GONE);
 
         if (mActivated && mAttached) {
             invalidate();

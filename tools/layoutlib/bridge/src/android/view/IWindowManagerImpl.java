@@ -500,6 +500,11 @@ public class IWindowManagerImpl implements IWindowManager {
     }
 
     @Override
+    public Bitmap getScreenshotFromApplications(IBinder appToken) {
+        return null;
+    }
+
+    @Override
     public boolean hasMenuKeyEnabled() {
         return true;
     }
