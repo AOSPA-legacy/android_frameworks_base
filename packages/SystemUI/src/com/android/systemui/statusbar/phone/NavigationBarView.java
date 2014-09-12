@@ -431,6 +431,7 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
         } else if (button == NavigationCallback.NAVBAR_HOME_HINT) {
             ((ImageView)getHomeButton()).setImageDrawable(mVertical ? mHomeLandIcon : mHomeIcon);
         }
+        mBarTransitions.resetColorBackground(backAlt);
     }
 
     @Override
