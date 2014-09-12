@@ -47,7 +47,9 @@ import android.content.res.Configuration;
 import android.content.res.ThemeConfig;
 import android.content.res.Resources;
 import android.database.ContentObserver;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -75,6 +77,8 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
+import android.view.IWindowManager;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -84,14 +88,18 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.ViewPropertyAnimator;
 import android.view.ViewStub;
 import android.view.WindowManager;
+import android.view.WindowManagerGlobal;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.FrameLayout;
+import android.widget.ImageSwitcher;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import com.android.internal.statusbar.StatusBarIcon;
@@ -694,6 +702,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
 
         mTicker = new MyTicker(context, mStatusBarView);
+        mTicker.setStatusBar(this);
 
         TickerView tickerView = (TickerView)mStatusBarView.findViewById(R.id.tickerText);
         tickerView.mTicker = mTicker;
@@ -765,6 +774,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
             mNetworkController.addSignalCluster(signalCluster);
             signalCluster.setNetworkController(mNetworkController);
+	        signalCluster.setStatusBar(this);
 
             final boolean isAPhone = mNetworkController.hasVoiceCallingFeature();
             if (isAPhone) {
@@ -915,6 +925,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         filter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_ACTIVITY_COLOR_DETECTOR);
         filter.addAction(ACTION_DEMO);
         filter.addAction(CUSTOM_LOCKSCREEN_STATE);
         filter.addAction(ACTION_VOLUMEPANEL_SHOWN);
@@ -931,7 +942,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mCircleBattery.updateUser(mCurrentUserId);
         mCircleBattery.updateSettings(false);
         mCircleBattery.setColors(false);
-
+        mStatusBarView.getPhoneStatusBarTransitions().addText((TextView) mClock);
+        mStatusBarView.getPhoneStatusBarTransitions().addText((TextView) mClockCenter);
         if (MSimTelephonyManager.getDefault().isMultiSimEnabled()) {
             mMSimNetworkController.setListener(this);
         } else {
@@ -1446,6 +1458,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         for (int i=0; i<toShow.size(); i++) {
             View v = toShow.get(i);
+            addIconToColor((ImageView) v);
             if (v.getParent() == null) {
                 mNotificationIcons.addView(v, i, params);
             }
@@ -1577,6 +1590,24 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         View clock = mStatusBarView.findViewById(R.id.clock);
         if (clock != null) {
             clock.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    public void addIconToColor(ImageView iv) {
+        mStatusBarView.getPhoneStatusBarTransitions().addIcon(iv);
+    }
+
+    public void setColorToAllTextSwitcherChildren(TextSwitcher switcher) {
+        for (int i = 0; i < switcher.getChildCount(); i++) {
+             TextView view = (TextView) switcher.getChildAt(i);
+             mStatusBarView.getPhoneStatusBarTransitions().addText(view);
+        }
+    }
+
+    public void setColorToAllImageSwitcherChildren(ImageSwitcher switcher) {
+        for (int i = 0; i < switcher.getChildCount(); i++) {
+             ImageView view = (ImageView) switcher.getChildAt(i);
+             mStatusBarView.getPhoneStatusBarTransitions().addIcon(view);
         }
     }
 
@@ -2965,8 +2996,52 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 // work around problem where mDisplay.getRotation() is not stable while screen is off (bug 7086018)
                 repositionNavigationBar();
                 notifyNavigationBarScreenOn(true);
-            }
-            else if (ACTION_DEMO.equals(action)) {
+           } else if (Intent.ACTION_ACTIVITY_COLOR_DETECTOR.equals(action)) {
+                final IBinder packageToken = (IBinder) intent.getExtra("packagetoken");
+                final String packageName = intent.getStringExtra("packagename");
+                final Bitmap bitmap = captureTheScreen(packageToken);
+                final int packageSt = intent.getIntExtra("packagestcolor", -3);
+                final int packageNv = intent.getIntExtra("packagenvcolor", -3);
+                final int packageIcSt = intent.getIntExtra("packageicstcolor", -3);
+                final int packageIcNv = intent.getIntExtra("packageicnvcolor", -3);
+                mHandler.postDelayed(new Runnable() {
+                      public void run() {
+                          int colorTop = getMainColorFromTop(bitmap);
+                          int colorBottom = getMainColorFromBottom(bitmap);
+                          Log.w(TAG, "ScreenShot color is " + colorTop + " and " + colorBottom);
+                          int colorIcTop = -3;
+                          int colorIcBottom = -3;
+                          if (packageSt != -3) {
+                              colorTop = packageSt;
+                          }
+                          if (packageNv != -3) {
+                              colorBottom = packageNv;
+                          }
+                          if (packageIcSt != -3) {
+                              colorIcTop = packageIcSt;
+                          }
+                          if (packageIcNv != -3) {
+                              colorIcBottom = packageIcNv;
+                          }
+                          if (mStatusBarView != null) {
+                              mStatusBarView.getBarTransitions().changeColorIconBackground(colorTop, colorIcTop);
+                          }
+                          if (mNavigationBarView != null) {
+                              mNavigationBarView.getBarTransitions().changeColorIconBackground(colorBottom, colorIcBottom);
+                          }
+                          if (mCircleBattery != null) {
+                              int mode = mStatusBarView.getBarTransitions().getMode();
+                              boolean isModeOpaque = mStatusBarView.getPhoneStatusBarTransitions().isOpaque(mode);
+                              if ((colorIcTop != -3) && isModeOpaque) {
+                                  mCircleBattery.updateSettings(colorIcTop);
+                              } else {
+                                  mCircleBattery.updateSettings();
+                              }
+                          }
+                      }}, 100);
+            } else if (SCHEDULE_REMINDER_NOTIFY.equals(action)) {
+                updateAndNotifyReminder();
+            } else if (ACTION_DEMO.equals(action)) {
                 Bundle bundle = intent.getExtras();
                 if (bundle != null) {
                     String command = bundle.getString("command", "").trim().toLowerCase();
@@ -2993,6 +3068,47 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
         }
     };
+
+    private Bitmap captureTheScreen(IBinder appToken) {
+        IWindowManager wm = (IWindowManager) WindowManagerGlobal.getWindowManagerService();
+        Bitmap bitmap;
+        try {
+            bitmap = wm.getScreenshotFromApplications(appToken);
+        } catch (RemoteException e) {
+            bitmap = null;
+        }
+        if (bitmap == null) {
+            Log.w(TAG, "ScreenShot is NULL");
+        } else {
+            Log.w(TAG, "ScreenShot size is " + bitmap.getHeight() + " and " + bitmap.getWidth());
+        }
+        return bitmap;
+    }
+
+    private int getMainColorFromTop(Bitmap bitmap) {
+        if (bitmap == null) {
+            return -3;
+        }
+        int pixel = bitmap.getPixel(10, getStatusBarHeight());
+        int red = Color.red(pixel);
+        int blue = Color.blue(pixel);
+        int green = Color.green(pixel);
+        int alpha = Color.alpha(pixel);
+        return Color.argb(alpha, red, green, blue);
+    }
+
+    private int getMainColorFromBottom(Bitmap bitmap) {
+        if (bitmap == null) {
+            return -3;
+        }
+        int height = bitmap.getHeight() - (getStatusBarHeight() + 50);
+        int pixel = bitmap.getPixel(10, height);
+        int red = Color.red(pixel);
+        int blue = Color.blue(pixel);
+        int green = Color.green(pixel);
+        int alpha = Color.alpha(pixel);
+        return Color.argb(alpha, red, green, blue);
+    }
 
     // SystemUIService notifies SystemBars of configuration changes, which then calls down here
     @Override
