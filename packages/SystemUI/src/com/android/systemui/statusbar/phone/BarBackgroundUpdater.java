@@ -35,6 +35,8 @@ import android.view.Surface;
 import android.view.SurfaceControl;
 import android.view.WindowManager;
 
+import org.eclipse.ecf.core.user.User;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -260,12 +262,12 @@ public class BarBackgroundUpdater {
                 Settings.System.getUriFor(Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE),
                 false, mObserver, UserHandle.USER_ALL);
 
-        mStatusEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.DYNAMIC_STATUS_BAR_STATE, 0) == 1;
-        mNavigationEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0) == 1;
-        mStatusFilterEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0) == 1;
+        mStatusEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.DYNAMIC_STATUS_BAR_STATE, 0, UserHandle.USER_CURRENT) == 1;
+        mNavigationEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0, UserHandle.USER_CURRENT) == 1;
+        mStatusFilterEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0, UserHandle.USER_CURRENT) == 1;
 
         PAUSED = false;
     }
@@ -486,12 +488,13 @@ public class BarBackgroundUpdater {
 
         @Override
         public void onChange(final boolean selfChange) {
-            mStatusEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.DYNAMIC_STATUS_BAR_STATE, 0) == 1;
-            mNavigationEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0) == 1;
-            mStatusFilterEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0) == 1;
+            mStatusEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_STATUS_BAR_STATE, 0, UserHandle.USER_CURRENT) == 1;
+            mNavigationEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0, UserHandle.USER_CURRENT) == 1;
+            mStatusFilterEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0,
+                    UserHandle.USER_CURRENT) == 1;
         }
     }
 
