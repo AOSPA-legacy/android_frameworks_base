@@ -35,8 +35,6 @@ import android.view.Surface;
 import android.view.SurfaceControl;
 import android.view.WindowManager;
 
-import org.eclipse.ecf.core.user.User;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
