@@ -143,7 +143,7 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     }
 
     @Override
-    public boolean canChildBeDismissed(View v) {
+    public boolean canChildBeDismissed(int gestureDirection, View v) {
         return true;
     }
 
@@ -156,7 +156,7 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     }
 
     @Override
-    public void onChildDismissed(View v) {
+    public void onChildDismissed(int gestureDirection, View v) {
         // First: Handle swipe and let callback remove view from adapter
         if (mCallback != null) {
             // Use fake view with correct task description
@@ -174,6 +174,16 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     public void onDragCancelled(View v) {
         v.setActivated(false);
         resetOverscrolling();
+    }
+
+    @Override
+    public boolean isConstrainSwipeEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isFadeoutEnabled(int gestureDirection) {
+        return true;
     }
 
     @Override
