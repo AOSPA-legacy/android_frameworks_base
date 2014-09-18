@@ -31,7 +31,7 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
 public class TickerImageView extends ImageSwitcher {
     private final Handler mHandler;
-    private final mDSBDuration;
+    private final int mDSBDuration;
     private int mOverrideIconColor = 0;
 
     public TickerImageView(final Context context, final AttributeSet attrs) {
