@@ -211,6 +211,7 @@ public class BarBackgroundUpdater {
     });
 
     static {
+        THREAD.setPriority(4);
         THREAD.start();
     }
 
