@@ -58,6 +58,8 @@ public class BarTransitions {
 
     private int mMode;
 
+    private final int mDSBDuration;
+
     public BarTransitions(View view, BarBackgroundDrawable barBackground) {
         mTag = "BarTransitions." + view.getClass().getSimpleName();
         mView = view;
@@ -167,6 +169,7 @@ public class BarTransitions {
             mOpaqueColorResourceId = opaqueColorResourceId;
             mSemiTransparentColorResourceId = semiTransparentColorResourceId;
             mHandler = new Handler();
+            mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
         }
 
         protected int getColorOpaque() {
@@ -278,8 +281,7 @@ public class BarTransitions {
                       (int)(v * Color.blue(mColor) + Color.blue(mColorStart) * (1 - v)));
             }
 
-            mStartTime = now + 50;
-            mEndTime = mStartTime + 350;
+            mEndTime = now + mDSBDuration;
             mAnimating = true;
 
             // only invalidate when we will need to use these colors for sure

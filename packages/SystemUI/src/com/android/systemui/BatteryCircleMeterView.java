@@ -106,6 +106,8 @@ public class BatteryCircleMeterView extends ImageView {
 
     private int mOverrideIconColor = 0;
 
+    private final int mDSBDuration;
+
     // runnable to invalidate view via mHandler.postDelayed() call
     private final Runnable mInvalidate = new Runnable() {
         public void run() {
@@ -192,6 +194,8 @@ public class BatteryCircleMeterView extends ImageView {
 
         mCircleBatteryView = circleBatteryType.getString(
                 com.android.systemui.R.styleable.BatteryIcon_batteryView);
+
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
 
         if (mCircleBatteryView == null) {
             mCircleBatteryView = StatusBar;
@@ -309,7 +313,7 @@ public class BatteryCircleMeterView extends ImageView {
     // BatteryMeterView calls invalidate already no need to do it here
     private ObjectAnimator buildAnimator(Paint painter, int toColor)  {
          ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "color", new ArgbEvaluator(), painter.getColor(), toColor);
-              colorFader.setDuration(500);
+              colorFader.setDuration(mDSBDuration);
         return colorFader;
     }
 

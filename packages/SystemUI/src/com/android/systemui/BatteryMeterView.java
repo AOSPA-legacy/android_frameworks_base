@@ -82,6 +82,8 @@ public class BatteryMeterView extends View implements DemoMode {
     private final RectF mClipFrame = new RectF();
     private final RectF mBoltFrame = new RectF();
 
+    private final int mDSBDuration;
+
     private class BatteryTracker extends BroadcastReceiver {
         public static final int UNKNOWN_LEVEL = -1;
 
@@ -220,6 +222,8 @@ public class BatteryMeterView extends View implements DemoMode {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         updateSettings(false);
+
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
@@ -239,7 +243,7 @@ public class BatteryMeterView extends View implements DemoMode {
 
     private ObjectAnimator buildAnimator(Paint painter, int toColor)  {
          ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "backgroundColor", new ArgbEvaluator(), painter.getColor(), toColor);
-              colorFader.setDuration(500);
+              colorFader.setDuration(mDSBDuration);
               colorFader.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {

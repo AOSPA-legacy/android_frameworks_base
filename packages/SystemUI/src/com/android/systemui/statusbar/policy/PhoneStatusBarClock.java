@@ -29,6 +29,7 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
  */
 public class PhoneStatusBarClock extends Clock {
     private final Handler mHandler;
+    private final int mDSBDuration;
 
     public PhoneStatusBarClock(final Context context) {
         this(context, null);
@@ -43,6 +44,8 @@ public class PhoneStatusBarClock extends Clock {
         super(context, attrs, defStyle);
 
         mHandler = new Handler();
+
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
@@ -66,7 +69,7 @@ public class PhoneStatusBarClock extends Clock {
                     public void run() {
                         int currentColor = getTextColors().getDefaultColor();
                         ObjectAnimator.ofObject(this, "textColor", new ArgbEvaluator(), currentColor, iconColor)
-                            .setDuration(500)
+                            .setDuration(mDSBDuration)
                             .start();
                     }
                 });

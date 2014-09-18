@@ -32,11 +32,13 @@ public class TickerView extends TextSwitcher {
     Ticker mTicker;
 
     private final Handler mHandler;
+    private final int mDSBDuration;
     private int mOverrideTextColor = 0;
 
     public TickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mHandler = new Handler();
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
@@ -72,7 +74,7 @@ public class TickerView extends TextSwitcher {
                             if (tv != null) {
                                 int currentColor = tv.getTextColors().getDefaultColor();
                                 ObjectAnimator.ofObject(tv, "textColor", new ArgbEvaluator(), currentColor, iconColor)
-                                    .setDuration(500)
+                                    .setDuration(mDSBDuration)
                                     .start();
                             }
                         }

@@ -113,6 +113,8 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
 
     private Resources mThemedResources;
 
+    private final int mDSBDuration;
+
     private class NavTransitionListener implements TransitionListener {
         private boolean mBackTransitioning;
         private boolean mHomeAppearing;
@@ -233,6 +235,7 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
         mCameraDisabledByDpm = isCameraDisabledByDpm();
         watchForDevicePolicyChanges();
 
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
@@ -273,7 +276,7 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
                             Integer currentColor = (Integer) button.getTag();
                             if (currentColor == null) currentColor = new Integer(0); // On the first pass the tag is null
                             ObjectAnimator.ofObject(button, "tint", new ArgbEvaluator(), currentColor.intValue(), mOverrideIconColor)
-	                            .setDuration(500)
+	                            .setDuration(mDSBDurration)
                                 .start();
                             button.setTag(new Integer(mOverrideIconColor));
                         }

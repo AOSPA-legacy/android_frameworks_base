@@ -31,11 +31,13 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
 public class TickerImageView extends ImageSwitcher {
     private final Handler mHandler;
+    private final mDSBDuration;
     private int mOverrideIconColor = 0;
 
     public TickerImageView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         mHandler = new Handler();
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
@@ -72,7 +74,7 @@ public class TickerImageView extends ImageSwitcher {
                                 Integer currentColor = (Integer) iv.getTag();
                                 if (currentColor == null) currentColor = new Integer(0); // On the first pass the tag is null
                                 ObjectAnimator.ofObject(iv, "tint", new ArgbEvaluator(), currentColor.intValue(), mOverrideIconColor)
-	                                .setDuration(500)
+	                                .setDuration(mDSBDuration)
                                     .start();
                                 iv.setTag(new Integer(mOverrideIconColor));
                             }
