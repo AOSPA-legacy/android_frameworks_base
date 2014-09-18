@@ -68,9 +68,13 @@ public class TickerImageView extends ImageSwitcher {
                         for (int i = 0; i < childCount; i++) {
                             final ImageView iv = (ImageView) getChildAt(i);
                             if (iv != null) {
-                                ObjectAnimator.ofObject(iv, "tint", new ArgbEvaluator(), iv.getColorFilter(), iconColor)
+                                //Imageviews have no way to get the current color filter, store the last one in a tag
+                                Integer currentColor = (Integer) iv.getTag();
+                                if (currentColor == null) currentColor = new Integer(0); // On the first pass the tag is null
+                                ObjectAnimator.ofObject(iv, "tint", new ArgbEvaluator(), currentColor.intValue(), mOverrideIconColor)
 	                                .setDuration(500)
                                     .start();
+                                iv.setTag(new Integer(mOverrideIconColor));
                             }
                         }
                     }
