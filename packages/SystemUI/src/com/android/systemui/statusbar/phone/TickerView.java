@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
-import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
+import com.android.systemui.R;
 
 public class TickerView extends TextSwitcher {
     Ticker mTicker;
@@ -38,7 +38,7 @@ public class TickerView extends TextSwitcher {
     public TickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mHandler = new Handler();
-        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override

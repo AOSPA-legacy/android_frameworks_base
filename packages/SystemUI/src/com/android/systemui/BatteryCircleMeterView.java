@@ -195,7 +195,8 @@ public class BatteryCircleMeterView extends ImageView {
         mCircleBatteryView = circleBatteryType.getString(
                 com.android.systemui.R.styleable.BatteryIcon_batteryView);
 
-        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
+        mDSBDuration = context.getResources().getInteger(com.android.systemui.R.integer
+                .dsb_transition_duration);
 
         if (mCircleBatteryView == null) {
             mCircleBatteryView = StatusBar;

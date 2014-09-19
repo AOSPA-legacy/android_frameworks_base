@@ -52,13 +52,13 @@ public class BarTransitions {
     public static final int LIGHTS_OUT_DURATION = 750;
     public static final int BACKGROUND_DURATION = 200;
 
+    private static int mDSBDuration;
+
     private final String mTag;
     private final View mView;
     private final BarBackgroundDrawable mBarBackground;
 
     private int mMode;
-
-    private final int mDSBDuration;
 
     public BarTransitions(View view, BarBackgroundDrawable barBackground) {
         mTag = "BarTransitions." + view.getClass().getSimpleName();
@@ -169,7 +169,7 @@ public class BarTransitions {
             mOpaqueColorResourceId = opaqueColorResourceId;
             mSemiTransparentColorResourceId = semiTransparentColorResourceId;
             mHandler = new Handler();
-            mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
+            mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
         }
 
         protected int getColorOpaque() {

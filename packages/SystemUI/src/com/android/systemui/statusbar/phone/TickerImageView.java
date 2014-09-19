@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 
-import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
+import com.android.systemui.R;
 
 public class TickerImageView extends ImageSwitcher {
     private final Handler mHandler;
@@ -37,7 +37,7 @@ public class TickerImageView extends ImageSwitcher {
     public TickerImageView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         mHandler = new Handler();
-        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override

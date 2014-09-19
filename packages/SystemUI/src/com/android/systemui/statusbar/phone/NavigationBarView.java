@@ -276,7 +276,7 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
                             Integer currentColor = (Integer) button.getTag();
                             if (currentColor == null) currentColor = new Integer(0); // On the first pass the tag is null
                             ObjectAnimator.ofObject(button, "tint", new ArgbEvaluator(), currentColor.intValue(), mOverrideIconColor)
-	                            .setDuration(mDSBDurration)
+	                            .setDuration(mDSBDuration)
                                 .start();
                             button.setTag(new Integer(mOverrideIconColor));
                         }
