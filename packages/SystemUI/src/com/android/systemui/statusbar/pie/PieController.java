@@ -16,6 +16,7 @@
 
 package com.android.systemui.statusbar.pie;
 
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.app.StatusBarManager;
 import android.content.Context;
@@ -179,9 +180,16 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                         | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
                         | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 PixelFormat.TRANSLUCENT);
+
+        // Turn on hardware acceleration for high end gfx devices.
+        if (ActivityManager.isHighEndGfx()) {
+            lp.flags |= WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
+            lp.privateFlags |=
+                    WindowManager.LayoutParams.PRIVATE_FLAG_FORCE_HARDWARE_ACCELERATED;
+        }
+
         lp.setTitle("PieControlPanel");
         lp.windowAnimations = android.R.style.Animation;
 
