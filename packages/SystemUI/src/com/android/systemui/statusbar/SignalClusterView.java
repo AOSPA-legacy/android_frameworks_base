@@ -83,7 +83,33 @@ public class SignalClusterView extends LinearLayout
 
                     @Override
                     public void run() {
-                        apply();
+                        if (mOverrideIconColor == 0) {
+                            if (mWifi != null) {
+                                mWifi.setColorFilter(null);
+                            }
+                            if (mMobile != null) {
+                                mMobile.setColorFilter(null);
+                            }
+                            if (mMobileType != null) {
+                                mMobileType.setColorFilter(null);
+                            }
+                            if (mAirplane != null) {
+                                mAirplane.setColorFilter(null);
+                            }
+                        } else {
+                            if (mWifi != null) {
+                                buildAnimator(mWifi).start();
+                            }
+                            if (mMobile != null) {
+                                buildAnimator(mMobile).start();
+                            }
+                            if (mMobileType != null) {
+                                buildAnimator(mMobileType).start();
+                            }
+                            if (mAirplane != null) {
+                                buildAnimator(mAirplane).start();
+                            }
+                        }
                     }
 
                 });
@@ -210,12 +236,6 @@ public class SignalClusterView extends LinearLayout
         if (mWifiVisible) {
             mWifi.setImageResource(mWifiStrengthId);
 
-            if (mOverrideIconColor == 0) {
-                mWifi.setColorFilter(null);
-            } else {
-                buildAnimator(mWifi).start();
-            }
-
             mWifiGroup.setContentDescription(mWifiDescription);
             mWifiGroup.setVisibility(View.VISIBLE);
         } else {
@@ -231,14 +251,6 @@ public class SignalClusterView extends LinearLayout
             mMobile.setImageResource(mMobileStrengthId);
             mMobileType.setImageResource(mMobileTypeId);
 
-            if (mOverrideIconColor == 0) {
-                mMobile.setColorFilter(null);
-                mMobileType.setColorFilter(null);
-            } else {
-                buildAnimator(mMobile).start();
-                buildAnimator(mMobileType).start();
-            }
-
             mMobileGroup.setContentDescription(mMobileTypeDescription + " " + mMobileDescription);
             mMobileGroup.setVisibility(View.VISIBLE);
         } else {
@@ -247,13 +259,6 @@ public class SignalClusterView extends LinearLayout
 
         if (mIsAirplaneMode) {
             mAirplane.setImageResource(mAirplaneIconId);
-
-            if (mOverrideIconColor == 0) {
-                mAirplane.setColorFilter(null);
-            } else {
-                buildAnimator(mAirplane).start();
-            }
-
             mAirplane.setVisibility(View.VISIBLE);
         } else {
             mAirplane.setVisibility(View.GONE);
