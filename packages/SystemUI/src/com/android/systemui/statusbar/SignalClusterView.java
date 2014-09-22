@@ -16,6 +16,9 @@
 
 package com.android.systemui.statusbar;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Handler;
@@ -53,6 +56,8 @@ public class SignalClusterView extends LinearLayout
     View mSpacer;
 
     private final Handler mHandler;
+    private final int mDSBDuration;
+    private int mPreviousOverrideIconColor = 0;
     private int mOverrideIconColor = 0;
 
     public SignalClusterView(Context context) {
@@ -66,12 +71,13 @@ public class SignalClusterView extends LinearLayout
     public SignalClusterView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mHandler = new Handler();
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
             public void onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
-                // TODO animate this bugger
+                mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
                 mHandler.post(new Runnable() {
 
@@ -84,6 +90,21 @@ public class SignalClusterView extends LinearLayout
             }
 
         });
+    }
+
+    private ObjectAnimator buildAnimator(final ImageView target) {
+        final ObjectAnimator animator = ObjectAnimator.ofObject(target, "colorFilter",
+                new ArgbEvaluator(), mPreviousOverrideIconColor, mOverrideIconColor);
+        animator.setDuration(mDSBDuration);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(final ValueAnimator anim) {
+                target.invalidate();
+            }
+
+        });
+        return animator;
     }
 
     public void setNetworkController(NetworkController nc) {
@@ -192,7 +213,7 @@ public class SignalClusterView extends LinearLayout
             if (mOverrideIconColor == 0) {
                 mWifi.setColorFilter(null);
             } else {
-                mWifi.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+                buildAnimator(mWifi).start();
             }
 
             mWifiGroup.setContentDescription(mWifiDescription);
@@ -214,8 +235,8 @@ public class SignalClusterView extends LinearLayout
                 mMobile.setColorFilter(null);
                 mMobileType.setColorFilter(null);
             } else {
-                mMobile.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
-                mMobileType.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+                buildAnimator(mMobile).start();
+                buildAnimator(mMobileType).start();
             }
 
             mMobileGroup.setContentDescription(mMobileTypeDescription + " " + mMobileDescription);
@@ -230,7 +251,7 @@ public class SignalClusterView extends LinearLayout
             if (mOverrideIconColor == 0) {
                 mAirplane.setColorFilter(null);
             } else {
-                mAirplane.setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+                buildAnimator(mAirplane).start();
             }
 
             mAirplane.setVisibility(View.VISIBLE);

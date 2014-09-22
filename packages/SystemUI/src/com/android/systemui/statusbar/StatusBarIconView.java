@@ -16,6 +16,9 @@
 
 package com.android.systemui.statusbar;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Notification;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -55,6 +58,8 @@ public class StatusBarIconView extends AnimatedImageView {
     private Notification mNotification;
 
     private final Handler mHandler;
+    private final int mDSBDuration;
+    private int mPreviousOverrideIconColor = 0;
     private int mOverrideIconColor = 0;
 
     public StatusBarIconView(Context context, String slot, Notification notification) {
@@ -81,12 +86,13 @@ public class StatusBarIconView extends AnimatedImageView {
         setScaleType(ImageView.ScaleType.CENTER);
 
         mHandler = new Handler();
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
             public void onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
-                // TODO animate this bugger
+                mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
                 mHandler.post(new Runnable() {
 
@@ -111,12 +117,14 @@ public class StatusBarIconView extends AnimatedImageView {
         setScaleY(scale);
 
         mHandler = new Handler();
+        mDSBDuration = context.getResources().getInteger(com.android.systemui.R.integer
+                .dsb_transition_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
             public void onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
-                // TODO animate this bugger
+                mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
                 mHandler.post(new Runnable() {
 
@@ -209,7 +217,18 @@ public class StatusBarIconView extends AnimatedImageView {
         if (mOverrideIconColor == 0) {
             setColorFilter(null);
         } else {
-            setColorFilter(mOverrideIconColor, PorterDuff.Mode.MULTIPLY);
+            final ObjectAnimator anim = ObjectAnimator.ofObject(this, "colorFilter",
+                    new ArgbEvaluator(), mPreviousOverrideIconColor, mOverrideIconColor);
+            anim.setDuration(mDSBDuration);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                @Override
+                public void onAnimationUpdate(final ValueAnimator animation) {
+                    invalidate();
+                }
+
+            });
+            anim.start();
         }
 
         return true;
