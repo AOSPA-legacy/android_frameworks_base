@@ -92,6 +92,7 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
     int mDisabledFlags = 0;
     int mNavigationIconHints = 0;
 
+    private int mPreviousOverrideIconColor = 0;
     private int mOverrideIconColor = 0;
     private Drawable mBackIcon, mBackLandIcon, mBackAltIcon, mBackAltLandIcon,
             mRecentIcon, mRecentLandIcon, mRecentAltIcon, mRecentAltLandIcon,
@@ -239,13 +240,9 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onResetNavigationBarIconColor() {
-                mOverrideIconColor = 0;
-                updateButtonColors();
-            }
-
-            @Override
-            public void onUpdateNavigationBarIconColor(final int iconColor) {
+            public void onUpdateNavigationBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
                 updateButtonColors();
             }
@@ -272,13 +269,10 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
                         if (mOverrideIconColor == 0) {
                             button.setColorFilter(null);
                         } else {
-                            //Imageviews have no way to get the current color fiklter, store the last one in a tag
-                            Integer currentColor = (Integer) button.getTag();
-                            if (currentColor == null) currentColor = new Integer(0); // On the first pass the tag is null
-                            ObjectAnimator.ofObject(button, "tint", new ArgbEvaluator(), currentColor.intValue(), mOverrideIconColor)
-	                            .setDuration(mDSBDuration)
+                            ObjectAnimator.ofObject(button, "colorFilter", new ArgbEvaluator(),
+                                    mPreviousOverrideIconColor, mOverrideIconColor)
+                                .setDuration(mDSBDuration)
                                 .start();
-                            button.setTag(new Integer(mOverrideIconColor));
                         }
                     }
 

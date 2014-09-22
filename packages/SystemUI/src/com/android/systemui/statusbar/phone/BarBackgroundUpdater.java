@@ -47,7 +47,7 @@ public class BarBackgroundUpdater {
     private final static boolean DEBUG_EXCESSIVE_DELAY = DEBUG_ALL || false;
     private final static boolean DEBUG_FLOOD_ALL_DELAY = DEBUG_ALL || false;
 
-    private final static long MIN_DELAY = 450; // ~2 fps a frame capture takes ~50 ms
+    private final static long MIN_DELAY = 450; // enforce at least 450ms between shots (~2 fps)
 
     private static boolean PAUSED = true;
 
@@ -217,11 +217,15 @@ public class BarBackgroundUpdater {
 
     private static boolean mStatusEnabled = false;
     private static boolean mStatusFilterEnabled = false;
+    private static int mPreviousStatusBarOverrideColor = 0;
     private static int mStatusBarOverrideColor = 0;
+    private static int mPreviousStatusBarIconOverrideColor = 0;
     private static int mStatusBarIconOverrideColor = 0;
 
     private static boolean mNavigationEnabled = false;
+    private static int mPreviousNavigationBarOverrideColor = 0;
     private static int mNavigationBarOverrideColor = 0;
+    private static int mPreviousNavigationBarIconOverrideColor = 0;
     private static int mNavigationBarIconOverrideColor = 0;
 
     private static Context mContext = null;
@@ -277,29 +281,17 @@ public class BarBackgroundUpdater {
                 continue;
             }
 
-            if (mStatusBarOverrideColor == 0) {
-                listener.onResetStatusBarColor();
-            } else {
-                listener.onUpdateStatusBarColor(mStatusBarOverrideColor);
-            }
+            listener.onUpdateStatusBarColor(mPreviousStatusBarOverrideColor,
+                    mStatusBarOverrideColor);
 
-            if (mStatusBarIconOverrideColor == 0) {
-                listener.onResetStatusBarIconColor();
-            } else {
-                listener.onUpdateStatusBarIconColor(mStatusBarIconOverrideColor);
-            }
+            listener.onUpdateStatusBarIconColor(mPreviousStatusBarIconOverrideColor,
+                    mStatusBarIconOverrideColor);
 
-            if (mNavigationBarOverrideColor == 0) {
-                listener.onResetNavigationBarColor();
-            } else {
-                listener.onUpdateNavigationBarColor(mNavigationBarOverrideColor);
-            }
+            listener.onUpdateNavigationBarColor(mPreviousNavigationBarOverrideColor,
+                    mNavigationBarOverrideColor);
 
-            if (mNavigationBarIconOverrideColor == 0) {
-                listener.onResetNavigationBarIconColor();
-            } else {
-                listener.onUpdateNavigationBarIconColor(mNavigationBarIconOverrideColor);
-            }
+            listener.onUpdateNavigationBarIconColor(mPreviousNavigationBarIconOverrideColor,
+                    mNavigationBarIconOverrideColor);
 
             boolean shouldAdd = true;
 
@@ -365,6 +357,7 @@ public class BarBackgroundUpdater {
             return;
         }
 
+        mPreviousStatusBarOverrideColor = mStatusBarOverrideColor;
         mStatusBarOverrideColor = newColor;
 
         if (DEBUG_COLOR_CHANGE) {
@@ -373,11 +366,8 @@ public class BarBackgroundUpdater {
         }
 
         for (final UpdateListener listener : mListeners) {
-            if (newColor == 0) {
-                listener.onResetStatusBarColor();
-            } else {
-                listener.onUpdateStatusBarColor(newColor);
-            }
+            listener.onUpdateStatusBarColor(mPreviousStatusBarOverrideColor,
+                    mStatusBarOverrideColor);
         }
     }
 
@@ -386,6 +376,7 @@ public class BarBackgroundUpdater {
             return;
         }
 
+        mPreviousStatusBarIconOverrideColor = mStatusBarIconOverrideColor;
         mStatusBarIconOverrideColor = newColor;
 
         if (DEBUG_COLOR_CHANGE) {
@@ -394,11 +385,8 @@ public class BarBackgroundUpdater {
         }
 
         for (final UpdateListener listener : mListeners) {
-            if (newColor == 0) {
-                listener.onResetStatusBarIconColor();
-            } else {
-                listener.onUpdateStatusBarIconColor(newColor);
-            }
+            listener.onUpdateStatusBarIconColor(mPreviousStatusBarIconOverrideColor,
+                    mStatusBarIconOverrideColor);
         }
     }
 
@@ -407,6 +395,7 @@ public class BarBackgroundUpdater {
             return;
         }
 
+        mPreviousNavigationBarOverrideColor = mNavigationBarOverrideColor;
         mNavigationBarOverrideColor = newColor;
 
         if (DEBUG_COLOR_CHANGE) {
@@ -415,11 +404,8 @@ public class BarBackgroundUpdater {
         }
 
         for (final UpdateListener listener : mListeners) {
-            if (newColor == 0) {
-                listener.onResetNavigationBarColor();
-            } else {
-                listener.onUpdateNavigationBarColor(newColor);
-            }
+            listener.onUpdateNavigationBarColor(mPreviousNavigationBarOverrideColor,
+                    mNavigationBarOverrideColor);
         }
     }
 
@@ -428,6 +414,7 @@ public class BarBackgroundUpdater {
             return;
         }
 
+        mPreviousNavigationBarIconOverrideColor = mNavigationBarIconOverrideColor;
         mNavigationBarIconOverrideColor = newColor;
 
         if (DEBUG_COLOR_CHANGE) {
@@ -436,11 +423,8 @@ public class BarBackgroundUpdater {
         }
 
         for (final UpdateListener listener : mListeners) {
-            if (newColor == 0) {
-                listener.onResetNavigationBarIconColor();
-            } else {
-                listener.onUpdateNavigationBarIconColor(newColor);
-            }
+            listener.onUpdateNavigationBarIconColor(mPreviousNavigationBarIconOverrideColor,
+                    mNavigationBarIconOverrideColor);
         }
     }
 
@@ -455,28 +439,16 @@ public class BarBackgroundUpdater {
             return mRef.get() == null;
         }
 
-        public void onResetStatusBarColor() {
+        public void onUpdateStatusBarColor(final int previousColor, final int color) {
         }
 
-        public void onUpdateStatusBarColor(final int color) {
+        public void onUpdateStatusBarIconColor(final int previousIconColor, final int iconColor) {
         }
 
-        public void onResetStatusBarIconColor() {
+        public void onUpdateNavigationBarColor(final int previousColor, final int color) {
         }
 
-        public void onUpdateStatusBarIconColor(final int iconColor) {
-        }
-
-        public void onResetNavigationBarColor() {
-        }
-
-        public void onUpdateNavigationBarColor(final int color) {
-        }
-
-        public void onResetNavigationBarIconColor() {
-        }
-
-        public void onUpdateNavigationBarIconColor(final int iconColor) {
+        public void onUpdateNavigationBarIconColor(final int previousIconColor, final int iconColor) {
         }
     }
 

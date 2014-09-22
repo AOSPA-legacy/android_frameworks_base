@@ -16,8 +16,6 @@
 
 package com.android.systemui.statusbar.phone;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -142,15 +140,9 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
             BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
                 @Override
-                public void onResetStatusBarColor() {
-                    mOverrideColor = 0;
-                    forceStartAnimation();
-                }
-
-                @Override
-                public void onUpdateStatusBarColor(final int color) {
+                public void onUpdateStatusBarColor(final int previousColor, final int color) {
                     mOverrideColor = color;
-                    doColorTranistion();
+                    startAnimation(25);
                 }
 
             });
@@ -180,7 +172,7 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
 
         public void setGradientAlpha(final int alpha) {
             mGradientAlpha = alpha;
-            forceStartAnimation();
+            startAnimation(25);
         }
     }
 

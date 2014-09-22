@@ -50,33 +50,28 @@ public class PhoneStatusBarClock extends Clock {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onResetStatusBarIconColor() {
+            public void onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
                 mHandler.post(new Runnable() {
 
                     @Override
                     public void run() {
-                        // TODO themeability - use the resource instead of a hardcoded value
-                        setTextColor(0xffffffff);
+                        // TODO use the resource value instead for themeability
+                        updateColor(iconColor == 0 ? 0xffffffff : iconColor);
                     }
 
-                });
-            }
-
-            @Override
-            public void onUpdateStatusBarIconColor(final int iconColor) {
-                mHandler.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        int currentColor = getTextColors().getDefaultColor();
-                        ObjectAnimator.ofObject(this, "textColor", new ArgbEvaluator(), currentColor, iconColor)
-                            .setDuration(mDSBDuration)
-                            .start();
-                    }
                 });
             }
 
         });
+    }
+
+    protected void updateColor(final int targetColor) {
+        final int currentColor = getTextColors().getDefaultColor();
+        ObjectAnimator.ofObject(this, "textColor", new ArgbEvaluator(),
+                currentColor, targetColor)
+            .setDuration(mDSBDuration)
+            .start();
     }
 
 }

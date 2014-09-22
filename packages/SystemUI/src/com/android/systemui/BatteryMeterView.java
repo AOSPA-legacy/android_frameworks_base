@@ -16,7 +16,6 @@
 
 package com.android.systemui;
 
-
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -227,13 +226,9 @@ public class BatteryMeterView extends View implements DemoMode {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onResetStatusBarIconColor() {
-                mOverrideIconColor = 0;
-                postInvalidate();
-            }
-
-            @Override
-            public void onUpdateStatusBarIconColor(final int iconColor) {
+            public void onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                // TODO animate this bugger
                 mOverrideIconColor = iconColor;
                 postInvalidate();
             }
@@ -241,15 +236,16 @@ public class BatteryMeterView extends View implements DemoMode {
         });
     }
 
-    private ObjectAnimator buildAnimator(Paint painter, int toColor)  {
-         ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "backgroundColor", new ArgbEvaluator(), painter.getColor(), toColor);
-              colorFader.setDuration(mDSBDuration);
-              colorFader.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    invalidate();
-                }
-            });
+    protected ObjectAnimator buildAnimator(final Paint painter, final int toColor)  {
+        final ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "backgroundColor",
+                new ArgbEvaluator(), painter.getColor(), toColor);
+        colorFader.setDuration(mDSBDuration);
+        colorFader.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                invalidate();
+            }
+        });
         return colorFader;
     }
 

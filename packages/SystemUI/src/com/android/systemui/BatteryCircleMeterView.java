@@ -118,11 +118,14 @@ public class BatteryCircleMeterView extends ImageView {
     };
 
     private final Runnable mColorTransition = new Runnable() {
+
+        @Override
         public void run() {
-            if(mActivated && mAttached) {
+            if (mActivated && mAttached) {
                 buildAnimator(mPaintSystem, mOverrideIconColor).start();
             }
         }
+
     };
 
     // keeps track of current battery level and charger-plugged-state
@@ -209,23 +212,14 @@ public class BatteryCircleMeterView extends ImageView {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onResetStatusBarIconColor() {
-                mOverrideIconColor = 0;
-
-                mPaintSystem.setColor(mCircleColor);
-
-                mHandler.removeCallbacks(mInvalidate);
-                mHandler.postDelayed(mInvalidate, 50);
-            }
-
-            @Override
-            public void onUpdateStatusBarIconColor(final int iconColor) {
+            public void onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
                 mOverrideIconColor = iconColor;
 
-                if (mQS) {
+                if (mQS || mOverrideIconColor == 0) {
                     mPaintSystem.setColor(mCircleColor);
                 } else {
-                     mHandler.post(mColorTransition);
+                    mHandler.post(mColorTransition);
                 }
 
                 mHandler.removeCallbacks(mInvalidate);
@@ -311,10 +305,16 @@ public class BatteryCircleMeterView extends ImageView {
 
     }
 
-    // BatteryMeterView calls invalidate already no need to do it here
-    private ObjectAnimator buildAnimator(Paint painter, int toColor)  {
-         ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "color", new ArgbEvaluator(), painter.getColor(), toColor);
-              colorFader.setDuration(mDSBDuration);
+    protected ObjectAnimator buildAnimator(final Paint painter, final int toColor)  {
+        final ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "color",
+                new ArgbEvaluator(), painter.getColor(), toColor);
+        colorFader.setDuration(mDSBDuration);
+        colorFader.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                invalidate();
+            }
+        });
         return colorFader;
     }
 

@@ -69,20 +69,9 @@ public class SignalClusterView extends LinearLayout
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onResetStatusBarIconColor() {
-                mOverrideIconColor = 0;
-                mHandler.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        apply();
-                    }
-
-                });
-            }
-
-            @Override
-            public void onUpdateStatusBarIconColor(final int iconColor) {
+            public void onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                // TODO animate this bugger
                 mOverrideIconColor = iconColor;
                 mHandler.post(new Runnable() {
 

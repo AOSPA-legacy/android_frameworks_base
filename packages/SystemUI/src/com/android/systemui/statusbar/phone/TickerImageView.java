@@ -32,6 +32,7 @@ import com.android.systemui.R;
 public class TickerImageView extends ImageSwitcher {
     private final Handler mHandler;
     private final int mDSBDuration;
+    private int mPreviousOverrideIconColor = 0;
     private int mOverrideIconColor = 0;
 
     public TickerImageView(final Context context, final AttributeSet attrs) {
@@ -41,26 +42,9 @@ public class TickerImageView extends ImageSwitcher {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onResetStatusBarIconColor() {
-                mOverrideIconColor = 0;
-                mHandler.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        final int childCount = getChildCount();
-                        for (int i = 0; i < childCount; i++) {
-                            final ImageView iv = (ImageView) getChildAt(i);
-                            if (iv != null) {
-                                iv.setColorFilter(null);
-                            }
-                        }
-                    }
-
-                });
-            }
-
-            @Override
-            public void onUpdateStatusBarIconColor(final int iconColor) {
+            public void onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
                 mHandler.post(new Runnable() {
 
@@ -70,13 +54,14 @@ public class TickerImageView extends ImageSwitcher {
                         for (int i = 0; i < childCount; i++) {
                             final ImageView iv = (ImageView) getChildAt(i);
                             if (iv != null) {
-                                //Imageviews have no way to get the current color filter, store the last one in a tag
-                                Integer currentColor = (Integer) iv.getTag();
-                                if (currentColor == null) currentColor = new Integer(0); // On the first pass the tag is null
-                                ObjectAnimator.ofObject(iv, "tint", new ArgbEvaluator(), currentColor.intValue(), mOverrideIconColor)
+                                if (mOverrideIconColor == 0) {
+                                    iv.setColorFilter(null);
+                                } else {
+                                    ObjectAnimator.ofObject(iv, "colorFilter", new ArgbEvaluator(),
+                                            mPreviousOverrideIconColor, mOverrideIconColor)
 	                                .setDuration(mDSBDuration)
-                                    .start();
-                                iv.setTag(new Integer(mOverrideIconColor));
+                                        .start();
+                                }
                             }
                         }
                     }

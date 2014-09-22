@@ -33,6 +33,7 @@ public class TickerView extends TextSwitcher {
 
     private final Handler mHandler;
     private final int mDSBDuration;
+    private final int mDefaultTextColor = 0xffffffff; // TODO use the resource value instead
     private int mOverrideTextColor = 0;
 
     public TickerView(Context context, AttributeSet attrs) {
@@ -42,27 +43,8 @@ public class TickerView extends TextSwitcher {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onResetStatusBarIconColor() {
-                mOverrideTextColor = 0;
-                mHandler.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        final int childCount = getChildCount();
-                        for (int i = 0; i < childCount; i++) {
-                            final TextView tv = (TextView) getChildAt(i);
-                            if (tv != null) {
-                                // TODO themeability - use the resource instead of a hardcoded value
-                                tv.setTextColor(0xffffffff);
-                            }
-                        }
-                    }
-
-                });
-            }
-
-            @Override
-            public void onUpdateStatusBarIconColor(final int iconColor) {
+            public void onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
                 mOverrideTextColor = iconColor;
                 mHandler.post(new Runnable() {
 
@@ -72,8 +54,11 @@ public class TickerView extends TextSwitcher {
                         for (int i = 0; i < childCount; i++) {
                             final TextView tv = (TextView) getChildAt(i);
                             if (tv != null) {
-                                int currentColor = tv.getTextColors().getDefaultColor();
-                                ObjectAnimator.ofObject(tv, "textColor", new ArgbEvaluator(), currentColor, iconColor)
+                                final int currentColor = tv.getTextColors().getDefaultColor();
+                                final int targetColor = mOverrideTextColor == 0 ?
+                                        mDefaultTextColor : mOverrideTextColor;
+                                ObjectAnimator.ofObject(tv, "textColor", new ArgbEvaluator(),
+                                        currentColor, targetColor)
                                     .setDuration(mDSBDuration)
                                     .start();
                             }
@@ -102,9 +87,8 @@ public class TickerView extends TextSwitcher {
     @Override
     public void addView(final View child, final int index, final ViewGroup.LayoutParams params) {
         if (child instanceof TextView) {
-            // TODO themeability - use the resource instead of a hardcoded value
             ((TextView) child).setTextColor(mOverrideTextColor == 0 ?
-                    0xffffffff : mOverrideTextColor);
+                    mDefaultTextColor : mOverrideTextColor);
         }
 
         super.addView(child, index, params);

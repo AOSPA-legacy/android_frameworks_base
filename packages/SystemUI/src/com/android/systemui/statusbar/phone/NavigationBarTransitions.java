@@ -243,15 +243,9 @@ public final class NavigationBarTransitions extends BarTransitions {
             BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
                 @Override
-                public void onResetNavigationBarColor() {
-                    mOverrideColor = 0;
-                    forceStartAnimation();
-                }
-
-                @Override
-                public void onUpdateNavigationBarColor(final int color) {
+                public void onUpdateNavigationBarColor(final int previousColor, final int color) {
                     mOverrideColor = color;
-                    doColorTranistion();
+                    startAnimation(25);
                 }
 
             });
@@ -281,7 +275,7 @@ public final class NavigationBarTransitions extends BarTransitions {
 
         public void setGradientAlpha(final int alpha) {
             mGradientAlpha = alpha;
-            forceStartAnimation();
+            startAnimation(25);
         }
     }
 
