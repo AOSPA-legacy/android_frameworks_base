@@ -98,7 +98,8 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
                     RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) contentView.getTag();
                     if (holder != null) {
                         final View thumbnailView = holder.thumbnailView;
-                        mCallback.handleLongPress(contentView, thumbnailView, thumbnailView);
+                        final View anchorView = holder.appColorBarView;
+                        mCallback.handleLongPress(contentView, anchorView, thumbnailView);
                         return true;
                     }
                 }
