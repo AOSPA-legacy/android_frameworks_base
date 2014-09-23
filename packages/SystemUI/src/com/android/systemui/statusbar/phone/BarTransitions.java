@@ -27,6 +27,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -49,18 +50,18 @@ public class BarTransitions {
     public static final int LIGHTS_OUT_DURATION = 750;
     public static final int BACKGROUND_DURATION = 200;
 
+    private static int mDSBDuration;
+
     private final String mTag;
     private final View mView;
     private final BarBackgroundDrawable mBarBackground;
 
     private int mMode;
 
-    public BarTransitions(View view, int gradientResourceId, int opaqueColorResourceId,
-            int semiTransparentColorResourceId) {
+    public BarTransitions(View view, BarBackgroundDrawable barBackground) {
         mTag = "BarTransitions." + view.getClass().getSimpleName();
         mView = view;
-        mBarBackground = new BarBackgroundDrawable(mView.getContext(), gradientResourceId,
-                opaqueColorResourceId, semiTransparentColorResourceId);
+        mBarBackground = barBackground;
         if (HIGH_END) {
             mView.setBackground(mBarBackground);
         }
@@ -121,11 +122,20 @@ public class BarTransitions {
         // for subclasses
     }
 
-    private static class BarBackgroundDrawable extends Drawable {
+    protected static class BarBackgroundDrawable extends Drawable {
         private final int mGradientResourceId;
         private final int mOpaqueColorResourceId;
         private final int mSemiTransparentColorResourceId;
         private final TimeInterpolator mInterpolator;
+        private final Handler mHandler;
+        private final Runnable mInvalidateSelf = new Runnable() {
+
+            @Override
+            public void run() {
+                invalidateSelf();
+            }
+
+        };
 
         private int mOpaque;
         private int mSemiTransparent;
@@ -156,6 +166,24 @@ public class BarTransitions {
             mGradientResourceId = gradientResourceId;
             mOpaqueColorResourceId = opaqueColorResourceId;
             mSemiTransparentColorResourceId = semiTransparentColorResourceId;
+            mHandler = new Handler();
+            mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
+        }
+
+        protected int getColorOpaque() {
+            return mOpaque;
+        }
+
+        protected int getColorSemiTransparent() {
+            return mSemiTransparent;
+        }
+
+        protected int getGradientAlphaOpaque() {
+            return 0;
+        }
+
+        protected int getGradientAlphaSemiTransparent() {
+            return 0;
         }
 
         public void updateResources(Resources res)  {
@@ -191,12 +219,13 @@ public class BarTransitions {
             mAnimating = animate;
             if (animate) {
                 long now = SystemClock.elapsedRealtime();
-                mStartTime = now;
-                mEndTime = now + BACKGROUND_DURATION;
+                mStartTime = now + 50;
+                mEndTime = mStartTime + BACKGROUND_DURATION;
                 mGradientAlphaStart = mGradientAlpha;
                 mColorStart = mColor;
             }
-            invalidateSelf();
+            mHandler.removeCallbacks(mInvalidateSelf);
+            mHandler.postDelayed(mInvalidateSelf, 50);
         }
 
         @Override
@@ -204,10 +233,44 @@ public class BarTransitions {
             return PixelFormat.TRANSLUCENT;
         }
 
+        protected synchronized void startAnimation() {
+            startAnimation(50);
+        }
+
+        protected synchronized void startAnimation(final int delay) {
+            final long now = SystemClock.elapsedRealtime();
+
+            if (!mAnimating || now >= mEndTime) {
+                mGradientAlphaStart = mGradientAlpha;
+                mColorStart = mColor;
+            } else {
+                final float t = Math.max(0, now - mStartTime) / (float)(mEndTime - mStartTime);
+                final float v = Math.max(0, Math.min(mInterpolator.getInterpolation(t), 1));
+                mGradientAlphaStart = (int)(v * mGradientAlpha + mGradientAlphaStart * (1 - v));
+                mColorStart = Color.argb(
+                      (int)(v * Color.alpha(mColor) + Color.alpha(mColorStart) * (1 - v)),
+                      (int)(v * Color.red(mColor) + Color.red(mColorStart) * (1 - v)),
+                      (int)(v * Color.green(mColor) + Color.green(mColorStart) * (1 - v)),
+                      (int)(v * Color.blue(mColor) + Color.blue(mColorStart) * (1 - v)));
+            }
+
+            mStartTime = now + 50;
+            mEndTime = mStartTime + BACKGROUND_DURATION;
+            mAnimating = true;
+
+            // only invalidate when we will need to use these colors for sure
+            if (mMode == MODE_OPAQUE || mMode == MODE_LIGHTS_OUT ||
+                    mMode == MODE_SEMI_TRANSPARENT) {
+                mHandler.removeCallbacks(mInvalidateSelf);
+                mHandler.postDelayed(mInvalidateSelf, delay);
+            }
+        }
+
         public void finishAnimation() {
             if (mAnimating) {
                 mAnimating = false;
-                invalidateSelf();
+                mHandler.removeCallbacks(mInvalidateSelf);
+                mHandler.postDelayed(mInvalidateSelf, 50);
             }
         }
 
@@ -217,11 +280,13 @@ public class BarTransitions {
             if (mMode == MODE_TRANSLUCENT) {
                 targetGradientAlpha = 0xff;
             } else if (mMode == MODE_SEMI_TRANSPARENT) {
-                targetColor = mSemiTransparent;
+                targetGradientAlpha = getGradientAlphaSemiTransparent();
+                targetColor = getColorSemiTransparent();
             } else if (mMode == MODE_TRANSPARENT) {
                 targetGradientAlpha = 0;
             } else {
-                targetColor = mOpaque;
+                targetGradientAlpha = getGradientAlphaOpaque();
+                targetColor = getColorOpaque();
             }
             if (!mAnimating) {
                 mColor = targetColor;
@@ -233,7 +298,7 @@ public class BarTransitions {
                     mColor = targetColor;
                     mGradientAlpha = targetGradientAlpha;
                 } else {
-                    final float t = (now - mStartTime) / (float)(mEndTime - mStartTime);
+                    final float t = Math.max(0, now - mStartTime) / (float)(mEndTime - mStartTime);
                     final float v = Math.max(0, Math.min(mInterpolator.getInterpolation(t), 1));
                     mGradientAlpha = (int)(v * targetGradientAlpha + mGradientAlphaStart * (1 - v));
                     mColor = Color.argb(
@@ -243,15 +308,17 @@ public class BarTransitions {
                           (int)(v * Color.blue(targetColor) + Color.blue(mColorStart) * (1 - v)));
                 }
             }
+            if (Color.alpha(mColor) > 0) {
+                canvas.drawColor(mColor);
+            }
             if (mGradientAlpha > 0) {
                 mGradient.setAlpha(mGradientAlpha);
                 mGradient.draw(canvas);
             }
-            if (Color.alpha(mColor) > 0) {
-                canvas.drawColor(mColor);
-            }
             if (mAnimating) {
-                invalidateSelf();  // keep going
+                // keep going
+                mHandler.removeCallbacks(mInvalidateSelf);
+                mHandler.postDelayed(mInvalidateSelf, 50);
             }
         }
     }

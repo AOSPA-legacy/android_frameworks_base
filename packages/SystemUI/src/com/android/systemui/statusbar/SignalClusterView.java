@@ -16,7 +16,12 @@
 
 package com.android.systemui.statusbar;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -26,11 +31,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.android.systemui.R;
+import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 import com.android.systemui.statusbar.policy.NetworkController;
 
 // Intimately tied to the design of res/layout/signal_cluster_view.xml
-public class SignalClusterView
-        extends LinearLayout
+public class SignalClusterView extends LinearLayout
         implements NetworkController.SignalCluster {
 
     static final boolean DEBUG = false;
@@ -50,6 +55,11 @@ public class SignalClusterView
     ImageView mWifi, mMobile, mMobileType, mAirplane;
     View mSpacer;
 
+    private final Handler mHandler;
+    private final int mDSBDuration;
+    private int mPreviousOverrideIconColor = 0;
+    private int mOverrideIconColor = 0;
+
     public SignalClusterView(Context context) {
         this(context, null);
     }
@@ -60,6 +70,67 @@ public class SignalClusterView
 
     public SignalClusterView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mHandler = new Handler();
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public void onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                mPreviousOverrideIconColor = previousIconColor;
+                mOverrideIconColor = iconColor;
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (mOverrideIconColor == 0) {
+                            if (mWifi != null) {
+                                mWifi.setColorFilter(null);
+                            }
+                            if (mMobile != null) {
+                                mMobile.setColorFilter(null);
+                            }
+                            if (mMobileType != null) {
+                                mMobileType.setColorFilter(null);
+                            }
+                            if (mAirplane != null) {
+                                mAirplane.setColorFilter(null);
+                            }
+                        } else {
+                            if (mWifi != null) {
+                                buildAnimator(mWifi).start();
+                            }
+                            if (mMobile != null) {
+                                buildAnimator(mMobile).start();
+                            }
+                            if (mMobileType != null) {
+                                buildAnimator(mMobileType).start();
+                            }
+                            if (mAirplane != null) {
+                                buildAnimator(mAirplane).start();
+                            }
+                        }
+                    }
+
+                });
+            }
+
+        });
+    }
+
+    private ObjectAnimator buildAnimator(final ImageView target) {
+        final ObjectAnimator animator = ObjectAnimator.ofObject(target, "colorFilter",
+                new ArgbEvaluator(), mPreviousOverrideIconColor, mOverrideIconColor);
+        animator.setDuration(mDSBDuration);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(final ValueAnimator anim) {
+                target.invalidate();
+            }
+
+        });
+        return animator;
     }
 
     public void setNetworkController(NetworkController nc) {
@@ -207,5 +278,5 @@ public class SignalClusterView
         mMobileType.setVisibility(
                 !mWifiVisible ? View.VISIBLE : View.GONE);
     }
-}
 
+}
