@@ -110,6 +110,7 @@ public class CardStackView extends RelativeLayout {
     private int mOverScrollPosition = 0;
     private boolean mIsScrolling;
     private boolean mIsFlinging;
+    private boolean mWasScrolling;
 
     private float mInitTouchPos;
     private float mPagingTouchSlop;
@@ -492,6 +493,10 @@ public class CardStackView extends RelativeLayout {
         return mIsScrolling;
     }
 
+    public boolean wasScrolling() {
+        return mWasScrolling;
+    }
+
     public int getChildIdAtViewPosition(float position, boolean ignoreOcclusion) {
         int id = -1;
         if (mItems.size() > 0) {
@@ -599,23 +604,6 @@ public class CardStackView extends RelativeLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        float curTouchPos = getPos(ev);
-
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mIsScrolling = false;
-                mInitTouchPos = curTouchPos;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (Math.abs(mInitTouchPos-curTouchPos) > mPagingTouchSlop) {
-                    mIsScrolling = true;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                mIsScrolling = false;
-                break;
-        }
         return mIsScrolling;
     }
 
@@ -637,11 +625,17 @@ public class CardStackView extends RelativeLayout {
                     mLastScrollTouch -= mScrollPosition;
                 }
                 mLastViewTouch = (int)(curViewTouch - mDeltaToScrollAnchor);
+                mIsScrolling = false;
+                mWasScrolling = false;
+                mInitTouchPos = curViewTouch;
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 int pos;
                 float curScrollTouch;
+                if (Math.abs(mInitTouchPos-curViewTouch) > mPagingTouchSlop) {
+                    mIsScrolling = mWasScrolling = true;
+                }
 
                 // (1) Move touch event in view coordinate system to anchor of
                 // current item and (2) convert to scroll coordinate system
@@ -672,6 +666,7 @@ public class CardStackView extends RelativeLayout {
                     resetOverscrolling();
                 }
                 updateLayout();
+                mIsScrolling = false;
                 break;
         }
 
@@ -680,12 +675,16 @@ public class CardStackView extends RelativeLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        super.dispatchTouchEvent(event);
+        boolean ret = super.dispatchTouchEvent(event);
 
         // Handle event here instead of using an OnTouchListener
-        onTouchEvent(event);
+        if (getChildIdAtViewPosition(getPos(event), true) >= 0) {
+            onTouchEvent(event);
+        } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            onTouchOutside();
+        }
 
-        return true;
+        return ret;
     }
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener
@@ -735,5 +734,8 @@ public class CardStackView extends RelativeLayout {
     }
 
     protected void updateAdapter(int i, CardStackViewItem item, boolean occluded) {
+    }
+
+    protected void onTouchOutside() {
     }
 }

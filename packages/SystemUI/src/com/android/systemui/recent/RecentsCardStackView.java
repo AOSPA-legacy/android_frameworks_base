@@ -45,7 +45,10 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     private RecentsCallback mCallback;
     private TaskDescriptionAdapter mAdapter;
 
-    public RecentsCardStackView(Context context, int orientation) {
+    // RecentsActivity for dismissing RecentsView
+    private final RecentsActivity mRecentsActivity;
+
+    public RecentsCardStackView(Context context, RecentsActivity recentsActivity, int orientation) {
         super(context, orientation);
 
         setOnClickListener(this);
@@ -61,6 +64,8 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
         mClearAllAnimationDone = true;
 
+        mRecentsActivity = recentsActivity;
+
         mInstance = this;
     }
 
@@ -75,7 +80,7 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
     @Override
     public void onClick(View view) {
-        if (!isScrolling() && !mIsSwiping) {
+        if (!wasScrolling() && !mIsSwiping) {
             int viewId = getChildIdAtViewPosition(mLastViewTouch, false);
 
             if (viewId >= 0 && mCallback != null) {
@@ -98,7 +103,8 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
                     RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) contentView.getTag();
                     if (holder != null) {
                         final View thumbnailView = holder.thumbnailView;
-                        mCallback.handleLongPress(contentView, thumbnailView, thumbnailView);
+                        final View anchorView = holder.appColorBarView;
+                        mCallback.handleLongPress(contentView, anchorView, thumbnailView);
                         return true;
                     }
                 }
@@ -268,6 +274,11 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
         updateAdapter();
         updateLayout();
+    }
+
+    @Override
+    public void onTouchOutside() {
+        mRecentsActivity.dismissAndGoHome();
     }
 
     @Override
