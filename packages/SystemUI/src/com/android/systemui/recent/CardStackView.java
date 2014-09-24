@@ -110,6 +110,7 @@ public class CardStackView extends RelativeLayout {
     private int mOverScrollPosition = 0;
     private boolean mIsScrolling;
     private boolean mIsFlinging;
+    private boolean mWasScrolling;
 
     private float mInitTouchPos;
     private float mPagingTouchSlop;
@@ -492,6 +493,10 @@ public class CardStackView extends RelativeLayout {
         return mIsScrolling;
     }
 
+    public boolean wasScrolling() {
+        return mWasScrolling;
+    }
+
     public int getChildIdAtViewPosition(float position, boolean ignoreOcclusion) {
         int id = -1;
         if (mItems.size() > 0) {
@@ -621,6 +626,7 @@ public class CardStackView extends RelativeLayout {
                 }
                 mLastViewTouch = (int)(curViewTouch - mDeltaToScrollAnchor);
                 mIsScrolling = false;
+                mWasScrolling = false;
                 mInitTouchPos = curViewTouch;
                 break;
 
@@ -628,7 +634,7 @@ public class CardStackView extends RelativeLayout {
                 int pos;
                 float curScrollTouch;
                 if (Math.abs(mInitTouchPos-curViewTouch) > mPagingTouchSlop) {
-                    mIsScrolling = true;
+                    mIsScrolling = mWasScrolling = true;
                 }
 
                 // (1) Move touch event in view coordinate system to anchor of
@@ -660,6 +666,7 @@ public class CardStackView extends RelativeLayout {
                     resetOverscrolling();
                 }
                 updateLayout();
+                mIsScrolling = false;
                 break;
         }
 

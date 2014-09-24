@@ -75,7 +75,7 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
     @Override
     public void onClick(View view) {
-        if (!isScrolling() && !mIsSwiping) {
+        if (!wasScrolling() && !mIsSwiping) {
             int viewId = getChildIdAtViewPosition(mLastViewTouch, false);
 
             if (viewId >= 0 && mCallback != null) {
