@@ -126,6 +126,8 @@ public class CardStackView extends RelativeLayout {
     private int mDeltaToScrollAnchor;
     private float mLastScrollTouch;
 
+    protected final RecentsActivity mRecentsActivity;
+
     // OverScroller and GestureDector for handling fling scrolling (measuring
     // scroll velocity on TOUCH_UP and computing decelerating scroll animation).
     private GestureDetector mDetector;
@@ -282,12 +284,13 @@ public class CardStackView extends RelativeLayout {
         }
     }
 
-    public CardStackView(Context context, int orientation) {
+    public CardStackView(Context context, RecentsActivity recentsActivity, int orientation) {
         super(context);
 
         mContext = context;
         mOrientation = orientation;
         mPagingTouchSlop = ViewConfiguration.get(context).getScaledPagingTouchSlop();
+        mRecentsActivity = recentsActivity;
 
         mDetector = new GestureDetector(context, mGestureListener);
         mScroller = new OverScroller(context);
@@ -675,12 +678,16 @@ public class CardStackView extends RelativeLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        super.dispatchTouchEvent(event);
+        boolean ret = super.dispatchTouchEvent(event);
 
         // Handle event here instead of using an OnTouchListener
-        onTouchEvent(event);
+        if (getChildIdAtViewPosition(getPos(event), true) >= 0) {
+            onTouchEvent(event);
+        } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            mRecentsActivity.dismissAndGoHome();
+        }
 
-        return true;
+        return ret;
     }
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener

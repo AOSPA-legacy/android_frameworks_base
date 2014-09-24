@@ -542,7 +542,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                 height = dm.heightPixels;
             }
             RecentsCardStackView container =
-                    new RecentsCardStackView(mContext, orientation);
+                    new RecentsCardStackView(mContext, mRecentsActivity, orientation);
             container.setCardWidth(width);
             container.setCardHeight(height);
             addView((View)container, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);

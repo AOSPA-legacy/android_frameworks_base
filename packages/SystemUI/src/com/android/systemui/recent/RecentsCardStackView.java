@@ -45,8 +45,8 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     private RecentsCallback mCallback;
     private TaskDescriptionAdapter mAdapter;
 
-    public RecentsCardStackView(Context context, int orientation) {
-        super(context, orientation);
+    public RecentsCardStackView(Context context, RecentsActivity recentsActivity, int orientation) {
+        super(context, recentsActivity, orientation);
 
         setOnClickListener(this);
         setOnLongClickListener(this);
