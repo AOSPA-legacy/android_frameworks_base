@@ -45,8 +45,11 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
     private RecentsCallback mCallback;
     private TaskDescriptionAdapter mAdapter;
 
+    // RecentsActivity for dismissing RecentsView
+    private final RecentsActivity mRecentsActivity;
+
     public RecentsCardStackView(Context context, RecentsActivity recentsActivity, int orientation) {
-        super(context, recentsActivity, orientation);
+        super(context, orientation);
 
         setOnClickListener(this);
         setOnLongClickListener(this);
@@ -60,6 +63,8 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
                 this, densityScale, pagingTouchSlop);
 
         mClearAllAnimationDone = true;
+
+        mRecentsActivity = recentsActivity;
 
         mInstance = this;
     }
@@ -259,6 +264,11 @@ public class RecentsCardStackView extends CardStackView implements View.OnClickL
 
         updateAdapter();
         updateLayout();
+    }
+
+    @Override
+    public void onTouchOutside() {
+        mRecentsActivity.dismissAndGoHome();
     }
 
     @Override
