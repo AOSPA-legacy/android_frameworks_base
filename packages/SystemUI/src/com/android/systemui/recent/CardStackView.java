@@ -599,23 +599,6 @@ public class CardStackView extends RelativeLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        float curTouchPos = getPos(ev);
-
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                mIsScrolling = false;
-                mInitTouchPos = curTouchPos;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (Math.abs(mInitTouchPos-curTouchPos) > mPagingTouchSlop) {
-                    mIsScrolling = true;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                mIsScrolling = false;
-                break;
-        }
         return mIsScrolling;
     }
 
@@ -637,11 +620,16 @@ public class CardStackView extends RelativeLayout {
                     mLastScrollTouch -= mScrollPosition;
                 }
                 mLastViewTouch = (int)(curViewTouch - mDeltaToScrollAnchor);
+                mIsScrolling = false;
+                mInitTouchPos = curViewTouch;
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 int pos;
                 float curScrollTouch;
+                if (Math.abs(mInitTouchPos-curViewTouch) > mPagingTouchSlop) {
+                    mIsScrolling = true;
+                }
 
                 // (1) Move touch event in view coordinate system to anchor of
                 // current item and (2) convert to scroll coordinate system
