@@ -60,6 +60,7 @@ public class BarBackgroundUpdater {
                     PAUSED = true;
                 } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                     PAUSED = false;
+                    BarBackgroundUpdater.class.notify();
                 }
             }
         }
@@ -74,12 +75,13 @@ public class BarBackgroundUpdater {
                 final long now = System.currentTimeMillis();
 
                 if (PAUSED) {
-                    // we have been told to do nothing; retry in a bit
-
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        return;
+                    // we have been told to do nothing; wait for notify to continue
+                    synchronized (BarBackgroundUpdater.class) {
+                        try {
+                            BarBackgroundUpdater.class.wait();
+                        } catch (InterruptedException e) {
+                            return;
+                        }
                     }
 
                     continue;
