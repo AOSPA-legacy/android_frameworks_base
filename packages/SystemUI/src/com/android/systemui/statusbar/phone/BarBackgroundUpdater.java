@@ -275,6 +275,7 @@ public class BarBackgroundUpdater {
                 Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0, UserHandle.USER_CURRENT) == 1;
 
         PAUSED = false;
+        BarBackgroundUpdater.class.notify();
     }
 
     public synchronized static void addListener(final UpdateListener... listeners) {
