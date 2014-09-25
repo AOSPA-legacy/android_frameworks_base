@@ -2307,8 +2307,6 @@ public class NotificationManagerService extends INotificationManager.Stub
                     if ((notification.flags & Notification.FLAG_SHOW_LIGHTS) != 0
                             && canInterrupt) {
                         mLights.add(r);
-                        // force reevaluation of active light
-                        mLedNotification = null;
                         updateLightsLocked();
                     } else {
                         if (old != null
@@ -2611,29 +2609,16 @@ public class NotificationManagerService extends INotificationManager.Stub
             }
         }
 
-        // Don't flash while we are in a call or screen is on
-        final boolean enableLed;
-        if (mLedNotification == null) {
-            enableLed = false;
-        } else if (isLedNotificationForcedOn(mLedNotification)) {
-            enableLed = true;
-        } else if (mInCall || (mScreenOn && !mDreaming)) {
-            enableLed = false;
-        } else if (mLedNotification == null || mInCall || (mScreenOn && !mDreaming)
-                || (QuietHoursUtils.inQuietHours(mContext, Settings.System.QUIET_HOURS_DIM))) {
-            enableLed = false;
-        } else {
-            enableLed = true;
-        }
 
-        if (!enableLed) {
+        // Don't flash while we are in a call or screen is on or its disabled
+        if (mLedNotification == null || mInCall || mScreenOn  || !mNotificationPulseEnabled) {
             mNotificationLight.turnOff();
         } else if (mNotificationPulseEnabled) {
             final Notification ledno = mLedNotification.sbn.getNotification();
             final NotificationLedValues ledValues = getLedValuesForNotification(mLedNotification);
-            int ledARGB;
-            int ledOnMS;
-            int ledOffMS;
+            int ledARGB = ledno.ledARGB;
+            int ledOnMS = ledno.ledOnMS;
+            int ledOffMS = ledno.ledOffMS;
 
             if (ledValues != null) {
                 ledARGB = ledValues.color != 0 ? ledValues.color : mDefaultNotificationColor;
@@ -2643,10 +2628,6 @@ public class NotificationManagerService extends INotificationManager.Stub
                 ledARGB = mDefaultNotificationColor;
                 ledOnMS = mDefaultNotificationLedOn;
                 ledOffMS = mDefaultNotificationLedOff;
-            } else {
-                ledARGB = ledno.ledARGB;
-                ledOnMS = ledno.ledOnMS;
-                ledOffMS = ledno.ledOffMS;
             }
 
             // pulse repeatedly
