@@ -57,10 +57,9 @@ public class BarBackgroundUpdater {
         public void onReceive(Context context, Intent intent) {
             synchronized(BarBackgroundUpdater.class) {
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                    PAUSED = true;
+                    pause();
                 } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-                    PAUSED = false;
-                    BarBackgroundUpdater.class.notify();
+                    resume();
                 }
             }
         }
@@ -237,6 +236,22 @@ public class BarBackgroundUpdater {
     private BarBackgroundUpdater() {
     }
 
+    private synchronized static void setPauseState(final boolean isPaused) {
+        PAUSED = isPaused;
+        if (!isPaused) {
+            // the thread should be notified to resume
+            BarBackgroundUpdater.class.notify();
+        }
+    }
+
+    private static void pause() {
+        setPauseState(true);
+    }
+
+    private static void resume() {
+        setPauseState(false);
+    }
+
     public synchronized static void init(final Context context) {
         if (mContext != null) {
             mContext.unregisterReceiver(RECEIVER);
@@ -274,8 +289,7 @@ public class BarBackgroundUpdater {
         mStatusFilterEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0, UserHandle.USER_CURRENT) == 1;
 
-        PAUSED = false;
-        BarBackgroundUpdater.class.notify();
+        resume();
     }
 
     public synchronized static void addListener(final UpdateListener... listeners) {
