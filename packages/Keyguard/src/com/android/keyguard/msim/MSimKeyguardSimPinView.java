@@ -221,8 +221,17 @@ public class MSimKeyguardSimPinView extends KeyguardSimPinView {
                                 // so it knows right away.
                                 closeKeyGuard(success);
                             } else {
-                                mSecurityMessageDisplay.setMessage(getSecurityMessageDisplay
-                                        (R.string.kg_password_wrong_pin_code), true);
+                                try {
+                                    final int attemptsRemaining = ITelephonyMSim.Stub.asInterface(
+                                            ServiceManager.checkService("phone_msim"))
+                                                    .getIccPin1RetryCount(mSubscription);
+                                    mSecurityMessageDisplay.setMessage(getSecurityMessageDisplay(
+                                            R.plurals.kg_password_wrong_pin_code,
+                                            attemptsRemaining), true);
+                                } catch (RemoteException e) {
+                                    mSecurityMessageDisplay.setMessage(getSecurityMessageDisplay(
+                                            R.string.keyguard_password_wrong_pin_code), true);
+                                }
                                 mPasswordEntry.setText("");
                             }
                             mCallback.userActivity(0);
@@ -240,6 +249,12 @@ public class MSimKeyguardSimPinView extends KeyguardSimPinView {
         return getContext().getString(R.string.msim_kg_sim_pin_msg_format,
                 KeyguardUpdateMonitor.getInstance(mContext).getPinLockedSubscription()+1,
                 getContext().getResources().getText(resId));
+    }
+
+    protected CharSequence getSecurityMessageDisplay(final int resId, final int quantity) {
+        return getContext().getString(R.string.msim_kg_sim_pin_msg_format,
+                KeyguardUpdateMonitor.getInstance(mContext).getPinLockedSubscription() + 1,
+                getContext().getResources().getQuantityString(resId, quantity, quantity));
     }
 }
 
