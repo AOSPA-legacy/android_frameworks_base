@@ -122,8 +122,5 @@
          Default for pie is high sensivity -->
     <integer name="pie_gesture_sensivity">10</integer>
 
-    <!-- DSB color transiion duration (ms) -->
-    <integer name="dsb_transittion_duration">500</integer>
-
 </resources>
 

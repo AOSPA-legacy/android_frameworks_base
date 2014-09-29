@@ -17,6 +17,7 @@
 
 package com.android.systemui;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -117,17 +118,6 @@ public class BatteryCircleMeterView extends ImageView {
         }
     };
 
-    private final Runnable mColorTransition = new Runnable() {
-
-        @Override
-        public void run() {
-            if (mActivated && mAttached) {
-                buildAnimator(mPaintSystem, mOverrideIconColor).start();
-            }
-        }
-
-    };
-
     // keeps track of current battery level and charger-plugged-state
     class BatteryReceiver extends BroadcastReceiver {
         private boolean mIsRegistered = false;
@@ -212,18 +202,32 @@ public class BatteryCircleMeterView extends ImageView {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public ObjectAnimator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mOverrideIconColor = iconColor;
 
                 if (mQS || mOverrideIconColor == 0) {
                     mPaintSystem.setColor(mCircleColor);
+                    mHandler.removeCallbacks(mInvalidate);
+                    mHandler.postDelayed(mInvalidate, 50);
                 } else {
-                    mHandler.post(mColorTransition);
+                    if (mActivated && mAttached) {
+                        final ObjectAnimator anim = ObjectAnimator.ofObject(mPaintSystem, "color",
+                                new ArgbEvaluator(), mPaintSystem.getColor(), mOverrideIconColor);
+                        anim.setDuration(mDSBDuration);
+                        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                            @Override
+                            public void onAnimationUpdate(final ValueAnimator animator) {
+                                invalidate();
+                            }
+
+                        });
+                        return anim;
+                    }
                 }
 
-                mHandler.removeCallbacks(mInvalidate);
-                mHandler.postDelayed(mInvalidate, 50);
+                return null;
             }
 
         });
@@ -303,19 +307,6 @@ public class BatteryCircleMeterView extends ImageView {
             canvas.drawText(Integer.toString(level), textX, mTextY, mPaintFont);
         }
 
-    }
-
-    protected ObjectAnimator buildAnimator(final Paint painter, final int toColor)  {
-        final ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "color",
-                new ArgbEvaluator(), painter.getColor(), toColor);
-        colorFader.setDuration(mDSBDuration);
-        colorFader.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(final ValueAnimator animation) {
-                invalidate();
-            }
-        });
-        return colorFader;
     }
 
     public void setColors(boolean qs) {

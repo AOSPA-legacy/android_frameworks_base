@@ -155,9 +155,10 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
             BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
                 @Override
-                public void onUpdateStatusBarColor(final int previousColor, final int color) {
+                public Animator onUpdateStatusBarColor(final int previousColor, final int color) {
                     mOverrideColor = color;
                     startAnimation(25);
+                    return null; // TODO return the animator
                 }
 
             });

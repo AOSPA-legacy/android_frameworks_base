@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -178,6 +180,23 @@ public class BarBackgroundUpdater {
                     updateNavigationBarIconColor(0);
                 }
 
+                // start queued animators
+                if (!mQueuedAnimators.isEmpty()) {
+                    final AnimatorSet animSet = new AnimatorSet();
+
+                    animSet.playTogether(mQueuedAnimators);
+                    mQueuedAnimators.clear();
+
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            animSet.start();
+                        }
+
+                    });
+                }
+
                 // do a quick cleanup of the listener list
                 synchronized(BarBackgroundUpdater.class) {
                     final ArrayList<UpdateListener> removables = new ArrayList<UpdateListener>();
@@ -229,11 +248,26 @@ public class BarBackgroundUpdater {
     private static int mPreviousNavigationBarIconOverrideColor = 0;
     private static int mNavigationBarIconOverrideColor = 0;
 
+    private static final ArrayList<UpdateListener> mListeners = new ArrayList<UpdateListener>();
+    private static final ArrayList<Animator> mQueuedAnimators = new ArrayList<Animator>();
+    private static Handler mHandler = null;
     private static Context mContext = null;
-    private static ArrayList<UpdateListener> mListeners = new ArrayList<UpdateListener>();
     private static SettingsObserver mObserver = null;
 
     private BarBackgroundUpdater() {
+    }
+
+    private static void anim(final Animator animator) {
+        if (animator != null) {
+            mHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    animator.start();
+                }
+
+            });
+        }
     }
 
     private synchronized static void setPauseState(final boolean isPaused) {
@@ -261,6 +295,7 @@ public class BarBackgroundUpdater {
             }
         }
 
+        mHandler = new Handler();
         mContext = context;
 
         final IntentFilter filter = new IntentFilter();
@@ -298,17 +333,17 @@ public class BarBackgroundUpdater {
                 continue;
             }
 
-            listener.onUpdateStatusBarColor(mPreviousStatusBarOverrideColor,
-                    mStatusBarOverrideColor);
+            anim(listener.onUpdateStatusBarColor(mPreviousStatusBarOverrideColor,
+                    mStatusBarOverrideColor));
 
-            listener.onUpdateStatusBarIconColor(mPreviousStatusBarIconOverrideColor,
-                    mStatusBarIconOverrideColor);
+            anim(listener.onUpdateStatusBarIconColor(mPreviousStatusBarIconOverrideColor,
+                    mStatusBarIconOverrideColor));
 
-            listener.onUpdateNavigationBarColor(mPreviousNavigationBarOverrideColor,
-                    mNavigationBarOverrideColor);
+            anim(listener.onUpdateNavigationBarColor(mPreviousNavigationBarOverrideColor,
+                    mNavigationBarOverrideColor));
 
-            listener.onUpdateNavigationBarIconColor(mPreviousNavigationBarIconOverrideColor,
-                    mNavigationBarIconOverrideColor);
+            anim(listener.onUpdateNavigationBarIconColor(mPreviousNavigationBarIconOverrideColor,
+                    mNavigationBarIconOverrideColor));
 
             boolean shouldAdd = true;
 
@@ -383,8 +418,11 @@ public class BarBackgroundUpdater {
         }
 
         for (final UpdateListener listener : mListeners) {
-            listener.onUpdateStatusBarColor(mPreviousStatusBarOverrideColor,
-                    mStatusBarOverrideColor);
+            final Animator anim = listener.onUpdateStatusBarColor(
+                    mPreviousStatusBarOverrideColor, mStatusBarOverrideColor);
+            if (anim != null) {
+                mQueuedAnimators.add(anim);
+            }
         }
     }
 
@@ -402,8 +440,11 @@ public class BarBackgroundUpdater {
         }
 
         for (final UpdateListener listener : mListeners) {
-            listener.onUpdateStatusBarIconColor(mPreviousStatusBarIconOverrideColor,
-                    mStatusBarIconOverrideColor);
+            final Animator anim = listener.onUpdateStatusBarIconColor(
+                    mPreviousStatusBarIconOverrideColor, mStatusBarIconOverrideColor);
+            if (anim != null) {
+                mQueuedAnimators.add(anim);
+            }
         }
     }
 
@@ -421,8 +462,11 @@ public class BarBackgroundUpdater {
         }
 
         for (final UpdateListener listener : mListeners) {
-            listener.onUpdateNavigationBarColor(mPreviousNavigationBarOverrideColor,
-                    mNavigationBarOverrideColor);
+            final Animator anim = listener.onUpdateNavigationBarColor(
+                    mPreviousNavigationBarOverrideColor, mNavigationBarOverrideColor);
+            if (anim != null) {
+                mQueuedAnimators.add(anim);
+            }
         }
     }
 
@@ -440,8 +484,11 @@ public class BarBackgroundUpdater {
         }
 
         for (final UpdateListener listener : mListeners) {
-            listener.onUpdateNavigationBarIconColor(mPreviousNavigationBarIconOverrideColor,
-                    mNavigationBarIconOverrideColor);
+            final Animator anim = listener.onUpdateNavigationBarIconColor(
+                    mPreviousNavigationBarIconOverrideColor, mNavigationBarIconOverrideColor);
+            if (anim != null) {
+                mQueuedAnimators.add(anim);
+            }
         }
     }
 
@@ -456,16 +503,23 @@ public class BarBackgroundUpdater {
             return mRef.get() == null;
         }
 
-        public void onUpdateStatusBarColor(final int previousColor, final int color) {
+        public Animator onUpdateStatusBarColor(final int previousColor, final int color) {
+            return null;
         }
 
-        public void onUpdateStatusBarIconColor(final int previousIconColor, final int iconColor) {
+        public Animator onUpdateStatusBarIconColor(final int previousIconColor,
+                final int iconColor) {
+            return null;
         }
 
-        public void onUpdateNavigationBarColor(final int previousColor, final int color) {
+        public Animator onUpdateNavigationBarColor(final int previousColor,
+                final int color) {
+            return null;
         }
 
-        public void onUpdateNavigationBarIconColor(final int previousIconColor, final int iconColor) {
+        public Animator onUpdateNavigationBarIconColor(final int previousIconColor,
+                final int iconColor) {
+            return null;
         }
     }
 

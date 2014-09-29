@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -27,6 +29,8 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import com.android.systemui.R;
+
+import java.util.ArrayList;
 
 public class TickerView extends TextSwitcher {
     Ticker mTicker;
@@ -43,29 +47,31 @@ public class TickerView extends TextSwitcher {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public AnimatorSet onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mOverrideTextColor = iconColor;
-                mHandler.post(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        final int childCount = getChildCount();
-                        for (int i = 0; i < childCount; i++) {
-                            final TextView tv = (TextView) getChildAt(i);
-                            if (tv != null) {
-                                final int currentColor = tv.getTextColors().getDefaultColor();
-                                final int targetColor = mOverrideTextColor == 0 ?
-                                        mDefaultTextColor : mOverrideTextColor;
-                                ObjectAnimator.ofObject(tv, "textColor", new ArgbEvaluator(),
-                                        currentColor, targetColor)
-                                    .setDuration(mDSBDuration)
-                                    .start();
-                            }
-                        }
+                final ArrayList<Animator> anims = new ArrayList<Animator>();
+                final int targetColor = mOverrideTextColor == 0 ?
+                        mDefaultTextColor : mOverrideTextColor;
+
+                final int childCount = getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    final TextView tv = (TextView) getChildAt(i);
+                    if (tv != null) {
+                        final int currentColor = tv.getTextColors().getDefaultColor();
+                        anims.add(ObjectAnimator.ofObject(tv, "textColor", new ArgbEvaluator(),
+                            currentColor, targetColor).setDuration(mDSBDuration));
                     }
+                }
 
-                });
+                if (anims.isEmpty()) {
+                    return null;
+                } else {
+                    final AnimatorSet animSet = new AnimatorSet();
+                    animSet.playTogether(anims);
+                    return animSet;
+                }
             }
 
         });
