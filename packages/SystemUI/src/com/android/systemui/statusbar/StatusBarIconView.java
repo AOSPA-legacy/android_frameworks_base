@@ -16,6 +16,7 @@
 
 package com.android.systemui.statusbar;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -90,7 +91,7 @@ public class StatusBarIconView extends AnimatedImageView {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
@@ -102,6 +103,7 @@ public class StatusBarIconView extends AnimatedImageView {
                     }
 
                 });
+                return null; // TODO return the animator
             }
 
         });
@@ -122,7 +124,7 @@ public class StatusBarIconView extends AnimatedImageView {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
@@ -134,6 +136,7 @@ public class StatusBarIconView extends AnimatedImageView {
                     }
 
                 });
+                return null; // TODO return the animator
             }
 
         });

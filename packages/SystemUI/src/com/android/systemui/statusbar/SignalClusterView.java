@@ -16,6 +16,7 @@
 
 package com.android.systemui.statusbar;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -75,7 +76,7 @@ public class SignalClusterView extends LinearLayout
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
@@ -113,6 +114,7 @@ public class SignalClusterView extends LinearLayout
                     }
 
                 });
+                return null; // TODO return the animation
             }
 
         });

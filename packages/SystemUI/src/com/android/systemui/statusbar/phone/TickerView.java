@@ -16,6 +16,7 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -43,7 +44,7 @@ public class TickerView extends TextSwitcher {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mOverrideTextColor = iconColor;
                 mHandler.post(new Runnable() {
@@ -66,6 +67,7 @@ public class TickerView extends TextSwitcher {
                     }
 
                 });
+                return null; // TODO return the animator
             }
 
         });

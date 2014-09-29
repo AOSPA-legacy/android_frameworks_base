@@ -16,6 +16,7 @@
 
 package com.android.systemui;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -226,11 +227,11 @@ public class BatteryMeterView extends View implements DemoMode {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
-                // TODO animate this bugger
                 mOverrideIconColor = iconColor;
                 postInvalidate();
+                return null; // TODO return the animator
             }
 
         });

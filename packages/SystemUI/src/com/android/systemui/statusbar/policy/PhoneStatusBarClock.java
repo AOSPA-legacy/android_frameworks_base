@@ -16,6 +16,7 @@
 
 package com.android.systemui.statusbar.policy;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -50,7 +51,7 @@ public class PhoneStatusBarClock extends Clock {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mHandler.post(new Runnable() {
 
@@ -61,6 +62,7 @@ public class PhoneStatusBarClock extends Clock {
                     }
 
                 });
+                return null; // TODO return the animator
             }
 
         });

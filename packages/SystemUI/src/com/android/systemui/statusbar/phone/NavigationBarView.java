@@ -17,6 +17,7 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.Animator;
 import android.animation.LayoutTransition;
 import android.animation.LayoutTransition.TransitionListener;
 import android.animation.ObjectAnimator;
@@ -240,11 +241,12 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateNavigationBarIconColor(final int previousIconColor,
+            public Animator onUpdateNavigationBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
                 updateButtonColors();
+                return null; // TODO return the animator
             }
 
         });

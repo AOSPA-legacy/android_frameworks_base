@@ -17,6 +17,7 @@
 
 package com.android.systemui;
 
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -212,7 +213,7 @@ public class BatteryCircleMeterView extends ImageView {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public void onUpdateStatusBarIconColor(final int previousIconColor,
+            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mOverrideIconColor = iconColor;
 
@@ -224,6 +225,8 @@ public class BatteryCircleMeterView extends ImageView {
 
                 mHandler.removeCallbacks(mInvalidate);
                 mHandler.postDelayed(mInvalidate, 50);
+
+                return null; // TODO return the animator
             }
 
         });
