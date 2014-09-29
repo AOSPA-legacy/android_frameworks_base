@@ -229,9 +229,10 @@ public class BatteryMeterView extends View implements DemoMode {
             @Override
             public Animator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
+                // TODO animate this bugger
                 mOverrideIconColor = iconColor;
                 postInvalidate();
-                return null; // TODO return the animator
+                return null;
             }
 
         });
