@@ -248,10 +248,10 @@ public class BarBackgroundUpdater {
     private static int mPreviousNavigationBarIconOverrideColor = 0;
     private static int mNavigationBarIconOverrideColor = 0;
 
+    private static final ArrayList<UpdateListener> mListeners = new ArrayList<UpdateListener>();
     private static final ArrayList<Animator> mQueuedAnimators = new ArrayList<Animator>();
     private static Handler mHandler = null;
     private static Context mContext = null;
-    private static ArrayList<UpdateListener> mListeners = new ArrayList<UpdateListener>();
     private static SettingsObserver mObserver = null;
 
     private BarBackgroundUpdater() {
