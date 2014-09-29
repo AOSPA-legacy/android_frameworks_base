@@ -16,11 +16,9 @@
 
 package com.android.systemui.statusbar.policy;
 
-import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.os.Handler;
 import android.util.AttributeSet;
 
 import com.android.systemui.R;
@@ -30,7 +28,6 @@ import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
  * Digital clock exclusively for the phone status bar.
  */
 public class PhoneStatusBarClock extends Clock {
-    private final Handler mHandler;
     private final int mDSBDuration;
 
     public PhoneStatusBarClock(final Context context) {
@@ -45,35 +42,20 @@ public class PhoneStatusBarClock extends Clock {
             final int defStyle) {
         super(context, attrs, defStyle);
 
-        mHandler = new Handler();
-
         mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
+            public ObjectAnimator onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
-                mHandler.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // TODO use the resource value instead for themeability
-                        updateColor(iconColor == 0 ? 0xffffffff : iconColor);
-                    }
-
-                });
-                return null; // TODO return the animator
+                final int currentColor = getTextColors().getDefaultColor();
+                // TODO use the resource value instead for themeability
+                final int targetColor = iconColor == 0 ? 0xffffffff : iconColor;
+                return ObjectAnimator.ofObject(PhoneStatusBarClock.this, "textColor",
+                        new ArgbEvaluator(), currentColor, targetColor).setDuration(mDSBDuration);
             }
 
         });
-    }
-
-    protected void updateColor(final int targetColor) {
-        final int currentColor = getTextColors().getDefaultColor();
-        ObjectAnimator.ofObject(this, "textColor", new ArgbEvaluator(),
-                currentColor, targetColor)
-            .setDuration(mDSBDuration)
-            .start();
     }
 
 }
