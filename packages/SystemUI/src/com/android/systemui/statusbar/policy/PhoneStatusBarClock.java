@@ -42,7 +42,7 @@ public class PhoneStatusBarClock extends Clock {
             final int defStyle) {
         super(context, attrs, defStyle);
 
-        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override

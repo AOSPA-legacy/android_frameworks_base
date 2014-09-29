@@ -223,7 +223,7 @@ public class BatteryMeterView extends View implements DemoMode {
 
         updateSettings(false);
 
-        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transittion_duration);
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
