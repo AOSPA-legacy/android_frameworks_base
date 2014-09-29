@@ -99,8 +99,9 @@ public class StatusBarIconView extends AnimatedImageView {
                     setColorFilter(null);
                     return null;
                 } else {
-                    final ObjectAnimator anim = ObjectAnimator.ofObject(this, "colorFilter",
-                            new ArgbEvaluator(), mPreviousOverrideIconColor, mOverrideIconColor);
+                    final ObjectAnimator anim = ObjectAnimator.ofObject(StatusBarIconView.this,
+                            "colorFilter", new ArgbEvaluator(), mPreviousOverrideIconColor,
+                            mOverrideIconColor);
                     anim.setDuration(mDSBDuration);
                     anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
@@ -141,8 +142,9 @@ public class StatusBarIconView extends AnimatedImageView {
                     setColorFilter(null);
                     return null;
                 } else {
-                    final ObjectAnimator anim = ObjectAnimator.ofObject(this, "colorFilter",
-                            new ArgbEvaluator(), mPreviousOverrideIconColor, mOverrideIconColor);
+                    final ObjectAnimator anim = ObjectAnimator.ofObject(StatusBarIconView.this,
+                            "colorFilter", new ArgbEvaluator(), mPreviousOverrideIconColor,
+                            mOverrideIconColor);
                     anim.setDuration(mDSBDuration);
                     anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
