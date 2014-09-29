@@ -831,11 +831,9 @@ public class NavigationBarView extends LinearLayout implements NavigationCallbac
 
     private static class StatusBarBlockerTransitions extends BarTransitions {
         public StatusBarBlockerTransitions(View statusBarBlocker) {
-            super(statusBarBlocker, new BarBackgroundDrawable(statusBarBlocker.getContext(),
-                    R.drawable.status_background,
+            super(statusBarBlocker, R.drawable.status_background,
                     R.color.status_bar_background_opaque,
-                    R.color.status_bar_background_semi_transparent));
-
+                    R.color.status_bar_background_semi_transparent);
         }
 
         public void init() {
