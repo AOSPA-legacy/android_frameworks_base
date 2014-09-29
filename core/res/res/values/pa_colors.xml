@@ -21,7 +21,7 @@
      for different hardware and product builds.  Do not translate. -->
 <resources>
     <!-- PA new volume panel style background -->
-    <color name="volume_panel_bg">#cc111111</color>
+    <color name="volume_panel_bg">#80000000</color>
     <!-- Action(s) list background used on expanded notifications -->
     <drawable name="notification_action_list_bg">#00000000</drawable>
     <!-- Title divider bar for the dialog boxes -->
