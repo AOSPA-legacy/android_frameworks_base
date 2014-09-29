@@ -17,6 +17,7 @@
 package com.android.systemui.statusbar.phone;
 
 import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -29,6 +30,8 @@ import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 
 import com.android.systemui.R;
+
+import java.util.ArrayList;
 
 public class TickerImageView extends ImageSwitcher {
     private final Handler mHandler;
@@ -43,32 +46,34 @@ public class TickerImageView extends ImageSwitcher {
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
             @Override
-            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
+            public AnimatorSet onUpdateStatusBarIconColor(final int previousIconColor,
                     final int iconColor) {
                 mPreviousOverrideIconColor = previousIconColor;
                 mOverrideIconColor = iconColor;
-                mHandler.post(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        final int childCount = getChildCount();
-                        for (int i = 0; i < childCount; i++) {
-                            final ImageView iv = (ImageView) getChildAt(i);
-                            if (iv != null) {
-                                if (mOverrideIconColor == 0) {
-                                    iv.setColorFilter(null);
-                                } else {
-                                    ObjectAnimator.ofObject(iv, "colorFilter", new ArgbEvaluator(),
-                                            mPreviousOverrideIconColor, mOverrideIconColor)
-	                                .setDuration(mDSBDuration)
-                                        .start();
-                                }
-                            }
+                final ArrayList<Animator> anims = new ArrayList<Animator>();
+
+                final int childCount = getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    final ImageView iv = (ImageView) getChildAt(i);
+                    if (iv != null) {
+                        if (mOverrideIconColor == 0) {
+                            iv.setColorFilter(null);
+                        } else {
+                            anims.add(ObjectAnimator.ofObject(iv, "colorFilter",
+                                    new ArgbEvaluator(), mPreviousOverrideIconColor,
+                                    mOverrideIconColor).setDuration(mDSBDuration));
                         }
                     }
+                }
 
-                });
-                return null; // TODO return the animator
+                if (anims.isEmpty()) {
+                    return null;
+                } else {
+                    final AnimatorSet animSet = new AnimatorSet();
+                    animSet.playTogether(anims);
+                    return animSet;
+                }
             }
 
         });
