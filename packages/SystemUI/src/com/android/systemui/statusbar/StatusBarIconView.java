@@ -96,7 +96,14 @@ public class StatusBarIconView extends AnimatedImageView {
                 mOverrideIconColor = iconColor;
 
                 if (mOverrideIconColor == 0) {
-                    setColorFilter(null);
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            setColorFilter(null);
+                        }
+
+                    });
                     return null;
                 } else {
                     final ObjectAnimator anim = ObjectAnimator.ofObject(StatusBarIconView.this,
@@ -139,7 +146,14 @@ public class StatusBarIconView extends AnimatedImageView {
                 mOverrideIconColor = iconColor;
 
                 if (mOverrideIconColor == 0) {
-                    setColorFilter(null);
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            setColorFilter(null);
+                        }
+
+                    });
                     return null;
                 } else {
                     final ObjectAnimator anim = ObjectAnimator.ofObject(StatusBarIconView.this,
