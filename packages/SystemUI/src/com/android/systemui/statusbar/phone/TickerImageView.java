@@ -58,7 +58,14 @@ public class TickerImageView extends ImageSwitcher {
                     final ImageView iv = (ImageView) getChildAt(i);
                     if (iv != null) {
                         if (mOverrideIconColor == 0) {
-                            iv.setColorFilter(null);
+                            mHandler.post(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    iv.setColorFilter(null);
+                                }
+
+                            });
                         } else {
                             anims.add(ObjectAnimator.ofObject(iv, "colorFilter",
                                     new ArgbEvaluator(), mPreviousOverrideIconColor,

@@ -23,6 +23,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -58,6 +59,7 @@ public class SignalClusterView extends LinearLayout
     ImageView mWifi, mMobile, mMobileType, mAirplane;
     View mSpacer;
 
+    private final Handler mHandler;
     private final int mDSBDuration;
     private int mPreviousOverrideIconColor = 0;
     private int mOverrideIconColor = 0;
@@ -72,6 +74,7 @@ public class SignalClusterView extends LinearLayout
 
     public SignalClusterView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mHandler = new Handler();
         mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
         BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
 
@@ -82,18 +85,25 @@ public class SignalClusterView extends LinearLayout
                 mOverrideIconColor = iconColor;
 
                 if (mOverrideIconColor == 0) {
-                    if (mWifi != null) {
-                        mWifi.setColorFilter(null);
-                    }
-                    if (mMobile != null) {
-                        mMobile.setColorFilter(null);
-                    }
-                    if (mMobileType != null) {
-                        mMobileType.setColorFilter(null);
-                    }
-                    if (mAirplane != null) {
-                        mAirplane.setColorFilter(null);
-                    }
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (mWifi != null) {
+                                mWifi.setColorFilter(null);
+                            }
+                            if (mMobile != null) {
+                                mMobile.setColorFilter(null);
+                            }
+                            if (mMobileType != null) {
+                                mMobileType.setColorFilter(null);
+                            }
+                            if (mAirplane != null) {
+                                mAirplane.setColorFilter(null);
+                            }
+                        }
+
+                    });
 
                     return null;
                 } else {
