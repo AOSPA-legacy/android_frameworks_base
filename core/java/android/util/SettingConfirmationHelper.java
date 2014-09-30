@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 ParanoidAndroid Project
+ * Copyright (C) 2014 ParanoidAndroid Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.GifView;
 import android.widget.ImageView;
 import android.provider.Settings;
+
+import java.io.InputStream;
 
 import com.android.internal.R;
 
@@ -43,8 +46,6 @@ public class SettingConfirmationHelper {
     private static final int DISABLED = 2;
     private static final int ASK_LATER = 3;
 
-    private static Context mUiContext; /* theme engine context for getting just resources */
-
     /**
      * @hide
      */
@@ -55,28 +56,67 @@ public class SettingConfirmationHelper {
     /**
      * @hide
      */
-    public static void showConfirmationDialogForSetting(final Context mContext, String title, String msg, Drawable hint,
-                                                        final String setting,
-                                                        final OnSelectListener mListener) {
-        mUiContext = ThemeUtils.createUiContext(mContext); // avoid package mismatch
-        final int mCurrentUserId = ActivityManager.getCurrentUser();
+    public static void showConfirmationDialogForSetting(final Context context, String title, String msg, Drawable hint,
+                                                        final String setting, final OnSelectListener mListener) {
+        Context mUiContext = ThemeUtils.createUiContext(context); // avoid package mismatch
 
-        int mCurrentStatus = Settings.System.getInt(/*use system context to read*/mContext.getContentResolver(), setting, NOT_SET);
+        int mCurrentStatus = Settings.System.getInt(/*use system context to read*/
+                mUiContext.getContentResolver(), setting, NOT_SET);
         if (mCurrentStatus == ENABLED || mCurrentStatus == DISABLED) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(mUiContext);
         LayoutInflater layoutInflater = LayoutInflater.from(mUiContext);
         View dialogLayout = layoutInflater.inflate(R.layout.setting_confirmation_dialog, null);
         final ImageView visualHint = (ImageView)
                 dialogLayout.findViewById(R.id.setting_confirmation_dialog_visual_hint);
         visualHint.setImageDrawable(hint);
-        builder.setView(dialogLayout, 10, 10, 10, 20);
+        visualHint.setVisibility(View.VISIBLE);
+
+        AlertDialog dialog = createDialog(mUiContext,title,msg,dialogLayout,setting,mListener);
+        initWindow(dialog).show();
+    }
+
+    /**
+     * @hide
+     */
+    public static void showConfirmationDialogForSetting(final Context context, String title, String msg, InputStream gif,
+                                                        final String setting, final OnSelectListener mListener) {
+
+        Context mUiContext = ThemeUtils.createUiContext(context); // avoid package mismatch
+
+        int mCurrentStatus = Settings.System.getInt(/*use system context to read*/
+                mUiContext.getContentResolver(), setting, NOT_SET);
+        if (mCurrentStatus == ENABLED || mCurrentStatus == DISABLED) return;
+
+        LayoutInflater layoutInflater = LayoutInflater.from(mUiContext);
+        View dialogLayout = layoutInflater.inflate(R.layout.setting_confirmation_dialog, null);
+        final GifView gifView = (GifView)
+                dialogLayout.findViewById(R.id.setting_confirmation_dialog_visual_gif);
+        gifView.setGifResource(gif);
+        gifView.setVisibility(View.VISIBLE);
+
+        AlertDialog dialog = createDialog(mUiContext,title,msg,dialogLayout,setting,mListener);
+        initWindow(dialog).show();
+    }
+
+    private static AlertDialog initWindow(AlertDialog dialog) {
+        Window dialogWindow = dialog.getWindow();
+        dialogWindow.setType(WindowManager.LayoutParams.TYPE_STATUS_BAR_PANEL);
+        return dialog;
+    }
+
+    private static AlertDialog createDialog(final Context context, String title, String msg, View view,
+                                                        final String setting, final OnSelectListener mListener) {
+
+        final int mCurrentUserId = ActivityManager.getCurrentUser();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setView(view, 10, 10, 10, 20);
         builder.setTitle(title);
         builder.setMessage(msg);
         builder.setPositiveButton(R.string.setting_confirmation_yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putIntForUser(/*use system context to write*/mContext
+                        Settings.System.putIntForUser(/*use system context to write*/context
                                 .getContentResolver(), setting, ENABLED, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(true);
@@ -86,7 +126,7 @@ public class SettingConfirmationHelper {
         builder.setNeutralButton(R.string.setting_confirmation_ask_me_later,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putIntForUser(/*use system context to write*/mContext
+                        Settings.System.putIntForUser(/*use system context to write*/context
                                 .getContentResolver(), setting, ASK_LATER, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(false);
@@ -96,7 +136,7 @@ public class SettingConfirmationHelper {
         builder.setNegativeButton(R.string.setting_confirmation_no,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putIntForUser(/*use system context to write*/mContext
+                        Settings.System.putIntForUser(/*use system context to write*/context
                                 .getContentResolver(), setting, DISABLED, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(false);
@@ -104,11 +144,7 @@ public class SettingConfirmationHelper {
                 }
         );
         builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        Window dialogWindow = dialog.getWindow();
-        dialogWindow.setType(WindowManager.LayoutParams.TYPE_STATUS_BAR_PANEL);
 
-        dialog.show();
+        return builder.create();
     }
-
 }
