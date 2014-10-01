@@ -60,8 +60,8 @@ public class SettingConfirmationHelper {
                                                         final String setting, final OnSelectListener mListener) {
         Context mUiContext = ThemeUtils.createUiContext(context); // avoid package mismatch
 
-        int mCurrentStatus = Settings.System.getInt(/*use system context to read*/
-                mUiContext.getContentResolver(), setting, NOT_SET);
+        // use system context to read
+        int mCurrentStatus = Settings.System.getInt(context.getContentResolver(), setting, NOT_SET);
         if (mCurrentStatus == ENABLED || mCurrentStatus == DISABLED) return;
 
         LayoutInflater layoutInflater = LayoutInflater.from(mUiContext);
@@ -71,7 +71,7 @@ public class SettingConfirmationHelper {
         visualHint.setImageDrawable(hint);
         visualHint.setVisibility(View.VISIBLE);
 
-        AlertDialog dialog = createDialog(mUiContext,title,msg,dialogLayout,setting,mListener);
+        AlertDialog dialog = createDialog(context,title,msg,dialogLayout,setting,mListener);
         initWindow(dialog).show();
     }
 
@@ -83,8 +83,8 @@ public class SettingConfirmationHelper {
 
         Context mUiContext = ThemeUtils.createUiContext(context); // avoid package mismatch
 
-        int mCurrentStatus = Settings.System.getInt(/*use system context to read*/
-                mUiContext.getContentResolver(), setting, NOT_SET);
+        // use system context to read
+        int mCurrentStatus = Settings.System.getInt(context.getContentResolver(), setting, NOT_SET);
         if (mCurrentStatus == ENABLED || mCurrentStatus == DISABLED) return;
 
         LayoutInflater layoutInflater = LayoutInflater.from(mUiContext);
@@ -94,7 +94,7 @@ public class SettingConfirmationHelper {
         gifView.setGifResource(gif);
         gifView.setVisibility(View.VISIBLE);
 
-        AlertDialog dialog = createDialog(mUiContext,title,msg,dialogLayout,setting,mListener);
+        AlertDialog dialog = createDialog(context,title,msg,dialogLayout,setting,mListener);
         initWindow(dialog).show();
     }
 
