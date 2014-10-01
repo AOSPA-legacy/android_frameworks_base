@@ -59,14 +59,17 @@ public class BarTransitions {
             int semiTransparentColorResourceId) {
         mTag = "BarTransitions." + view.getClass().getSimpleName();
         mView = view;
-        mBarBackground = new BarBackgroundDrawable(mView.getContext(), gradientResourceId,
-                opaqueColorResourceId, semiTransparentColorResourceId);
         if (HIGH_END) {
+            mBarBackground = new BarBackgroundDrawable(mView.getContext(), gradientResourceId,
+                    opaqueColorResourceId, semiTransparentColorResourceId);
             mView.setBackground(mBarBackground);
+        } else {
+            mBarBackground = null;
         }
     }
 
     public void updateResources(Resources res) {
+        if (mBarBackground == null) return;
         mBarBackground.updateResources(res);
     }
 
@@ -96,6 +99,7 @@ public class BarTransitions {
     protected void applyModeBackground(int oldMode, int newMode, boolean animate) {
         if (DEBUG) Log.d(mTag, String.format("applyModeBackground oldMode=%s newMode=%s animate=%s",
                 modeToString(oldMode), modeToString(newMode), animate));
+        if (mBarBackground == null) return;
         mBarBackground.applyModeBackground(oldMode, newMode, animate);
     }
 
@@ -110,6 +114,7 @@ public class BarTransitions {
     }
 
     public void finishAnimations() {
+        if (mBarBackground == null) return;
         mBarBackground.finishAnimation();
     }
 
