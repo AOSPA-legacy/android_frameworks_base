@@ -132,38 +132,51 @@ class QuickSettingsTileView extends FrameLayout {
         mEditMode = enabled;
         mVisible = getVisibility() == View.VISIBLE
                 && (getScaleY() >= ENABLED || getScaleX() >= ENABLED);
-        if(!isTemporary() && enabled) {
-            setVisibility(View.VISIBLE);
-            setHoverEffect(HOVER_COLOR_BLACK, !mVisible);
-            float scale = mVisible ? ENABLED : DISABLED;
-            animate().scaleX(scale).scaleY(scale).setListener(null);
-            setEditModeClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    toggleVisibility();
-                }
-            });
-            setEditModeLongClickListener(new OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    QuickSettingsTileView tileView = ((QuickSettingsTileView) view);
-                    if(tileView.isEditModeEnabled()) {
-                        ClipData data = ClipData.newPlainText("", "");
-                        DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                        view.startDrag(data, shadowBuilder, view, 0);
+        final boolean temporary = isTemporary();
+        if (enabled) {
+            if (temporary) {
+                // request to enable edit mode for a temporary item
+                setOnClickListener(null);
+                setOnLongClickListener(null);
+                animate().scaleX(DISAPPEAR).scaleY(DISAPPEAR).setListener(null);
+            } else {
+                // request to enable edit mode for a permanent item
+                setVisibility(View.VISIBLE);
+                setHoverEffect(HOVER_COLOR_BLACK, !mVisible);
+                final float scale = mVisible ? ENABLED : DISABLED;
+                animate().scaleX(scale).scaleY(scale).setListener(null);
+                setEditModeClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(final View view) {
+                        toggleVisibility();
+                    }
+
+                });
+                setEditModeLongClickListener(new OnLongClickListener() {
+
+                    @Override
+                    public boolean onLongClick(final View view) {
+                        final QuickSettingsTileView tileView = ((QuickSettingsTileView) view);
+                        if (!tileView.isEditModeEnabled()) {
+                            return false;
+                        }
+
+                        view.startDrag(ClipData.newPlainText("", ""),
+                                new View.DragShadowBuilder(view), view, 0);
                         tileView.fadeOut();
                         return true;
                     }
-                    return false;
-                }
-            });
+
+                });
+            }
         } else {
-            boolean temporaryEditMode = isTemporary() && enabled;
-            setOnClickListener(temporaryEditMode ? null : mOnClickListener);
-            setOnLongClickListener(temporaryEditMode ? null : mOnLongClickListener);
-            float scale = temporaryEditMode ? DISAPPEAR : DEFAULT;
-            animate().scaleX(scale).scaleY(scale).setListener(null);
-            if(!mVisible && !isTemporary()) { // Item has been disabled
+            // request to disable edit mode
+            setOnClickListener(mOnClickListener);
+            setOnLongClickListener(mOnLongClickListener);
+            animate().scaleX(DEFAULT).scaleY(DEFAULT).setListener(null);
+            if (!mVisible && !temporary) {
+                // the item has been disabled
                 setVisibility(View.GONE);
             }
         }
