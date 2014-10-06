@@ -207,6 +207,7 @@ class QuickSettingsContainerView extends FrameLayout {
         mEditModeEnabled = enabled;
         mEditModeChangedListener.onEditModeChanged(enabled);
         ArrayList<String> tiles = new ArrayList<String>();
+        ArrayList<String> hiddenTiles = new ArrayList<String>();
         for(int i = 0; i < getChildCount(); i++) {
             View v = getChildAt(i);
             if(v instanceof QuickSettingsTileView) {
@@ -217,6 +218,10 @@ class QuickSettingsContainerView extends FrameLayout {
                 if(!enabled && qs.getVisibility() == View.VISIBLE
                         && !qs.isTemporary()) {
                     tiles.add(qs.getTileId().toString());
+                }
+
+                if (qs.isHideRequested()) {
+                    hiddenTiles.add(qs.getTileId().toString());
                 }
             }
         }
@@ -231,6 +236,9 @@ class QuickSettingsContainerView extends FrameLayout {
                 Settings.System.putStringForUser(resolver,
                         Settings.System.QUICK_SETTINGS_TILES, QuickSettings.NO_TILES, mCurrentUserId);
             }
+            Settings.System.putStringForUser(resolver, Settings.System.QUICK_SETTINGS_HIDE_TILES,
+                    hiddenTiles.isEmpty() ? QuickSettings.NO_TILES :
+                            TextUtils.join(QuickSettings.DELIMITER, hiddenTiles), mCurrentUserId);
             updateSpan();
         }
     }

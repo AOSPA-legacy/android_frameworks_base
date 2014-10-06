@@ -60,9 +60,11 @@ class QuickSettingsTileView extends FrameLayout {
     private boolean mPrepared;
     private OnPrepareListener mOnPrepareListener;
 
-    private boolean mTemporary;
-    private boolean mEditMode;
-    private boolean mVisible;
+    private boolean mTemporary = false;
+    private boolean mDisplayInEditMode = true;
+    private boolean mEditMode = false;
+    private boolean mVisible = false;
+    private boolean mHideRequested = false;
 
     public QuickSettingsTileView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -87,11 +89,29 @@ class QuickSettingsTileView extends FrameLayout {
         mTemporary = temporary;
         if(temporary) { // No listeners needed
             setOnDragListener(null);
+            mDisplayInEditMode = getVisibility() == View.VISIBLE;
+        } else {
+            mDisplayInEditMode = true;
         }
     }
 
     boolean isTemporary() {
         return mTemporary;
+    }
+
+    void setHideRequested(final boolean hideRequested) {
+        mHideRequested = hideRequested;
+        if (hideRequested) {
+            mVisible = getVisibility() == View.VISIBLE &&
+                    (getScaleY() >= ENABLED || getScaleX() >= ENABLED);
+            if (mVisible) {
+                setVisibility(View.GONE, true);
+            }
+        }
+    }
+
+    boolean isHideRequested() {
+        return mHideRequested;
     }
 
     void setColumnSpan(int span) {
@@ -134,14 +154,13 @@ class QuickSettingsTileView extends FrameLayout {
                 && (getScaleY() >= ENABLED || getScaleX() >= ENABLED);
         final boolean temporary = isTemporary();
         if (enabled) {
-            if (temporary) {
-                // request to enable edit mode for a temporary item
+            // request to enable edit mode
+            if (!mDisplayInEditMode) {
                 setOnClickListener(null);
                 setOnLongClickListener(null);
                 animate().scaleX(DISAPPEAR).scaleY(DISAPPEAR).setListener(null);
             } else {
-                // request to enable edit mode for a permanent item
-                setVisibility(View.VISIBLE);
+                setVisibility(View.VISIBLE, true);
                 setHoverEffect(HOVER_COLOR_BLACK, !mVisible);
                 final float scale = mVisible ? ENABLED : DISABLED;
                 animate().scaleX(scale).scaleY(scale).setListener(null);
@@ -175,9 +194,9 @@ class QuickSettingsTileView extends FrameLayout {
             setOnClickListener(mOnClickListener);
             setOnLongClickListener(mOnLongClickListener);
             animate().scaleX(DEFAULT).scaleY(DEFAULT).setListener(null);
-            if (!mVisible && !temporary) {
+            if (!mVisible) {
                 // the item has been disabled
-                setVisibility(View.GONE);
+                setVisibility(View.GONE, true);
             }
         }
     }
@@ -194,6 +213,7 @@ class QuickSettingsTileView extends FrameLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mVisible = !mVisible;
+                setHideRequested(!mVisible);
             }
         });
     }
@@ -232,6 +252,18 @@ class QuickSettingsTileView extends FrameLayout {
 
     @Override
     public void setVisibility(int vis) {
+        setVisibility(vis, false);
+    }
+
+    public void setVisibility(int vis, final boolean fromUserAction) {
+        if (!fromUserAction && isTemporary()) {
+            mDisplayInEditMode = vis == View.VISIBLE;
+        }
+
+        if (!fromUserAction && mHideRequested && vis != View.GONE) {
+            vis = View.GONE;
+        }
+
         if (QuickSettings.DEBUG_GONE_TILES) {
             if (vis == View.GONE) {
                 vis = View.VISIBLE;
@@ -242,6 +274,7 @@ class QuickSettingsTileView extends FrameLayout {
                 setEnabled(true);
             }
         }
+
         super.setVisibility(vis);
     }
 

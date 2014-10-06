@@ -114,7 +114,13 @@ class QuickSettings {
         IMMERSIVE,
         LIGHTBULB,
         SLEEP,
-        SOUND
+        SOUND,
+        ALARM,
+        USB_MODE,
+        REMOTE_DISPLAY,
+        IME,
+        BUGREPORT,
+        SSL_CERT_WARNING
     }
 
     public static final String NO_TILES = "NO_TILES";
@@ -1120,6 +1126,7 @@ class QuickSettings {
         final QuickSettingsBasicTile alarmTile
                 = new QuickSettingsBasicTile(mContext);
         alarmTile.setTemporary(true);
+        alarmTile.setTileId(Tile.ALARM);
         alarmTile.setImageResource(R.drawable.ic_qs_alarm_on);
         alarmTile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1142,6 +1149,7 @@ class QuickSettings {
         final QuickSettingsBasicTile usbModeTile
                 = new QuickSettingsBasicTile(mContext);
         usbModeTile.setTemporary(true);
+        usbModeTile.setTileId(Tile.USB_MODE);
         usbModeTile.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -1171,6 +1179,7 @@ class QuickSettings {
         QuickSettingsBasicTile remoteDisplayTile
                 = new QuickSettingsBasicTile(mContext);
         remoteDisplayTile.setTemporary(true);
+        remoteDisplayTile.setTileId(Tile.REMOTE_DISPLAY);
         remoteDisplayTile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1196,11 +1205,12 @@ class QuickSettings {
                         .setShowWhenEnabled(true));
         parent.addView(remoteDisplayTile);
 
+        final QuickSettingsBasicTile imeTile;
         if (SHOW_IME_TILE || DEBUG_GONE_TILES) {
             // IME
-            final QuickSettingsBasicTile imeTile
-                    = new QuickSettingsBasicTile(mContext);
+            imeTile = new QuickSettingsBasicTile(mContext);
             imeTile.setTemporary(true);
+            imeTile.setTileId(Tile.IME);
             imeTile.setImageResource(R.drawable.ic_qs_ime);
             imeTile.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1217,12 +1227,15 @@ class QuickSettings {
                     new QuickSettingsModel.BasicRefreshCallback(imeTile)
                             .setShowWhenEnabled(true));
             parent.addView(imeTile);
+        } else {
+            imeTile = null;
         }
 
         // Bug reports
         final QuickSettingsBasicTile bugreportTile
                 = new QuickSettingsBasicTile(mContext);
         bugreportTile.setTemporary(true);
+        bugreportTile.setTileId(Tile.BUGREPORT);
         bugreportTile.setImageResource(com.android.internal.R.drawable.stat_sys_adb);
         bugreportTile.setTextResource(com.android.internal.R.string.bugreport_title);
         bugreportTile.setOnClickListener(new View.OnClickListener() {
@@ -1260,6 +1273,7 @@ class QuickSettings {
         final QuickSettingsBasicTile sslCaCertWarningTile =
                 new QuickSettingsBasicTile(mContext, null, R.layout.quick_settings_tile_monitoring);
         sslCaCertWarningTile.setTemporary(true);
+        sslCaCertWarningTile.setTileId(Tile.SSL_CERT_WARNING);
         sslCaCertWarningTile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1276,6 +1290,28 @@ class QuickSettings {
                 new QuickSettingsModel.BasicRefreshCallback(sslCaCertWarningTile)
                         .setShowWhenEnabled(true));
         parent.addView(sslCaCertWarningTile);
+
+        final String hideTiles = Settings.System.getStringForUser(mContext.getContentResolver(),
+                Settings.System.QUICK_SETTINGS_HIDE_TILES, UserHandle.USER_CURRENT);
+        if (hideTiles != null) {
+            for (final String tile : hideTiles.split(DELIMITER)) {
+                if (tile.equals(Tile.ALARM.toString())) {
+                    alarmTile.setHideRequested(true);
+                } else if (tile.equals(Tile.USB_MODE.toString())) {
+                    usbModeTile.setHideRequested(true);
+                } else if (tile.equals(Tile.REMOTE_DISPLAY.toString())) {
+                    remoteDisplayTile.setHideRequested(true);
+                } else if (tile.equals(Tile.IME.toString())) {
+                    if (imeTile != null) {
+                        imeTile.setHideRequested(true);
+                    }
+                } else if (tile.equals(Tile.BUGREPORT.toString())) {
+                    bugreportTile.setHideRequested(true);
+                } else if (tile.equals(Tile.SSL_CERT_WARNING.toString())) {
+                    sslCaCertWarningTile.setHideRequested(true);
+                }
+            }
+        }
     }
 
     List<String> enumToStringArray(Tile[] enumData) {
