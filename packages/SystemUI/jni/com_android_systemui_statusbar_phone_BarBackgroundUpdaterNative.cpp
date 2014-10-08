@@ -112,7 +112,7 @@ uint32_t getPixel(int32_t dx, int32_t dy)
 JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_getColors
         (JNIEnv * je, jclass jc, jint rotation, jint statusBarHeight, jint navigationBarHeight, jint xFromRightSide)
 {
-    jint response[2] = { 0, 0 };
+    jint response[4] = { 0, 0, 0, 0 };
     screenRotation = rotation;
 
     sp<IBinder> display = SurfaceComposerClient::getBuiltInDisplay(ISurfaceComposer::eDisplayIdMain);
@@ -120,15 +120,15 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
 
     if (display == NULL)
     {
-        jintArray arr = je->NewIntArray(2);
-        je->SetIntArrayRegion(arr, 0, 2, response);
+        jintArray arr = je->NewIntArray(4);
+        je->SetIntArrayRegion(arr, 0, 4, response);
         return arr;
     }
 
     if (screenshot.update(display, 0, 0, 0, -1UL) != NO_ERROR)
     {
-        jintArray arr = je->NewIntArray(2);
-        je->SetIntArrayRegion(arr, 0, 2, response);
+        jintArray arr = je->NewIntArray(4);
+        je->SetIntArrayRegion(arr, 0, 4, response);
         return arr;
     }
 
@@ -136,8 +136,8 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
 
     if (shotBase == NULL)
     {
-        jintArray arr = je->NewIntArray(2);
-        je->SetIntArrayRegion(arr, 0, 2, response);
+        jintArray arr = je->NewIntArray(4);
+        je->SetIntArrayRegion(arr, 0, 4, response);
         return arr;
     }
 
@@ -174,6 +174,8 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
         response[0] = sampleColors(4, colorsTop);
     }
 
+    response[1] = getPixel(1, 1) == getPixel(1, 5) ? 1 : 0;
+
     int fnbh = -2 - navigationBarHeight;
     uint32_t colorBotLeft = getPixel(1, fnbh);
     uint32_t colorBotLeftPadding = getPixel(1 + 10, fnbh);
@@ -183,24 +185,26 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
     if (colorBotLeft == colorBotRight)
     {
         // navigation bar appears to be completely uniform
-        response[1] = colorBotLeft;
+        response[2] = colorBotLeft;
     }
     else if (colorBotRightPadding == colorBotRight)
     {
         // the right side of the navigation bar appears to be uniform
-        response[1] = colorBotRight;
+        response[2] = colorBotRight;
     }
     else if (colorBotLeftPadding == colorBotLeft)
     {
         // the left side of the navigation bar appears to be uniform
-        response[1] = colorBotLeft;
+        response[2] = colorBotLeft;
     }
     else
     {
         // navigation bar does not appear to be uniform at all
         uint32_t colorsBot[4] = { colorBotLeft, colorBotLeftPadding, colorBotRight, colorBotRightPadding };
-        response[1] = sampleColors(4, colorsBot);
+        response[2] = sampleColors(4, colorsBot);
     }
+
+    response[3] = getPixel(-1, -1) == getPixel(-1, -5) ? 1 : 0;
 
     if (DEBUG_FLOOD) {
         ALOGD("width=%d height=%d tl=%d tlp=%d tr=%d trp=%d bl=%d blp=%d br=%d brp=%d",
@@ -208,8 +212,8 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
                 colorBotLeft, colorBotLeftPadding, colorBotRight, colorBotRightPadding);
     }
 
-    jintArray arr = je->NewIntArray(2);
-    je->SetIntArrayRegion(arr, 0, 2, response);
+    jintArray arr = je->NewIntArray(4);
+    je->SetIntArrayRegion(arr, 0, 4, response);
 
     return arr;
 }
