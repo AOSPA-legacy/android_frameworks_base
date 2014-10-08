@@ -296,7 +296,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
         final PackageManager pm = mContext.getPackageManager();
         Bitmap thumbnail = am.getTaskTopThumbnail(td.persistentTaskId);
 
-        if ((td.intent.getFlags() & Intent.FLAG_FLOATING_WINDOW) != 0) {
+        if (thumbnail != null && (td.intent.getFlags() & Intent.FLAG_FLOATING_WINDOW) != 0) {
             // See Activity.java:5300 for the values
             int x = Math.round(thumbnail.getWidth() * 0.05f);
             int y = Math.round(thumbnail.getHeight() * 0.15f);
