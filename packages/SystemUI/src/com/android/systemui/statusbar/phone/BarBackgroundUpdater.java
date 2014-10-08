@@ -146,8 +146,9 @@ public class BarBackgroundUpdater {
                                 (0.299f * Color.red(statusBarOverrideColor) +
                                 0.587f * Color.green(statusBarOverrideColor) +
                                 0.114f * Color.blue(statusBarOverrideColor)) / 255;
-                        updateStatusBarIconColor(statusBarBrightness > 0.7f ?
-                                0x95000000 : 0xFFFFFFFF);
+                        final boolean isStatusBarConsistent = colors[1] == 1;
+                        updateStatusBarIconColor(statusBarBrightness > 0.7f &&
+                                isStatusBarConsistent ? 0x95000000 : 0xFFFFFFFF);
                     } else {
                         // dynamic status bar is disabled
                         updateStatusBarColor(0);
@@ -155,7 +156,7 @@ public class BarBackgroundUpdater {
                     }
 
                     if (mNavigationEnabled) {
-                        final int navigationBarOverrideColor = colors[1];
+                        final int navigationBarOverrideColor = colors[2];
                         updateNavigationBarColor(navigationBarOverrideColor);
 
                         // magic from http://www.w3.org/TR/AERT#color-contrast
@@ -163,8 +164,9 @@ public class BarBackgroundUpdater {
                                 (0.299f * Color.red(navigationBarOverrideColor) +
                                 0.587f * Color.green(navigationBarOverrideColor) +
                                 0.114f * Color.blue(navigationBarOverrideColor)) / 255;
-                        updateNavigationBarIconColor(navigationBarBrightness > 0.7f ?
-                                0x95000000 : 0xFFFFFFFF);
+                        final boolean isNavigationBarConsistent = colors[3] == 1;
+                        updateNavigationBarIconColor(navigationBarBrightness > 0.7f &&
+                                isNavigationBarConsistent ? 0x95000000 : 0xFFFFFFFF);
                     } else {
                         // dynamic navigation bar is disabled
                         updateNavigationBarColor(0);
