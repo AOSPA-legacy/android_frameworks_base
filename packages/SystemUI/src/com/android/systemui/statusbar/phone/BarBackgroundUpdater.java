@@ -33,10 +33,12 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceControl;
 import android.view.WindowManager;
 
+import java.lang.Math;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,8 @@ public class BarBackgroundUpdater {
     private final static boolean DEBUG_FLOOD_ALL_DELAY = DEBUG_ALL || false;
 
     private final static long MIN_DELAY = 450; // enforce at least 450ms between shots (~2 fps)
+
+    private final static float SCREENSHOT_SCALE = .5f;
 
     private static boolean PAUSED = true;
 
@@ -324,7 +328,29 @@ public class BarBackgroundUpdater {
         mStatusFilterEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0, UserHandle.USER_CURRENT) == 1;
 
+        setScreenShotSize(SCREENSHOT_SCALE);
+
         resume();
+    }
+
+    private static void setScreenShotSize(float scale) {
+        final WindowManager wm =
+            (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        int rotation = display.getRotation();
+
+        boolean isLandscape = false;
+        if (rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90) {
+            isLandscape = true;
+        }
+
+        Point p = new Point();
+        display.getSize(p);
+
+        int width = Math.round(p.x * scale);
+        int height = Math.round(p.y * scale);
+
+        BarBackgroundUpdaterNative.setScreenShotSize(width,height,isLandscape);
     }
 
     public synchronized static void addListener(final UpdateListener... listeners) {

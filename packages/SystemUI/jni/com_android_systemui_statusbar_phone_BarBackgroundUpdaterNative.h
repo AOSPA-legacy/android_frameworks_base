@@ -31,6 +31,14 @@ extern "C" {
 JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_getColors
   (JNIEnv *, jclass, jint, jint, jint, jint);
 
+/*
+ * Class:     com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative
+ * Method:    setScreenShotSize
+ * Signature: (IIB)V
+ */
+JNIEXPORT void JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_setScreenShotSize
+  (JNIEnv *, jclass, jint, jint, jboolean);
+
 #ifdef __cplusplus
 }
 #endif
