@@ -92,6 +92,24 @@ uint32_t getPixel(int32_t dx, int32_t dy)
         break;
     }
 
+    if (x < 0)
+    {
+        x = 0;
+    }
+    else if (x >= shotWidth)
+    {
+        x = shotWidth - 1;
+    }
+
+    if (y < 0)
+    {
+        y = 0;
+    }
+    else if (y >= shotHeight)
+    {
+        y = shotHeight - 1;
+    }
+
     if (shotFormat == PIXEL_FORMAT_RGBA_8888)
     {
         // this is stored as BGRA behind the scenes, it seems
