@@ -61,6 +61,9 @@ uint32_t sampleColors(int n, uint32_t sources[])
 
 uint32_t getPixel(int32_t dx, int32_t dy)
 {
+    dx = (uint32_t) (dx * shotScale);
+    dy = (uint32_t) (dy * shotScale);
+
     uint32_t x = 0;
     uint32_t y = 0;
 
