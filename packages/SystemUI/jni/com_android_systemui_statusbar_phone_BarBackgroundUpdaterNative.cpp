@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-
 #include <jni/com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative.h>
 
-#define swap(a, b)   \
-do {                 \
-    int temp = a;    \
-    a = b;           \
-    b = temp;        \
-} while(0)
+#define swap(a, b) do { int temp = a; a = b; b = temp; } while(0)
 
 #define LOG_TAG "BarBackgroundUpdaterNative"
 #define DEBUG_FLOOD false
@@ -42,9 +36,10 @@ uint32_t shotHeight;
 uint32_t shotStride;
 PixelFormat shotFormat;
 
+bool isLandscape = false;
+float shotScale = .5f;
 uint32_t requestedShotWidth = 0;
 uint32_t requestedShotHeight = 0;
-bool isLandscape = false;
 
 uint32_t sampleColors(int n, uint32_t sources[])
 {
@@ -123,15 +118,21 @@ uint32_t getPixel(int32_t dx, int32_t dy)
 
 void handleRotation(uint32_t rotation) 
 {
-    if (rotation == 1 || rotation == 2) //portait
+    if (rotation == 1 || rotation == 2)
     {
+        // rotation value says we are actually portrait
         if (isLandscape)
         {
             swap(requestedShotWidth, requestedShotHeight);
             isLandscape = false;
         } 
-        else
+    }
+    else
+    {
+        // rotation value says we are actually landscape
+        if (!isLandscape)
         {
+            swap(requestedShotWidth, requestedShotHeight);
             isLandscape = true;
         }
     }
@@ -139,20 +140,18 @@ void handleRotation(uint32_t rotation)
     screenRotation = rotation;
 }
 
-JNIEXPORT void JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_setScreenShotSize
-        (JNIEnv * je, jclass jc, jint width, jint height, jboolean isLand)
+JNIEXPORT void JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_setScreenSize
+        (JNIEnv * je, jclass jc, jint width, jint height, jboolean landscape)
 {
-    requestedShotWidth = width;
-    requestedShotHeight = height;
-    isLandscape = isLand;
+    requestedShotWidth = width * shotScale;
+    requestedShotHeight = height * shotScale;
+    isLandscape = landscape;
 }
 
 JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_getColors
         (JNIEnv * je, jclass jc, jint rotation, jint statusBarHeight, jint navigationBarHeight, jint xFromRightSide)
 {
     jint response[4] = { 0, 0, 0, 0 };
-
-    handleRotation(rotation);
 
     sp<IBinder> display = SurfaceComposerClient::getBuiltInDisplay(ISurfaceComposer::eDisplayIdMain);
     ScreenshotClient screenshot;
@@ -164,6 +163,7 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
         return arr;
     }
 
+    handleRotation(rotation); // ensure everything matches up before actually grabbing the shot
     if (screenshot.update(display, requestedShotWidth, requestedShotHeight, 0, -1UL) != NO_ERROR)
     {
         jintArray arr = je->NewIntArray(4);

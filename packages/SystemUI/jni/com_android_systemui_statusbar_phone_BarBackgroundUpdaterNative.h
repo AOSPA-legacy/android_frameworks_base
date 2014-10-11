@@ -33,10 +33,10 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
 
 /*
  * Class:     com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative
- * Method:    setScreenShotSize
+ * Method:    setScreenSize
  * Signature: (IIB)V
  */
-JNIEXPORT void JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_setScreenShotSize
+JNIEXPORT void JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_setScreenSize
   (JNIEnv *, jclass, jint, jint, jboolean);
 
 #ifdef __cplusplus
