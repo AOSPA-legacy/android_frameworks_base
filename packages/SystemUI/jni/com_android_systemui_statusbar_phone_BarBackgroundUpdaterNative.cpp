@@ -21,6 +21,12 @@
 #define LOG_TAG "BarBackgroundUpdaterNative"
 #define DEBUG_FLOOD false
 
+#define SHOT_SCALE .5f
+#define ROTATION_0 0
+#define ROTATION_90 1
+#define ROTATION_180 2
+#define ROTATION_270 3
+
 #include <gui/ISurfaceComposer.h>
 #include <gui/SurfaceComposerClient.h>
 #include <utils/Log.h>
@@ -36,8 +42,6 @@ uint32_t shotHeight;
 uint32_t shotStride;
 PixelFormat shotFormat;
 
-bool isLandscape = false;
-float shotScale = .5f;
 uint32_t requestedShotWidth = 0;
 uint32_t requestedShotHeight = 0;
 
@@ -61,30 +65,30 @@ uint32_t sampleColors(int n, uint32_t sources[])
 
 uint32_t getPixel(int32_t dx, int32_t dy)
 {
-    dx = (uint32_t) (dx * shotScale);
-    dy = (uint32_t) (dy * shotScale);
+    dx = (uint32_t) (dx * SHOT_SCALE);
+    dy = (uint32_t) (dy * SHOT_SCALE);
 
     uint32_t x = 0;
     uint32_t y = 0;
 
     switch (screenRotation)
     {
-    case 1: // ROTATION_90
+    case ROTATION_90:
         // turned counter-clockwise;  invert some of the things
         x = (dy >= 0) ? (shotWidth - 1 - dy) : -dy;
         y = (dx >= 0) ? dx : (shotHeight - 1 + dx);
         break;
-    case 2: // ROTATION_180
+    case ROTATION_180:
         // turned upside down; invert all the things
         x = (dx >= 0) ? (shotWidth - 1 - dx) : -dx;
         y = (dy >= 0) ? (shotHeight - 1 - dy) : -dy;
         break;
-    case 3: // ROTATION_270
+    case ROTATION_270:
         // turned clockwise; invert some of the things
         x = (dy >= 0) ? dy : (shotWidth - 1 + dy);
         y = (dx >= 0) ? (shotHeight - 1 - dx) : -dx;
         break;
-    case 0: // ROTATION_0
+    case ROTATION_0:
     default: // Just smile and wave, boys. Smile and wave.
         // natural orientation; don't invert anything
         x = (dx >= 0) ? dx : (shotWidth - 1 + dx);
@@ -137,36 +141,12 @@ uint32_t getPixel(int32_t dx, int32_t dy)
     return 0;
 }
 
-void handleRotation(uint32_t rotation) 
-{
-    if (rotation == 1 || rotation == 2)
-    {
-        // rotation value says we are actually portrait
-        if (isLandscape)
-        {
-            swap(requestedShotWidth, requestedShotHeight);
-            isLandscape = false;
-        } 
-    }
-    else
-    {
-        // rotation value says we are actually landscape
-        if (!isLandscape)
-        {
-            swap(requestedShotWidth, requestedShotHeight);
-            isLandscape = true;
-        }
-    }
-
-    screenRotation = rotation;
-}
-
 JNIEXPORT void JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_setScreenSize
-        (JNIEnv * je, jclass jc, jint width, jint height, jboolean landscape)
+        (JNIEnv * je, jclass jc, jint rotation, jint width, jint height)
 {
-    requestedShotWidth = width * shotScale;
-    requestedShotHeight = height * shotScale;
-    isLandscape = landscape;
+    screenRotation = rotation;
+    requestedShotWidth = width * SHOT_SCALE;
+    requestedShotHeight = height * SHOT_SCALE;
 }
 
 JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_getColors
@@ -184,7 +164,15 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
         return arr;
     }
 
-    handleRotation(rotation); // ensure everything matches up before actually grabbing the shot
+    bool previouslyLandscape = screenRotation == ROTATION_90 || screenRotation == ROTATION_270;
+    bool currentlyLandscape = rotation == ROTATION_90 || rotation == ROTATION_270;
+    if (previouslyLandscape != currentlyLandscape)
+    {
+        // we have switched from portrait to landscape or vice versa...
+        swap(requestedShotWidth, requestedShotHeight);
+    }
+    screenRotation = rotation;
+
     if (screenshot.update(display, requestedShotWidth, requestedShotHeight, 0, -1UL) != NO_ERROR)
     {
         jintArray arr = je->NewIntArray(4);

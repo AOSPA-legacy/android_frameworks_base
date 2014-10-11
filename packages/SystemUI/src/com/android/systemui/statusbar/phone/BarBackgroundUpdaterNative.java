@@ -20,7 +20,7 @@ public class BarBackgroundUpdaterNative {
     public static native int[] getColors(int rotation, int statusBarHeight,
             int navigationBarHeight, int xFromRightSide);
 
-    public static native void setScreenSize(int x, int y, boolean landscape);
+    public static native void setScreenSize(int rotation, int width, int height);
 
     static {
         System.load("SystemUI.so");
