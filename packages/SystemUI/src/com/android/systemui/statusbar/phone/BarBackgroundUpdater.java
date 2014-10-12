@@ -33,10 +33,12 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceControl;
 import android.view.WindowManager;
 
+import java.lang.Math;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -323,6 +325,12 @@ public class BarBackgroundUpdater {
                 Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0, UserHandle.USER_CURRENT) == 1;
         mStatusFilterEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0, UserHandle.USER_CURRENT) == 1;
+
+        final Display d = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))
+                .getDefaultDisplay();
+        final Point sizePoint = new Point();
+        d.getSize(sizePoint);
+        BarBackgroundUpdaterNative.setScreenSize(d.getRotation(), sizePoint.x, sizePoint.y);
 
         resume();
     }
