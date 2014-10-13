@@ -125,7 +125,7 @@ public class BarTransitions {
         // for subclasses
     }
 
-    public static class BarBackgroundDrawable extends Drawable
+    protected static class BarBackgroundDrawable extends Drawable
             implements Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener {
         private final int mOpaqueColorResId;
         private final int mSemiTransparentColorResId;
