@@ -260,7 +260,7 @@ public class BarBackgroundUpdater {
     }
 
     private static void anim(final Animator animator) {
-        if (animator != null) {
+        if (animator != null && mHandler != null) {
             mHandler.post(new Runnable() {
 
                 @Override
