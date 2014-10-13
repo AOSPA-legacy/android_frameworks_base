@@ -116,15 +116,18 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
         }
     }
 
-    protected static class PhoneStatusBarBackgroundDrawable extends BarBackgroundDrawable {
+    protected static class PhoneStatusBarBackgroundDrawable
+            extends BarTransitions.BarBackgroundDrawable {
         private final Context mContext;
 
         private int mOverrideColor = 0;
-        private int mGradientAlpha = 0;
+        private int mOverrideGradientAlpha = 0;
 
         public PhoneStatusBarBackgroundDrawable(final Context context) {
-            super(context, R.drawable.status_background, R.color.status_bar_background_opaque,
-                R.color.status_bar_background_semi_transparent);
+            super(context,
+                    R.color.status_bar_background_opaque,
+                    R.color.status_bar_background_semi_transparent,
+                    R.drawable.status_background);
 
             mContext = context;
 
@@ -133,7 +136,7 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
                     GradientObserver.DYNAMIC_SYSTEM_BARS_GRADIENT_URI,
                     false, obs, UserHandle.USER_ALL);
 
-            mGradientAlpha = Settings.System.getInt(mContext.getContentResolver(),
+            mOverrideGradientAlpha = Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE, 0) == 1 ?
                             0xff : 0;
 
@@ -142,8 +145,7 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
                 @Override
                 public Animator onUpdateStatusBarColor(final int previousColor, final int color) {
                     mOverrideColor = color;
-                    startAnimation(25);
-                    return null; // TODO return the animator
+                    return generateAnimator();
                 }
 
             });
@@ -163,17 +165,17 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
 
         @Override
         protected int getGradientAlphaOpaque() {
-            return mGradientAlpha;
+            return mOverrideGradientAlpha;
         }
 
         @Override
         protected int getGradientAlphaSemiTransparent() {
-            return mGradientAlpha & 0x7f;
+            return mOverrideGradientAlpha & 0x7f;
         }
 
-        public void setGradientAlpha(final int alpha) {
-            mGradientAlpha = alpha;
-            startAnimation(25);
+        public void setOverrideGradientAlpha(final int alpha) {
+            mOverrideGradientAlpha = alpha;
+            generateAnimator().start();
         }
     }
 
@@ -191,7 +193,7 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
 
         @Override
         public void onChange(final boolean selfChange) {
-            mDrawable.setGradientAlpha(Settings.System.getInt(
+            mDrawable.setOverrideGradientAlpha(Settings.System.getInt(
                     mDrawable.mContext.getContentResolver(),
                     Settings.System.DYNAMIC_SYSTEM_BARS_GRADIENT_STATE, 0) == 1 ? 0xff : 0);
         }
