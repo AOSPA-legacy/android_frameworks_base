@@ -329,7 +329,7 @@ public class BarBackgroundUpdater {
         final Display d = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         final Point sizePoint = new Point();
-        d.getSize(sizePoint);
+        d.getRealSize(sizePoint);
         BarBackgroundUpdaterNative.setScreenSize(d.getRotation(), sizePoint.x, sizePoint.y);
 
         resume();
