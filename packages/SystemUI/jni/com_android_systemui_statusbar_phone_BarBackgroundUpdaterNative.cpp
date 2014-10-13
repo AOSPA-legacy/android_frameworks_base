@@ -16,8 +16,6 @@
 
 #include <jni/com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative.h>
 
-#define swap(a, b) do { int temp = a; a = b; b = temp; } while(0)
-
 #define LOG_TAG "BarBackgroundUpdaterNative"
 #define DEBUG_FLOOD false
 
@@ -96,20 +94,12 @@ uint32_t getPixel(int32_t dx, int32_t dy)
         break;
     }
 
-    if (x < 0)
-    {
-        x = 0;
-    }
-    else if (x >= shotWidth)
+    if (x >= shotWidth)
     {
         x = shotWidth - 1;
     }
 
-    if (y < 0)
-    {
-        y = 0;
-    }
-    else if (y >= shotHeight)
+    if (y >= shotHeight)
     {
         y = shotHeight - 1;
     }
@@ -169,7 +159,9 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
     if (previouslyLandscape != currentlyLandscape)
     {
         // we have switched from portrait to landscape or vice versa...
-        swap(requestedShotWidth, requestedShotHeight);
+        uint32_t oldWidth = requestedShotWidth;
+        requestedShotWidth = requestedShotHeight;
+        requestedShotHeight = oldWidth;
     }
     screenRotation = rotation;
 
