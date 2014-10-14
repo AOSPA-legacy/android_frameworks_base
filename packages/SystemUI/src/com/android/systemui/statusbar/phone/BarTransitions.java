@@ -70,6 +70,10 @@ public class BarTransitions {
         }
     }
 
+    protected void setGradientResourceId(int gradientResourceId) {
+        mBarBackground.setGradientResId(mView.getContext().getResources(), gradientResourceId);
+    }
+
     public void updateResources(Resources res) {
         mBarBackground.updateResources(res);
     }
@@ -129,7 +133,7 @@ public class BarTransitions {
             implements Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener {
         private final int mOpaqueColorResId;
         private final int mSemiTransparentColorResId;
-        private final int mGradientResId;
+        private int mGradientResId;
 
         private final Handler mHandler;
         private final Runnable mInvalidateSelf = new Runnable() {
@@ -254,6 +258,11 @@ public class BarTransitions {
         protected final void onBoundsChange(final Rect bounds) {
             super.onBoundsChange(bounds);
             mGradient.setBounds(bounds);
+        }
+
+        public final void setGradientResId(final Resources res, final int gradientResId) {
+            mGradientResId = gradientResId;
+            updateResources(res);
         }
 
         public final synchronized void updateResources(final Resources res)  {

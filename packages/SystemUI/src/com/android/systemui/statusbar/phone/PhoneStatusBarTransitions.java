@@ -30,6 +30,8 @@ import android.view.View;
 
 import com.android.systemui.R;
 
+import java.util.ArrayList;
+
 public final class PhoneStatusBarTransitions extends BarTransitions {
     private static final float ICON_ALPHA_WHEN_NOT_OPAQUE = 1;
     private static final float ICON_ALPHA_WHEN_LIGHTS_OUT_BATTERY_CLOCK = 0.5f;
@@ -60,6 +62,9 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
     }
 
     public ObjectAnimator animateTransitionTo(View v, float toAlpha) {
+        if (v == null) {
+            return null;
+        }
         return ObjectAnimator.ofFloat(v, "alpha", v.getAlpha(), toAlpha);
     }
 
@@ -92,27 +97,64 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
             mCurrentAnimation.cancel();
         }
         if (animate) {
+            ArrayList<Animator> animList = new ArrayList<Animator>();
+
+            ObjectAnimator leftSideAnim = animateTransitionTo(mLeftSide, newAlpha);
+            if (leftSideAnim != null) {
+                animList.add(leftSideAnim);
+            }
+
+            ObjectAnimator statusIconsAnim = animateTransitionTo(mStatusIcons, newAlpha);
+            if (statusIconsAnim != null) {
+                animList.add(statusIconsAnim);
+            }
+
+            ObjectAnimator signalClusterAnim = animateTransitionTo(mSignalCluster, newAlpha);
+            if (signalClusterAnim != null) {
+                animList.add(signalClusterAnim);
+            }
+
+            ObjectAnimator batteryAnim = animateTransitionTo(mBattery, newAlphaBC);
+            if (batteryAnim != null) {
+                animList.add(batteryAnim);
+            }
+
+            ObjectAnimator batteryCircleAnim = animateTransitionTo(mBatteryCircle, newAlphaBC);
+            if (batteryCircleAnim != null) {
+                animList.add(batteryCircleAnim);
+            }
+
+            ObjectAnimator clockAnim = animateTransitionTo(mClock, newAlphaBC);
+            if (clockAnim != null) {
+                animList.add(clockAnim);
+            }
+
             AnimatorSet anims = new AnimatorSet();
-            anims.playTogether(
-                    animateTransitionTo(mLeftSide, newAlpha),
-                    animateTransitionTo(mStatusIcons, newAlpha),
-                    animateTransitionTo(mSignalCluster, newAlpha),
-                    animateTransitionTo(mBattery, newAlphaBC),
-                    animateTransitionTo(mBatteryCircle, newAlphaBC),
-                    animateTransitionTo(mClock, newAlphaBC)
-                    );
+            anims.playTogether(animList);
             if (mode == MODE_LIGHTS_OUT) {
                 anims.setDuration(LIGHTS_OUT_DURATION);
             }
             anims.start();
             mCurrentAnimation = anims;
         } else {
-            mLeftSide.setAlpha(newAlpha);
-            mStatusIcons.setAlpha(newAlpha);
-            mSignalCluster.setAlpha(newAlpha);
-            mBattery.setAlpha(newAlphaBC);
-            mBatteryCircle.setAlpha(newAlphaBC);
-            mClock.setAlpha(newAlphaBC);
+            if (mLeftSide != null) {
+                mLeftSide.setAlpha(newAlpha);
+            }
+            if (mStatusIcons != null) {
+                mStatusIcons.setAlpha(newAlpha);
+            }
+            if (mSignalCluster != null) {
+                mSignalCluster.setAlpha(newAlpha);
+            }
+            if (mBattery != null) {
+                mBattery.setAlpha(newAlphaBC);
+            }
+            if (mBatteryCircle != null) {
+                mBatteryCircle.setAlpha(newAlphaBC);
+            }
+            if (mClock != null) {
+                mClock.setAlpha(newAlphaBC);
+            }
         }
     }
 

@@ -35,7 +35,9 @@
   <java-symbol type="array" name="notification_light_package_mapping" />
 
   <!--Setting confirmation dialog-->
+  <java-symbol type="style" name="Widget.GifView" />
   <java-symbol type="id" name="setting_confirmation_dialog_visual_hint" />
+  <java-symbol type="id" name="setting_confirmation_dialog_visual_gif" />
   <java-symbol type="layout" name="setting_confirmation_dialog" />
   <java-symbol type="string" name="setting_confirmation_ask_me_later" />
   <java-symbol type="string" name="setting_confirmation_yes" />
@@ -53,4 +55,6 @@
   <java-symbol type="dimen" name="edge_gesture_trigger_distance" />
   <java-symbol type="dimen" name="edge_gesture_perpendicular_distance" />
   <java-symbol type="dimen" name="edge_gesture_trigger_thickness" />
+
+  <java-symbol type="dimen" name="status_bar_recents_card_margin" />
 </resources>

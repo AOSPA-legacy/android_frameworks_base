@@ -2626,6 +2626,12 @@ public final class Settings {
         public static final String QUICK_SETTINGS_TILES = "quick_settings_tiles";
 
         /**
+         * Quick Settings tiles that should be hidden automatically.
+         * @hide
+         */
+        public static final String QUICK_SETTINGS_HIDE_TILES = "quick_settings_hide_tiles";
+
+        /**
          * Setting to show the battery percentage text
          * @hide
          */
@@ -2674,6 +2680,12 @@ public final class Settings {
          * @hide
          */
         public static final String RECENTS_SWITCH = "recents_switch";
+
+        /**
+         * Card stack view for recents
+         * @hide
+         */
+        public static final String STATUS_BAR_RECENTS_CARD_STACK = "status_bar_recents_card_stack";
 
         /**
          * Pie control panel. Meet him on the spot.
@@ -2852,7 +2864,8 @@ public final class Settings {
             SAFE_HEADSET_VOLUME,
             PIE_STATE,
             NAVBAR_RECENTS_CLEAR_ALL,
-            RECENTS_SWITCH
+            RECENTS_SWITCH,
+            STATUS_BAR_RECENTS_CARD_STACK
         };
 
         // Settings moved to Settings.Secure

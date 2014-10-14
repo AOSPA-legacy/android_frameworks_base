@@ -65,4 +65,14 @@
 
     <!-- Wifi mcombo margins (used by Theme Engine) -->
     <dimen name="wifi_combo_margin_end">-6dp</dimen>
+
+    <!-- Height of recents card app color bar -->
+    <dimen name="status_bar_recents_app_color_bar_height">50dp</dimen>
+
+    <dimen name="status_bar_recents_app_color_bar_label_size">16dip</dimen>
+    <dimen name="status_bar_recents_app_color_bar_icon_size">30dp</dimen>
+    <dimen name="status_bar_recents_app_color_bar_icon_margin">13dp</dimen>
+    <dimen name="status_bar_recents_app_color_bar_button_sep">9dp</dimen>
+    <dimen name="status_bar_recents_app_color_bar_button_margin">18dp</dimen>
+    <dimen name="status_bar_recents_app_color_bar_button_size">14dp</dimen>
 </resources>
