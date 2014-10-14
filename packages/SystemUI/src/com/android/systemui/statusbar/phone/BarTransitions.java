@@ -210,10 +210,19 @@ public class BarTransitions {
                 @Override
                 public void run() {
                     if (animation.equals(mColorAnimator)) {
-                        mColorAnimator = null;
+                        mColorAnimator = null; // abandon the bugger
+                        setCurrentColor(getTargetColor()); // force the good value
                     } else if (animation.equals(mGradientAlphaAnimator)) {
-                        mGradientAlphaAnimator = null;
+                        mGradientAlphaAnimator = null; // abandon the bugger
+                        setCurrentGradientAlpha(getTargetGradientAlpha()); // force the good value
+                    } else {
+                        // some poor zombie animation stopped
+                        return;
                     }
+
+                    // ensure the good value is shown to the user
+                    mHandler.removeCallbacks(mInvalidateSelf);
+                    mHandler.post(mInvalidateSelf);
                 }
 
             });
