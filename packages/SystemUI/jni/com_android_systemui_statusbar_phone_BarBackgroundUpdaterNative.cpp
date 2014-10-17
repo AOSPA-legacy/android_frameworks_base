@@ -135,8 +135,10 @@ JNIEXPORT void JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUp
         (JNIEnv * je, jclass jc, jint rotation, jint width, jint height)
 {
     screenRotation = rotation;
-    requestedShotWidth = width * SHOT_SCALE;
-    requestedShotHeight = height * SHOT_SCALE;
+
+    bool isNatural = rotation != ROTATION_90 && rotation != ROTATION_270;
+    requestedShotWidth = (isNatural ? width : height) * SHOT_SCALE;
+    requestedShotHeight = (isNatural ? height : width) * SHOT_SCALE;
 }
 
 JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgroundUpdaterNative_getColors
@@ -154,15 +156,6 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
         return arr;
     }
 
-    bool previouslyLandscape = screenRotation == ROTATION_90 || screenRotation == ROTATION_270;
-    bool currentlyLandscape = rotation == ROTATION_90 || rotation == ROTATION_270;
-    if (previouslyLandscape != currentlyLandscape)
-    {
-        // we have switched from portrait to landscape or vice versa...
-        uint32_t oldWidth = requestedShotWidth;
-        requestedShotWidth = requestedShotHeight;
-        requestedShotHeight = oldWidth;
-    }
     screenRotation = rotation;
 
     if (screenshot.update(display, requestedShotWidth, requestedShotHeight, 0, -1UL) != NO_ERROR)
