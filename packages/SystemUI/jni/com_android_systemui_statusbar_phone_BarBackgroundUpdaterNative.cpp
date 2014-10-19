@@ -19,7 +19,7 @@
 #define LOG_TAG "BarBackgroundUpdaterNative"
 #define DEBUG_FLOOD false
 
-#define SHOT_SCALE .5f
+#define SHOT_SCALE 1
 #define ROTATION_0 0
 #define ROTATION_90 1
 #define ROTATION_180 2
@@ -158,7 +158,7 @@ JNIEXPORT jintArray JNICALL Java_com_android_systemui_statusbar_phone_BarBackgro
 
     screenRotation = rotation;
 
-    if (screenshot.update(display, requestedShotWidth, requestedShotHeight, 0, -1UL) != NO_ERROR)
+    if (screenshot.update(display, SHOT_SCALE == 1 ? 0 : requestedShotWidth, SHOT_SCALE == 1 ? 0 : requestedShotHeight, 0, -1UL) != NO_ERROR)
     {
         jintArray arr = je->NewIntArray(4);
         je->SetIntArrayRegion(arr, 0, 4, response);
