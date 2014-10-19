@@ -2749,6 +2749,16 @@ public final class Settings {
                 "dynamic_status_bar_filter_state";
 
         /**
+         * The frequency of dynamic status bar updates
+         * less than 0 = update once each -N seconds
+         * 0 = update once each second
+         * more than 0 = update N times each second
+         * default value: 2
+         * @hide
+         */
+        public static final String EXPERIMENTAL_DSB_FREQUENCY = "experimental_dsb_frequency";
+
+        /**
          * Whether incomming call UI stays in background
          *
          * @hide

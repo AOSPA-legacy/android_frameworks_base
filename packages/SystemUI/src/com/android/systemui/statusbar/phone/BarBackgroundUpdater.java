@@ -51,7 +51,7 @@ public class BarBackgroundUpdater {
     private final static boolean DEBUG_EXCESSIVE_DELAY = DEBUG_ALL || false;
     private final static boolean DEBUG_FLOOD_ALL_DELAY = DEBUG_ALL || false;
 
-    private final static long MIN_DELAY = 450; // enforce at least 450ms between shots (~2 fps)
+    private static long sMinDelay = 450; // time to enforce between the screenshots
 
     private static boolean PAUSED = true;
 
@@ -215,9 +215,9 @@ public class BarBackgroundUpdater {
                 }
 
                 final long delta = System.currentTimeMillis() - now;
-                final long delay = Math.max(MIN_DELAY, delta * 2);
+                final long delay = Math.max(sMinDelay, delta * 2);
 
-                if (DEBUG_FLOOD_ALL_DELAY || (DEBUG_EXCESSIVE_DELAY && delay > MIN_DELAY)) {
+                if (DEBUG_FLOOD_ALL_DELAY || (DEBUG_EXCESSIVE_DELAY && delay > sMinDelay)) {
                     Log.d(LOG_TAG, "delta=" + Long.toString(delta) + "ms " +
                             "delay=" + Long.toString(delay) + "ms");
                 }
@@ -318,6 +318,9 @@ public class BarBackgroundUpdater {
         mContext.getContentResolver().registerContentObserver(
                 Settings.System.getUriFor(Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE),
                 false, mObserver, UserHandle.USER_ALL);
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.EXPERIMENTAL_DSB_FREQUENCY),
+                false, mObserver, UserHandle.USER_ALL);
 
         mStatusEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.DYNAMIC_STATUS_BAR_STATE, 0, UserHandle.USER_CURRENT) == 1;
@@ -325,6 +328,19 @@ public class BarBackgroundUpdater {
                 Settings.System.DYNAMIC_NAVIGATION_BAR_STATE, 0, UserHandle.USER_CURRENT) == 1;
         mStatusFilterEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0, UserHandle.USER_CURRENT) == 1;
+
+        final int freq = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.EXPERIMENTAL_DSB_FREQUENCY, 2, UserHandle.USER_CURRENT);
+        if (freq == 0) {
+            // approx 1 fps
+            sMinDelay = 950;
+        } else if (freq < 0) {
+            // approx (-freq)^-1 fps
+            sMinDelay = Math.abs(1000 * (-freq) - 50);
+        } else {
+            // approx freq fps
+            sMinDelay = Math.max(0, Math.round(1000 / freq) - 50);
+        }
 
         final Display d = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
@@ -545,6 +561,19 @@ public class BarBackgroundUpdater {
             mStatusFilterEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                     Settings.System.DYNAMIC_STATUS_BAR_FILTER_STATE, 0,
                     UserHandle.USER_CURRENT) == 1;
+
+            final int freq = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.EXPERIMENTAL_DSB_FREQUENCY, 2, UserHandle.USER_CURRENT);
+            if (freq == 0) {
+                // approx 1 fps
+                sMinDelay = 950;
+            } else if (freq < 0) {
+                // approx (-freq)^-1 fps
+                sMinDelay = Math.abs(1000 * (-freq) - 50);
+            } else {
+                // approx freq fps
+                sMinDelay = Math.max(0, Math.round(1000 / freq) - 50);
+            }
         }
     }
 
