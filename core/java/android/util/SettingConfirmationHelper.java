@@ -58,13 +58,11 @@ public class SettingConfirmationHelper {
      */
     public static void showConfirmationDialogForSetting(final Context context, String title, String msg, Drawable hint,
                                                         final String setting, final OnSelectListener mListener) {
-        Context mUiContext = ThemeUtils.createUiContext(context); // avoid package mismatch
-
-        // use system context to read
+        // Never read to system with a themed context
         int mCurrentStatus = Settings.System.getInt(context.getContentResolver(), setting, NOT_SET);
         if (mCurrentStatus == ENABLED || mCurrentStatus == DISABLED) return;
 
-        LayoutInflater layoutInflater = LayoutInflater.from(mUiContext);
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
         View dialogLayout = layoutInflater.inflate(R.layout.setting_confirmation_dialog, null);
         final ImageView visualHint = (ImageView)
                 dialogLayout.findViewById(R.id.setting_confirmation_dialog_visual_hint);
@@ -80,14 +78,11 @@ public class SettingConfirmationHelper {
      */
     public static void showConfirmationDialogForSetting(final Context context, String title, String msg, InputStream gif,
                                                         final String setting, final OnSelectListener mListener) {
-
-        Context mUiContext = ThemeUtils.createUiContext(context); // avoid package mismatch
-
-        // use system context to read
+        // Never read to system with a themed context
         int mCurrentStatus = Settings.System.getInt(context.getContentResolver(), setting, NOT_SET);
         if (mCurrentStatus == ENABLED || mCurrentStatus == DISABLED) return;
 
-        LayoutInflater layoutInflater = LayoutInflater.from(mUiContext);
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
         View dialogLayout = layoutInflater.inflate(R.layout.setting_confirmation_dialog, null);
         final GifView gifView = (GifView)
                 dialogLayout.findViewById(R.id.setting_confirmation_dialog_visual_gif);
@@ -108,7 +103,7 @@ public class SettingConfirmationHelper {
                                                         final String setting, final OnSelectListener mListener) {
 
         final int mCurrentUserId = ActivityManager.getCurrentUser();
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(createUiContext(context)); // Build dialog within a themed context
 
         builder.setView(view, 10, 10, 10, 20);
         builder.setTitle(title);
@@ -116,7 +111,7 @@ public class SettingConfirmationHelper {
         builder.setPositiveButton(R.string.setting_confirmation_yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putIntForUser(/*use system context to write*/context
+                        Settings.System.putIntForUser(context // Never write to system with a themed context
                                 .getContentResolver(), setting, ENABLED, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(true);
@@ -126,7 +121,7 @@ public class SettingConfirmationHelper {
         builder.setNeutralButton(R.string.setting_confirmation_ask_me_later,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putIntForUser(/*use system context to write*/context
+                        Settings.System.putIntForUser(context // Never write to system with a themed context
                                 .getContentResolver(), setting, ASK_LATER, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(false);
@@ -136,7 +131,7 @@ public class SettingConfirmationHelper {
         builder.setNegativeButton(R.string.setting_confirmation_no,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Settings.System.putIntForUser(/*use system context to write*/context
+                        Settings.System.putIntForUser(context // Never write to system with a themed context
                                 .getContentResolver(), setting, DISABLED, mCurrentUserId);
                         if (mListener == null) return;
                         mListener.onSelect(false);
@@ -146,5 +141,10 @@ public class SettingConfirmationHelper {
         builder.setCancelable(false);
 
         return builder.create();
+    }
+
+    private static final Context createUiContext(Context context) {
+        Context mUiContext = ThemeUtils.createUiContext(context);
+        return mUiContext;
     }
 }
