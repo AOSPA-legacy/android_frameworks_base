@@ -16,6 +16,10 @@
 
 package com.android.systemui;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.database.ContentObserver;
@@ -41,6 +45,8 @@ import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
+
 public class BatteryMeterView extends View implements DemoMode {
     public static final String TAG = BatteryMeterView.class.getSimpleName();
     public static final String ACTION_LEVEL_TEST = "com.android.systemui.BATTERY_LEVEL_TEST";
@@ -55,6 +61,9 @@ public class BatteryMeterView extends View implements DemoMode {
     public static final float SUBPIXEL = 0.4f;  // inset rects for softer edges
 
     int[] mColors;
+
+    private boolean mQS = false;
+    private int mOverrideIconColor = 0;
 
     boolean mShowPercent = true;
     Paint mFramePaint, mBatteryPaint, mWarningTextPaint, mTextPaint, mBoltPaint;
@@ -72,6 +81,8 @@ public class BatteryMeterView extends View implements DemoMode {
     private final RectF mButtonFrame = new RectF();
     private final RectF mClipFrame = new RectF();
     private final RectF mBoltFrame = new RectF();
+
+    private final int mDSBDuration;
 
     private class BatteryTracker extends BroadcastReceiver {
         public static final int UNKNOWN_LEVEL = -1;
@@ -211,9 +222,39 @@ public class BatteryMeterView extends View implements DemoMode {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         updateSettings(false);
+
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public Animator onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                // TODO animate this bugger
+                mOverrideIconColor = iconColor;
+                postInvalidate();
+                return null;
+            }
+
+        });
     }
 
+    protected ObjectAnimator buildAnimator(final Paint painter, final int toColor)  {
+        final ObjectAnimator colorFader = ObjectAnimator.ofObject(painter, "backgroundColor",
+                new ArgbEvaluator(), painter.getColor(), toColor);
+        colorFader.setDuration(mDSBDuration);
+        colorFader.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                invalidate();
+            }
+        });
+        return colorFader;
+    }
+
+
     public void setColors(boolean qs) {
+        mQS = qs;
+
         Resources res = getResources();
         TypedArray levels = res.obtainTypedArray(R.array.batterymeter_color_levels);
         TypedArray colors = res.obtainTypedArray(qs ? R.array.qs_batterymeter_color_values :
@@ -263,16 +304,24 @@ public class BatteryMeterView extends View implements DemoMode {
     }
 
     private int getColorForLevel(int percent) {
+        final boolean doOverride = mOverrideIconColor != 0 && !mQS;
+
         int thresh, color = 0;
         for (int i=0; i<mColors.length; i+=2) {
             thresh = mColors[i];
             color = mColors[i+1];
-            if (percent <= thresh) return color;
+            if (percent <= thresh) {
+                // just override the last level (full battery level)
+                return (doOverride && i == mColors.length - 2) ? mOverrideIconColor : color;
+            }
         }
-        return color;
+
+        return doOverride ? mOverrideIconColor : color;
     }
 
     public void updateSettings(final boolean qs) {
+        mQS = qs;
+
         int batteryStyle = Settings.System.getIntForUser(getContext().getContentResolver(),
                                 Settings.System.STATUS_BAR_BATTERY_STYLE, 0,
                                 ActivityManager.getCurrentUser());
@@ -324,7 +373,9 @@ public class BatteryMeterView extends View implements DemoMode {
         c.drawRect(mFrame, mFramePaint);
 
         // fill 'er up
-        final int color = tracker.plugged ? mChargeColor : getColorForLevel(level);
+        final boolean doOverride = mOverrideIconColor != 0 && !mQS;
+        final int color = tracker.plugged ? (doOverride ? mOverrideIconColor : mChargeColor) :
+            getColorForLevel(level);
         mBatteryPaint.setColor(color);
 
         if (level >= FULL) {
@@ -376,6 +427,8 @@ public class BatteryMeterView extends View implements DemoMode {
                             : (tracker.level == 100 ? 0.38f : 0.5f)));
             mTextHeight = -mTextPaint.getFontMetrics().ascent;
 
+            mTextPaint.setColor(doOverride ? mOverrideIconColor : 0xFF000000);
+
             final String str = String.valueOf(SINGLE_DIGIT_PERCENT ? (level/10) : level);
             final float x = mWidth * 0.5f;
             final float y = (mHeight + mTextHeight) * 0.47f;
@@ -410,4 +463,5 @@ public class BatteryMeterView extends View implements DemoMode {
            postInvalidate();
         }
     }
+
 }
