@@ -97,7 +97,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private boolean mFitThumbnailToXY;
     private int mRecentItemLayoutId;
     private boolean mHighEndGfx;
-    private ImageView mClearRecents;
 
     private RecentsActivity mRecentsActivity;
     private INotificationManager mNotificationManager;
@@ -359,9 +358,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             // TODO: Reimplement when hybrid is back!
             /* int navBarPercent = Integer.parseInt(ExtendedPropertiesUtils.getProperty("com.android.systemui.navbar.dpi",
                     "100"));
-            mClearRecents.setVisibility(navBarPercent == 0 && getTasks() > 0 ? View.VISIBLE : View.GONE);*/
-            // mClearRecents is the top right view not the nabar one, so show it when navbar is not showing and/or pie is disabled.
-            mClearRecents.setVisibility(showAlternativeRecentsClearAll() && getTasks() > 0 ? View.VISIBLE : View.GONE);
             onAnimationEnd(null);
             setFocusable(true);
             setFocusableInTouchMode(true);
@@ -479,16 +475,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
 
         mRecentsScrim = findViewById(R.id.recents_bg_protect);
         mRecentsNoApps = findViewById(R.id.recents_no_apps);
-
-        mClearRecents = (ImageView) findViewById(R.id.recents_clear);
-        if (mClearRecents != null){
-            mClearRecents.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mRecentsContainer.swipeAllViewsInLayout();
-                }
-            });
-        }
 
         if (mRecentsScrim != null) {
             mHighEndGfx = ActivityManager.isHighEndGfx();
