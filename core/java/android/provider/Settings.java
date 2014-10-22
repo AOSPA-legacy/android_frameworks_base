@@ -2422,6 +2422,12 @@ public final class Settings {
         public static final String INCREASING_RING_MIN_VOLUME = "increasing_ring_min_volume";
 
         /**
+         * Whether the proximity sensor will adjust call to speaker
+         * @hide
+         */
+        public static final String PROXIMITY_AUTO_SPEAKER = "proximity_auto_speaker";
+
+        /**
          * Whether the audible DTMF tones are played by the dialer when dialing. The value is
          * boolean (1 or 0).
          */
