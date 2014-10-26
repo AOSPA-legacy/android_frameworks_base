@@ -116,7 +116,8 @@ public class MSimNetworkController extends NetworkController {
     public MSimNetworkController(Context context) {
         super(context);
 
-        int numPhones = MSimTelephonyManager.getDefault().getPhoneCount();
+        MSimTelephonyManager tm = MSimTelephonyManager.getDefault();
+        int numPhones = tm.getPhoneCount();
         mMSimSignalStrength = new SignalStrength[numPhones];
         mMSimDataServiceState = new int[numPhones];
         mMSimServiceState = new ServiceState[numPhones];
@@ -150,7 +151,7 @@ public class MSimNetworkController extends NetworkController {
         for (int i=0; i < numPhones; i++) {
             mMSimSignalStrength[i] = new SignalStrength();
             mMSimServiceState[i] = new ServiceState();
-            mMSimState[i] = IccCardConstants.State.READY;
+            mMSimState[i] = simStateToIccState(tm.getSimState(i));
             // phone_signal
             mMSimPhoneSignalIconId[i] = R.drawable.stat_sys_signal_null;
             mMSimLastPhoneSignalIconId[i] = -1;
@@ -166,7 +167,7 @@ public class MSimNetworkController extends NetworkController {
             mMSimDataServiceState[i] = ServiceState.STATE_OUT_OF_SERVICE;
         }
 
-        mDefaultSubscription = MSimTelephonyManager.getDefault().getDefaultSubscription();
+        mDefaultSubscription = tm.getDefaultSubscription();
         mDataConnected = mMSimDataConnected[mDefaultSubscription];
         mSimState = mMSimState[mDefaultSubscription];
         mDataActivity = mMSimDataActivity[mDefaultSubscription];
@@ -264,6 +265,7 @@ public class MSimNetworkController extends NetworkController {
         } else if (action.equals(TelephonyIntents.ACTION_SIM_STATE_CHANGED)) {
             updateSimState(intent);
             for (int sub = 0; sub < MSimTelephonyManager.getDefault().getPhoneCount(); sub++) {
+                updateSimIcon(sub);
                 updateDataIcon(sub);
                 refreshViews(sub);
             }
@@ -505,6 +507,24 @@ public class MSimNetworkController extends NetworkController {
         }
         updateSimIcon(sub);
         updateDataIcon(sub);
+    }
+
+    private IccCardConstants.State simStateToIccState(int state) {
+        switch(state) {
+        case TelephonyManager.SIM_STATE_ABSENT:
+            return IccCardConstants.State.ABSENT;
+        case TelephonyManager.SIM_STATE_READY:
+            return IccCardConstants.State.READY;
+        case TelephonyManager.SIM_STATE_PIN_REQUIRED:
+            return IccCardConstants.State.PIN_REQUIRED;
+        case TelephonyManager.SIM_STATE_PUK_REQUIRED:
+            return IccCardConstants.State.PUK_REQUIRED;
+        case TelephonyManager.SIM_STATE_CARD_IO_ERROR:
+        case TelephonyManager.SIM_STATE_NETWORK_LOCKED:
+        case TelephonyManager.SIM_STATE_UNKNOWN:
+        default:
+            return IccCardConstants.State.UNKNOWN;
+        }
     }
 
     private boolean isCdma(int subscription) {
